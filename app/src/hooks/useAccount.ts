@@ -2,18 +2,19 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { QueryConfig } from "../types/query";
 
-const queryFn = () => window.unisat.getAccounts();
+const queryFn = async () => window.unisat.getAccounts();
 
 type UseAccountProps = QueryConfig<string, Error, string>;
 
 const useAccount = (props: UseAccountProps = {}) => {
-  const query = useQuery(["account"], queryFn, props);
+  const query = useQuery(["account"], queryFn, {
+    ...props,
+    onSuccess: ([data]) => {
+      previousAccountRef.current = data;
+    },
+  });
 
   const previousAccountRef = useRef<string>();
-
-  useEffect(() => {
-    previousAccountRef.current = query.data;
-  }, [query.data]);
 
   useEffect(() => {
     window.unisat.on("accountsChanged", () => query.refetch());
@@ -26,6 +27,7 @@ const useAccount = (props: UseAccountProps = {}) => {
 
   return {
     ...query,
+    data: previousAccountRef.current,
   };
 };
 

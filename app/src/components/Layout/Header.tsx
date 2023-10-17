@@ -1,13 +1,18 @@
-import { CTA } from "@interlay/ui";
-import { useConnect } from "../../hooks/useConnect";
-import { CTAWrapper, StyledHeader } from "./Layout.styles";
+import { CTA, Flex } from "@interlay/ui";
 import { useAccount } from "../../hooks/useAccount";
+import { useConnect } from "../../hooks/useConnect";
+import { StyledHeader } from "./Layout.styles";
+
+function shortAddress(address?: string, len = 5) {
+  if (!address) return "";
+  if (address.length <= len * 2) return address;
+  return address.slice(0, len) + "..." + address.slice(address.length - len);
+}
 
 const Header = () => {
   const { connect, isLoading } = useConnect();
   const { data: address } = useAccount();
 
-  console.log(address);
   const handleConnectWallet = () => connect();
 
   return (
@@ -23,11 +28,20 @@ const Header = () => {
           alt="logo"
         />
       </a>
-      <CTAWrapper>
+      <Flex>
+        {/* <Card
+          rounded="lg"
+          variant="bordered"
+          shadowed={false}
+          padding="spacing3"
+          alignItems="center"
+        >
+          <BTC />
+        </Card> */}
         <CTA disabled={isLoading} size="small" onPress={handleConnectWallet}>
-          Connect Wallet
+          {address ? shortAddress(address) : "Connect Wallet"}
         </CTA>
-      </CTAWrapper>
+      </Flex>
     </StyledHeader>
   );
 };

@@ -3,9 +3,7 @@ type AccountsChangedEvent = (
   handler: (accounts: Array<string>) => void
 ) => void;
 
-type Inscriptions = {
-  total: number;
-  list: Record<string, unknown>[];
+type Inscription = {
   inscriptionId: string;
   inscriptionNumber: string;
   address: string;
@@ -13,12 +11,14 @@ type Inscriptions = {
   content: string;
   contentLength: string;
   contentType: number;
-  preview: number;
+  preview: string;
   timestamp: number;
   offset: number;
   genesisTransaction: string;
   location: string;
 };
+
+type getInscriptionsResult = { total: number; list: Inscription[] };
 
 type SendInscriptionsResult = { txid: string };
 
@@ -27,12 +27,16 @@ type Unisat = {
   getAccounts: () => Promise<string>;
   on: AccountsChangedEvent;
   removeListener: AccountsChangedEvent;
-  getInscriptions: (cursor: number, size: number) => Promise<Inscriptions>;
+  getInscriptions: (
+    cursor: number,
+    size: number
+  ) => Promise<getInscriptionsResult>;
   sendInscription: (
     address: string,
     inscriptionId: string,
     options?: { feeRate: number }
   ) => Promise<SendInscriptionsResult>;
+  switchNetwork: (network: "livenet" | "testnet") => Promise<void>;
 };
 
 declare global {
@@ -41,4 +45,9 @@ declare global {
   }
 }
 
-export type { Inscriptions, SendInscriptionsResult, Unisat };
+export type {
+  Inscription,
+  SendInscriptionsResult,
+  Unisat,
+  getInscriptionsResult,
+};
