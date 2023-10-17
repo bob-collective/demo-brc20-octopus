@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@interlay/system": "^0.0.1",
+    "@interlay/theme": "^0.0.6",
+    "@interlay/ui": "^0.0.7",
     "@react-aria/utils": "^3.21.0",
     "@tanstack/react-query": "^4.36.1",
     "react": "^18.2.0",
