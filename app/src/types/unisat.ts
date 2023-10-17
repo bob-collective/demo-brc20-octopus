@@ -35,4 +35,10 @@ type Unisat = {
   ) => Promise<SendInscriptionsResult>;
 };
 
-export type { Unisat };
+declare global {
+  interface Window {
+    unisat: Unisat;
+  }
+}
+
+export type { Inscriptions, SendInscriptionsResult, Unisat };
