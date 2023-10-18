@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@interlay/coin-icons": "^0.0.7",
+    "@interlay/icons": "^0.0.6",
     "@interlay/system": "^0.0.1",
     "@interlay/theme": "^0.0.6",
     "@interlay/ui": "^0.0.7",

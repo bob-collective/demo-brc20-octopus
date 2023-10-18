@@ -38,9 +38,9 @@ const queryFn = async () => {
   }, {});
 };
 
-type UseErc20BalancesProps = QueryConfig<Balance, Error, Balance>;
+type UseBrc20BalancesProps = QueryConfig<Balance, Error, Balance>;
 
-const useErc20Balances = (props: UseErc20BalancesProps = {}) => {
+const useBrc20Balances = (props: UseBrc20BalancesProps = {}) => {
   const account = useAccount();
 
   const query = useQuery(["balances", account.data], queryFn, {
@@ -60,5 +60,5 @@ const useErc20Balances = (props: UseErc20BalancesProps = {}) => {
   };
 };
 
-export { useErc20Balances };
-export type { UseErc20BalancesProps };
+export { useBrc20Balances };
+export type { UseBrc20BalancesProps };
