@@ -1,4 +1,5 @@
 import { CTA, Flex } from "@interlay/ui";
+import { useState } from "react";
 import { useAccount } from "../../hooks/useAccount";
 import { useConnect } from "../../hooks/useConnect";
 import { StyledHeader } from "./Layout.styles";
@@ -9,10 +10,10 @@ function shortAddress(address?: string, len = 5) {
   return address.slice(0, len) + "..." + address.slice(address.length - len);
 }
 
-const Header = () => {
+const Header = ({ onClickAccount }) => {
   const { connect, isLoading } = useConnect();
   const { data: address } = useAccount();
-
+  const [isOpen, setOpen] = useState(false);
   const handleConnectWallet = () => connect();
 
   return (
@@ -40,6 +41,10 @@ const Header = () => {
         </Card> */}
         <CTA disabled={isLoading} size="small" onPress={handleConnectWallet}>
           {address ? shortAddress(address) : "Connect Wallet"}
+        </CTA>
+
+        <CTA disabled={isLoading} size="small" onPress={onClickAccount}>
+          Toggle
         </CTA>
       </Flex>
     </StyledHeader>
