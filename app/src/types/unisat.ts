@@ -10,7 +10,7 @@ type Inscription = {
   outputValue: string;
   content: string;
   contentLength: string;
-  contentType: number;
+  contentType: string;
   preview: string;
   timestamp: number;
   offset: number;

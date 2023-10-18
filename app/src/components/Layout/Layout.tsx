@@ -9,6 +9,7 @@ import {
   Flex,
   H2,
   H3,
+  P,
   Span,
   Tabs,
   TabsItem,
@@ -25,8 +26,10 @@ import {
   StyledClose,
   StyledDrawer,
   StyledMain,
+  StyledNFT,
   StyledRelative,
 } from "./Layout.styles";
+import { useGetNfts } from "../../hooks/useGetNfts";
 
 function shortAddress(address?: string, len = 5) {
   if (!address) return "";
@@ -42,8 +45,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
   const { data: balance } = useBalance();
   const { data: brc20Balances } = useBrc20Balances();
   const { data: address } = useAccount();
-
-  console.log(brc20Balances);
+  const { data: nfts } = useGetNfts();
 
   return (
     <>
@@ -86,40 +88,74 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                 <BTC />
                 <H2 size="xl">{balance?.total || 0} sats</H2>
               </Flex>
-              <Tabs>
+              <Tabs fullWidth>
                 <TabsItem key="tokens" title="BRC-20">
                   <StyledBRC20List gap="spacing4">
-                    {Object.entries(brc20Balances || {}).map(
-                      ([ticker, amount]) => (
+                    {Object.entries(brc20Balances || {}).length > 0 ? (
+                      Object.entries(brc20Balances || {}).map(
+                        ([ticker, amount]) => (
+                          <Card
+                            padding="spacing3"
+                            flex="0"
+                            variant="bordered"
+                            background="secondary"
+                            gap="spacing2"
+                            key={ticker}
+                          >
+                            <H3 size="lg">{ticker}</H3>
+                            <Dl direction="column" gap="spacing0">
+                              <DlGroup justifyContent="space-between">
+                                <Dt size="s">Transferable:</Dt>
+                                <Dd size="s">{0}</Dd>
+                              </DlGroup>
+                              <DlGroup justifyContent="space-between">
+                                <Dt size="s">Availabel:</Dt>
+                                <Dd size="s">{amount}</Dd>
+                              </DlGroup>
+                              <DlGroup justifyContent="space-between">
+                                <Dt size="s">Total:</Dt>
+                                <Dd size="s">{amount}</Dd>
+                              </DlGroup>
+                            </Dl>
+                          </Card>
+                        )
+                      )
+                    ) : (
+                      <Flex justifyContent="center" flex={1}>
+                        <P>No Coins</P>
+                      </Flex>
+                    )}
+                  </StyledBRC20List>
+                </TabsItem>
+                <TabsItem key="nfts" title="NFT">
+                  <StyledBRC20List gap="spacing4">
+                    {nfts && nfts?.length !== 0 ? (
+                      nfts.map((nft) => (
                         <Card
-                          padding="spacing3"
-                          flex={1}
+                          background="secondary"
+                          padding="spacing0"
                           variant="bordered"
                           gap="spacing2"
-                          key={ticker}
+                          key={nft.inscriptionId}
                         >
-                          <H3 size="lg">{ticker}</H3>
-                          <Dl direction="column" gap="spacing0">
-                            <DlGroup justifyContent="space-between">
-                              <Dt size="s">Transferable:</Dt>
-                              <Dd size="s">{0}</Dd>
-                            </DlGroup>
-                            <DlGroup justifyContent="space-between">
-                              <Dt size="s">Availabel:</Dt>
-                              <Dd size="s">{amount}</Dd>
-                            </DlGroup>
-                            <DlGroup justifyContent="space-between">
-                              <Dt size="s">Total:</Dt>
-                              <Dd size="s">{amount}</Dd>
-                            </DlGroup>
-                          </Dl>
+                          <StyledNFT
+                            height={150}
+                            width={150}
+                            src={`https://testnet.ordinals.com/content/${nft.inscriptionId}`}
+                          />
                         </Card>
-                      )
+                      ))
+                    ) : (
+                      <Flex justifyContent="center" flex={1}>
+                        <P>No Assets</P>
+                      </Flex>
                     )}
                   </StyledBRC20List>
                 </TabsItem>
                 <TabsItem key="activity" title="Activity">
-                  <Span>No Activity</Span>
+                  <StyledBRC20List justifyContent="center" gap="spacing4">
+                    <Span>No Activity</Span>
+                  </StyledBRC20List>
                 </TabsItem>
               </Tabs>
             </Flex>

@@ -21,6 +21,7 @@
     "react-dom": "^18.2.0",
     "react-modern-drawer": "^1.2.2",
     "react-pro-sidebar": "1.1.0-alpha.1",
+    "react-router-dom": "^6.17.0",
     "styled-components": "^6.1.0"
   },
   "devDependencies": {

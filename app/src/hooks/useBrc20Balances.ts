@@ -6,17 +6,21 @@ import { useAccount } from "./useAccount";
 type Balance = Record<string, number>;
 
 const queryFn = async () => {
-  const a = await window.unisat.getInscriptions(0, 20);
+  const inscriptions = await window.unisat.getInscriptions(0, 100);
 
-  const content = await Promise.all(
-    a.list.map((item) =>
+  const brc20Inscriptions = inscriptions.list.filter(
+    (inscription) => inscription.contentType !== "image/png"
+  );
+
+  const brc20Objs = await Promise.all(
+    brc20Inscriptions.map((item) =>
       fetch(`https://testnet.ordinals.com/content/${item.inscriptionId}`).then(
         (res) => res.json()
       )
     )
   );
 
-  return content.reduce((acc, val) => {
+  return brc20Objs.reduce((acc, val) => {
     if (val.p !== "brc-20") return;
 
     const { tick, amt } = val;
