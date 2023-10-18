@@ -1,0 +1,17 @@
+{
+  "name": "sdk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.8.7",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "bitcoinjs-lib": "^6.1.5",
+    "ecpair": "^2.1.0",
+    "minimalistic-assert": "^1.0.1",
+    "tiny-secp256k1": "^2.2.3"
+  }
+}
