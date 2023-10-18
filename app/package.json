@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@interlay/coin-icons": "^0.0.7",
+    "@interlay/icons": "^0.0.6",
     "@interlay/system": "^0.0.1",
     "@interlay/theme": "^0.0.6",
     "@interlay/ui": "^0.0.7",
@@ -18,6 +19,8 @@
     "@tanstack/react-query": "^4.36.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-modern-drawer": "^1.2.2",
+    "react-pro-sidebar": "1.1.0-alpha.1",
     "styled-components": "^6.1.0"
   },
   "devDependencies": {
