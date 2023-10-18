@@ -1,7 +1,7 @@
 import { theme } from "@interlay/theme";
 import { Flex } from "@interlay/ui";
-import styled from "styled-components";
 import Drawer from "react-modern-drawer";
+import styled from "styled-components";
 
 const StyledHeader = styled(Flex)`
   padding: 0 ${theme.spacing.spacing4};
@@ -45,20 +45,24 @@ const StyledRelative = styled.div`
 
 const StyledClose = styled.div`
   position: absolute;
-  left: -28px;
+  left: -46px;
+  width: 38px;
   top: 0;
   bottom: 0;
   height: 100%;
   transition: background-color 250ms ease 0s, margin 250ms ease 0s;
   cursor: pointer;
   display: flex;
-  align-items: center;
   justify-content: center;
   border-radius: ${theme.rounded.lg} !important;
 
   &:hover {
     background-color: rgba(152, 161, 192, 0.08);
     opacity: 0.6;
+  }
+
+  svg {
+    margin-top: ${theme.spacing.spacing2};
   }
 `;
 
@@ -71,13 +75,21 @@ const StyledLogo = styled.a`
   align-items: center;
 `;
 
+const StyledNFT = styled.img`
+  -ms-interpolation-mode: nearest-neighbor;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: pixelated;
+`;
+
 export {
-  StyledLogo,
-  StyledHeader,
-  StyledBRC20List,
-  StyledRelative,
-  StyledMain,
   CTAWrapper,
-  StyledDrawer,
+  StyledBRC20List,
   StyledClose,
+  StyledDrawer,
+  StyledHeader,
+  StyledLogo,
+  StyledMain,
+  StyledNFT,
+  StyledRelative,
 };
