@@ -12,7 +12,7 @@ function Home() {
   ];
 
   const rows =
-    list?.map((item, idx) => ({
+    list?.detail.map((item, idx) => ({
       id: item.ticker,
       index: idx,
       coin: item.ticker,

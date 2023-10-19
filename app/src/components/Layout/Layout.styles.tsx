@@ -41,6 +41,7 @@ const StyledRelative = styled.div`
   position: relative;
   height: 100%;
   padding: ${theme.spacing.spacing4};
+  /* overflow: hidden; */
 `;
 
 const StyledClose = styled.div`
@@ -82,6 +83,10 @@ const StyledNFT = styled.img`
   image-rendering: pixelated;
 `;
 
+const StyledIFrameWrapper = styled(Flex)`
+  position: relative;
+`;
+
 export {
   CTAWrapper,
   StyledBRC20List,
@@ -92,4 +97,5 @@ export {
   StyledMain,
   StyledNFT,
   StyledRelative,
+  StyledIFrameWrapper,
 };

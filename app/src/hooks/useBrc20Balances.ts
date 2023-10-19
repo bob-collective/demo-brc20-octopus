@@ -14,13 +14,13 @@ const queryFn = async () => {
 
   const brc20Objs = await Promise.all(
     brc20Inscriptions.map((item) =>
-      fetch(`https://testnet.ordinals.com/content/${item.inscriptionId}`).then(
-        (res) => res.json()
-      )
+      fetch(`https://testnet.ordinals.com/content/${item.inscriptionId}`)
+        .then((res) => res.json())
+        .catch(() => undefined)
     )
   );
 
-  return brc20Objs.reduce((acc, val) => {
+  return brc20Objs.filter(Boolean).reduce((acc, val) => {
     if (val.p !== "brc-20") return;
 
     const { tick, amt } = val;

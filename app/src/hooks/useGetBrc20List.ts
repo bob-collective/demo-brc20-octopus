@@ -1,15 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
-import list from "../constants/brc20-list";
+import api from "../api/api";
+import { BRC20List } from "../api/types";
 import { QueryConfig } from "../types/query";
 
-const queryFn = () => list.data.detail;
+const queryFn = async (): Promise<BRC20List> => {
+  const res = await api.unisat.getBrc20List();
 
-type UseGetBrc20ListProps = QueryConfig<
-  ReturnType<typeof queryFn>,
-  Error,
-  ReturnType<typeof queryFn>
->;
+  return res.data.data;
+};
+type UseGetBrc20ListProps = QueryConfig<BRC20List, Error, BRC20List>;
 
 const useGetBrc20List = (props: UseGetBrc20ListProps = {}) => {
   const query = useQuery(["brc20-list"], queryFn, {
@@ -17,10 +17,12 @@ const useGetBrc20List = (props: UseGetBrc20ListProps = {}) => {
     onSuccess: (data) => {
       previousAccountRef.current = data;
     },
-    refetchInterval: 60000,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
   });
 
-  const previousAccountRef = useRef<ReturnType<typeof queryFn>>();
+  const previousAccountRef = useRef<BRC20List>();
 
   return {
     ...query,

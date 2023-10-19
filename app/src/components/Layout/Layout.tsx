@@ -25,11 +25,14 @@ import {
   StyledBRC20List,
   StyledClose,
   StyledDrawer,
+  StyledIFrameWrapper,
   StyledMain,
   StyledNFT,
   StyledRelative,
 } from "./Layout.styles";
 import { useGetNfts } from "../../hooks/useGetNfts";
+import { useGetInscriptions } from "../../hooks/useGetInscriptions";
+import { Link } from "react-router-dom";
 
 function shortAddress(address?: string, len = 5) {
   if (!address) return "";
@@ -42,6 +45,8 @@ const Layout = (props: HTMLAttributes<unknown>) => {
   const { connect } = useConnect({
     onSuccess: () => setOpen(false),
   });
+
+  const { data: inscriptions } = useGetInscriptions();
   const { data: balance } = useBalance();
   const { data: brc20Balances } = useBrc20Balances();
   const { data: address } = useAccount();
@@ -89,6 +94,63 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                 <H2 size="xl">{balance?.total || 0} sats</H2>
               </Flex>
               <Tabs fullWidth>
+                <TabsItem key="all" title="All">
+                  <StyledBRC20List wrap gap="spacing4">
+                    {inscriptions && inscriptions?.list.length > 0 ? (
+                      inscriptions.list.map((inscription) => (
+                        <Card
+                          padding="spacing0"
+                          flex="0"
+                          variant="bordered"
+                          background="secondary"
+                          gap="spacing2"
+                          key={inscription.inscriptionId}
+                        >
+                          {inscription.contentType === "image/png" ? (
+                            <StyledIFrameWrapper>
+                              <StyledNFT
+                                height={125}
+                                width={125}
+                                src={`https://testnet.ordinals.com/content/${inscription.inscriptionId}`}
+                              />
+                              <Link
+                                style={{ position: "absolute", inset: 0 }}
+                                to={`/inscription/${inscription.inscriptionId}`}
+                              ></Link>
+                            </StyledIFrameWrapper>
+                          ) : (
+                            <StyledIFrameWrapper>
+                              <iframe
+                                onClick={console.log}
+                                src={inscription.preview}
+                                sandbox="allow-scripts"
+                                scrolling="no"
+                                loading="lazy"
+                                style={{
+                                  pointerEvents: "none",
+                                  width: 125,
+                                  height: 125,
+                                  overflowClipMargin: "content-box",
+                                  borderWidth: 0,
+                                  borderStyle: "inset",
+                                  overflow: "hidden",
+                                }}
+                              />
+                              <Link
+                                style={{ position: "absolute", inset: 0 }}
+                                to={`/inscription/${inscription.inscriptionId}`}
+                              ></Link>
+                            </StyledIFrameWrapper>
+                          )}
+                        </Card>
+                      ))
+                    ) : (
+                      <Flex justifyContent="center" flex={1}>
+                        <P>No Inscriptions</P>
+                      </Flex>
+                    )}
+                  </StyledBRC20List>
+                </TabsItem>
                 <TabsItem key="tokens" title="BRC-20">
                   <StyledBRC20List gap="spacing4">
                     {Object.entries(brc20Balances || {}).length > 0 ? (
@@ -152,11 +214,11 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                     )}
                   </StyledBRC20List>
                 </TabsItem>
-                <TabsItem key="activity" title="Activity">
+                {/* <TabsItem key="activity" title="Activity">
                   <StyledBRC20List justifyContent="center" gap="spacing4">
                     <Span>No Activity</Span>
                   </StyledBRC20List>
-                </TabsItem>
+                </TabsItem> */}
               </Tabs>
             </Flex>
           ) : (

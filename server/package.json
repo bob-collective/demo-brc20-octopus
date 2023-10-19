@@ -1,0 +1,33 @@
+{
+  "name": "express-vercel",
+  "version": "0.5.0",
+  "description": "express vercel boilerplate",
+  "main": "app.js",
+  "scripts": {
+    "start": "vercel dev",
+    "dev": "nodemon app.js",
+    "test": "jest -i"
+  },
+  "dependencies": {
+    "axios": "^1.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-rate-limit": "^5.5.0",
+    "express-session": "^1.17.3",
+    "helmet": "^4.6.0",
+    "node-fetch": "2.6.1",
+    "vercel": "^23.1.2"
+  },
+  "keywords": [
+    "vercel"
+  ],
+  "author": "Kizito Akhilome <kizito@akhilo.me>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "jest": "^27.0.3",
+    "nodemon": "^3.0.1",
+    "supertest": "^6.1.3"
+  }
+}
