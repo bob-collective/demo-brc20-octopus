@@ -171,7 +171,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                                 <Dd size="s">{0}</Dd>
                               </DlGroup>
                               <DlGroup justifyContent="space-between">
-                                <Dt size="s">Availabel:</Dt>
+                                <Dt size="s">Available:</Dt>
                                 <Dd size="s">{amount}</Dd>
                               </DlGroup>
                               <DlGroup justifyContent="space-between">
