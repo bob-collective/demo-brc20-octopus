@@ -29,27 +29,32 @@ const CTAWrapper = styled(Flex)`
 `;
 
 const StyledDrawer = styled(Drawer)`
+  background-color: transparent !important;
+  box-shadow: none !important;
+  height: calc(100vh - ${theme.spacing.spacing2}) !important;
+  width: 377px !important;
+`;
+
+const StyledRelative = styled.div`
+  width: 100%;
+  flex: 1;
+  position: relative;
+  height: 100%;
+  padding: ${theme.spacing.spacing4};
   background-color: ${theme.colors.bgPrimary} !important;
   margin: ${theme.spacing.spacing1} !important;
   border-radius: ${theme.rounded.lg} !important;
   border: ${theme.border.default};
-  height: calc(100vh - ${theme.spacing.spacing2}) !important;
-  width: 350px !important;
+  overflow: auto;
 `;
 
-const StyledRelative = styled.div`
-  position: relative;
-  height: 100%;
-  padding: ${theme.spacing.spacing4};
-  /* overflow: hidden; */
+const StyledContent = styled.div`
+  overflow: hidden;
 `;
 
 const StyledClose = styled.div`
-  position: absolute;
-  left: -46px;
-  width: 38px;
-  top: 0;
-  bottom: 0;
+  flex: 0 0 35px;
+  margin: ${theme.spacing.spacing1} 0;
   height: 100%;
   transition: background-color 250ms ease 0s, margin 250ms ease 0s;
   cursor: pointer;
@@ -98,4 +103,5 @@ export {
   StyledNFT,
   StyledRelative,
   StyledIFrameWrapper,
+  StyledContent,
 };

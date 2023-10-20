@@ -13,7 +13,7 @@ import { useGetBrc20List } from "../../hooks/useGetBrc20List";
 import { StyledWrapper } from "./Home.style";
 
 function Home() {
-  const { data: list, type, setType } = useGetBrc20List();
+  const { data: list, type, setType, isLoading } = useGetBrc20List();
 
   const columns: ColumnProps[] = [
     { id: "index", name: "#" },
@@ -46,7 +46,7 @@ function Home() {
           {""}
         </TabsItem>
       </Tabs>
-      {rows.length > 0 ? (
+      {rows.length > 0 && !isLoading ? (
         <Card>
           <Table columns={columns} rows={rows} />
         </Card>

@@ -57,13 +57,13 @@ const Header = ({ onClickAccount }: { onClickAccount: () => void }) => {
         <nav>
           <Flex elementType="ul" gap="spacing5">
             <li>
-              <Link to="/">
-                <Span weight="bold">Market</Span>
+              <Link to="/transfer">
+                <Span weight="bold">Transfer</Span>
               </Link>
             </li>
             <li>
-              <Link to="/transfer">
-                <Span weight="bold">Transfer</Span>
+              <Link to="/inscribe">
+                <Span weight="bold">Inscribe</Span>
               </Link>
             </li>
           </Flex>

@@ -6,8 +6,8 @@ import { Bitcoin } from "../../../../constants/currencies";
 import { useBalance } from "../../../../hooks/useBalance";
 import { Amount } from "../../../../utils/amount";
 import {
-  TransferBTCSchemaParams,
-  transferBtcSchema,
+  TransferBrc20SchemaParams,
+  transferBrc20Schema,
 } from "../../../../utils/schemas";
 import { Flex, Input, TokenInput } from "@interlay/ui";
 import { isFormDisabled } from "../../../../utils/validation";
@@ -40,7 +40,7 @@ const TransferBtcForm = (): JSX.Element => {
     ? new Amount(Bitcoin, balance.confirmed).toBig()
     : new Big(0);
 
-  const schemaParams: TransferBTCSchemaParams = {
+  const schemaParams: TransferBrc20SchemaParams = {
     amount: {
       maxAmount: inputBalance !== undefined ? inputBalance : undefined,
     },
@@ -51,7 +51,7 @@ const TransferBtcForm = (): JSX.Element => {
       amount: "",
       address: "",
     },
-    validationSchema: transferBtcSchema(schemaParams),
+    validationSchema: transferBrc20Schema(schemaParams),
     onSubmit: handleSubmit,
     hideErrors: "untouched",
   });

@@ -24,7 +24,6 @@ const useGetBrc20List = (props: UseGetBrc20ListProps = {}) => {
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
-    cacheTime: 600000,
   });
 
   const previousAccountRef = useRef<BRC20List>();

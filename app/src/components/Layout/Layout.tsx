@@ -16,10 +16,13 @@ import {
 } from "@interlay/ui";
 import { HTMLAttributes, useState } from "react";
 import "react-modern-drawer/dist/index.css";
+import { Link } from "react-router-dom";
 import { useAccount } from "../../hooks/useAccount";
 import { useBalance } from "../../hooks/useBalance";
-import { useConnect } from "../../hooks/useConnect";
 import { useBrc20Balances } from "../../hooks/useBrc20Balances";
+import { useConnect } from "../../hooks/useConnect";
+import { useGetInscriptions } from "../../hooks/useGetInscriptions";
+import { useGetNfts } from "../../hooks/useGetNfts";
 import { Header } from "./Header";
 import {
   StyledBRC20List,
@@ -30,9 +33,6 @@ import {
   StyledNFT,
   StyledRelative,
 } from "./Layout.styles";
-import { useGetNfts } from "../../hooks/useGetNfts";
-import { useGetInscriptions } from "../../hooks/useGetInscriptions";
-import { Link } from "react-router-dom";
 
 function shortAddress(address?: string, len = 5) {
   if (!address) return "";
@@ -64,190 +64,192 @@ const Layout = (props: HTMLAttributes<unknown>) => {
         onClose={() => setOpen(false)}
         direction="right"
       >
-        <StyledRelative>
+        <Flex style={{ height: "100%" }}>
           <StyledClose onClick={() => setOpen(false)}>
             <ChevronRight />
           </StyledClose>
-          {address ? (
-            <Flex direction="column" gap="spacing6">
-              <Flex alignItems="center" gap="spacing2">
+          <StyledRelative>
+            {address ? (
+              <Flex direction="column" gap="spacing6">
+                <Flex alignItems="center" gap="spacing2">
+                  <Card
+                    padding="spacing1"
+                    variant="bordered"
+                    background="secondary"
+                    rounded="full"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <img
+                      height={40}
+                      src="https://unisat.io/logo/color.svg"
+                      alt="unisat"
+                    ></img>
+                  </Card>
+                  <Span weight="semibold" size="s">
+                    {shortAddress(address)}
+                  </Span>
+                </Flex>
+                <Flex alignItems="center" gap="spacing2">
+                  <BTC />
+                  <H2 size="xl">{balance?.total || 0} sats</H2>
+                </Flex>
+                <Tabs defaultSelectedKey="tokens" fullWidth>
+                  <TabsItem key="all" title="All">
+                    <StyledBRC20List wrap gap="spacing4">
+                      {inscriptions && inscriptions?.list.length > 0 ? (
+                        inscriptions.list.map((inscription) => (
+                          <Card
+                            padding="spacing0"
+                            flex="0"
+                            variant="bordered"
+                            background="secondary"
+                            gap="spacing2"
+                            key={inscription.inscriptionId}
+                          >
+                            {inscription.contentType === "image/png" ? (
+                              <StyledIFrameWrapper>
+                                <StyledNFT
+                                  height={140}
+                                  width={140}
+                                  src={`https://testnet.ordinals.com/content/${inscription.inscriptionId}`}
+                                />
+                                <Link
+                                  style={{ position: "absolute", inset: 0 }}
+                                  to={`/inscription/${inscription.inscriptionId}`}
+                                ></Link>
+                              </StyledIFrameWrapper>
+                            ) : (
+                              <StyledIFrameWrapper>
+                                <iframe
+                                  onClick={console.log}
+                                  src={inscription.preview}
+                                  sandbox="allow-scripts"
+                                  scrolling="no"
+                                  loading="lazy"
+                                  style={{
+                                    pointerEvents: "none",
+                                    width: 140,
+                                    height: 140,
+                                    overflowClipMargin: "content-box",
+                                    borderWidth: 0,
+                                    borderStyle: "inset",
+                                    overflow: "hidden",
+                                  }}
+                                />
+                                <Link
+                                  style={{ position: "absolute", inset: 0 }}
+                                  to={`/inscription/${inscription.inscriptionId}`}
+                                ></Link>
+                              </StyledIFrameWrapper>
+                            )}
+                          </Card>
+                        ))
+                      ) : (
+                        <Flex justifyContent="center" flex={1}>
+                          <P>No Inscriptions</P>
+                        </Flex>
+                      )}
+                    </StyledBRC20List>
+                  </TabsItem>
+                  <TabsItem key="tokens" title="BRC-20">
+                    <StyledBRC20List wrap gap="spacing4">
+                      {Object.entries(brc20Balances || {}).length > 0 ? (
+                        Object.entries(brc20Balances || {}).map(
+                          ([ticker, amount]) => (
+                            <Card
+                              padding="spacing3"
+                              flex="0"
+                              variant="bordered"
+                              background="secondary"
+                              gap="spacing2"
+                              key={ticker}
+                            >
+                              <H3 size="lg">{ticker}</H3>
+                              <Dl direction="column" gap="spacing0">
+                                <DlGroup justifyContent="space-between">
+                                  <Dt size="s">Transferable:</Dt>
+                                  <Dd size="s">{0}</Dd>
+                                </DlGroup>
+                                <DlGroup justifyContent="space-between">
+                                  <Dt size="s">Available:</Dt>
+                                  <Dd size="s">{amount}</Dd>
+                                </DlGroup>
+                                <DlGroup justifyContent="space-between">
+                                  <Dt size="s">Total:</Dt>
+                                  <Dd size="s">{amount}</Dd>
+                                </DlGroup>
+                              </Dl>
+                            </Card>
+                          )
+                        )
+                      ) : (
+                        <Flex justifyContent="center" flex={1}>
+                          <P>No Coins</P>
+                        </Flex>
+                      )}
+                    </StyledBRC20List>
+                  </TabsItem>
+                  <TabsItem key="nfts" title="NFT">
+                    <StyledBRC20List wrap gap="spacing4">
+                      {nfts && nfts?.length !== 0 ? (
+                        nfts.map((nft) => (
+                          <Card
+                            background="secondary"
+                            padding="spacing0"
+                            variant="bordered"
+                            gap="spacing2"
+                            key={nft.inscriptionId}
+                          >
+                            <StyledNFT
+                              height={140}
+                              width={140}
+                              src={`https://testnet.ordinals.com/content/${nft.inscriptionId}`}
+                            />
+                          </Card>
+                        ))
+                      ) : (
+                        <Flex justifyContent="center" flex={1}>
+                          <P>No Assets</P>
+                        </Flex>
+                      )}
+                    </StyledBRC20List>
+                  </TabsItem>
+                  {/* <TabsItem key="activity" title="Activity">
+                  <StyledBRC20List justifyContent="center" gap="spacing4">
+                    <Span>No Activity</Span>
+                  </StyledBRC20List>
+                </TabsItem> */}
+                </Tabs>
+              </Flex>
+            ) : (
+              <Flex direction="column" gap="spacing6">
+                <H2 size="xl">Connect Wallet</H2>
                 <Card
-                  padding="spacing1"
+                  alignItems="center"
+                  isPressable
+                  isHoverable
+                  onPress={() => {
+                    connect();
+                  }}
+                  direction="row"
                   variant="bordered"
                   background="secondary"
-                  rounded="full"
-                  alignItems="center"
-                  justifyContent="center"
+                  padding="spacing4"
+                  gap="spacing4"
                 >
                   <img
                     height={40}
                     src="https://unisat.io/logo/color.svg"
                     alt="unisat"
                   ></img>
+                  Unisat Wallet
                 </Card>
-                <Span weight="semibold" size="s">
-                  {shortAddress(address)}
-                </Span>
               </Flex>
-              <Flex alignItems="center" gap="spacing2">
-                <BTC />
-                <H2 size="xl">{balance?.total || 0} sats</H2>
-              </Flex>
-              <Tabs defaultSelectedKey="tokens" fullWidth>
-                <TabsItem key="all" title="All">
-                  <StyledBRC20List wrap gap="spacing4">
-                    {inscriptions && inscriptions?.list.length > 0 ? (
-                      inscriptions.list.map((inscription) => (
-                        <Card
-                          padding="spacing0"
-                          flex="0"
-                          variant="bordered"
-                          background="secondary"
-                          gap="spacing2"
-                          key={inscription.inscriptionId}
-                        >
-                          {inscription.contentType === "image/png" ? (
-                            <StyledIFrameWrapper>
-                              <StyledNFT
-                                height={125}
-                                width={125}
-                                src={`https://testnet.ordinals.com/content/${inscription.inscriptionId}`}
-                              />
-                              <Link
-                                style={{ position: "absolute", inset: 0 }}
-                                to={`/inscription/${inscription.inscriptionId}`}
-                              ></Link>
-                            </StyledIFrameWrapper>
-                          ) : (
-                            <StyledIFrameWrapper>
-                              <iframe
-                                onClick={console.log}
-                                src={inscription.preview}
-                                sandbox="allow-scripts"
-                                scrolling="no"
-                                loading="lazy"
-                                style={{
-                                  pointerEvents: "none",
-                                  width: 125,
-                                  height: 125,
-                                  overflowClipMargin: "content-box",
-                                  borderWidth: 0,
-                                  borderStyle: "inset",
-                                  overflow: "hidden",
-                                }}
-                              />
-                              <Link
-                                style={{ position: "absolute", inset: 0 }}
-                                to={`/inscription/${inscription.inscriptionId}`}
-                              ></Link>
-                            </StyledIFrameWrapper>
-                          )}
-                        </Card>
-                      ))
-                    ) : (
-                      <Flex justifyContent="center" flex={1}>
-                        <P>No Inscriptions</P>
-                      </Flex>
-                    )}
-                  </StyledBRC20List>
-                </TabsItem>
-                <TabsItem key="tokens" title="BRC-20">
-                  <StyledBRC20List wrap gap="spacing4">
-                    {Object.entries(brc20Balances || {}).length > 0 ? (
-                      Object.entries(brc20Balances || {}).map(
-                        ([ticker, amount]) => (
-                          <Card
-                            padding="spacing3"
-                            flex="0"
-                            variant="bordered"
-                            background="secondary"
-                            gap="spacing2"
-                            key={ticker}
-                          >
-                            <H3 size="lg">{ticker}</H3>
-                            <Dl direction="column" gap="spacing0">
-                              <DlGroup justifyContent="space-between">
-                                <Dt size="s">Transferable:</Dt>
-                                <Dd size="s">{0}</Dd>
-                              </DlGroup>
-                              <DlGroup justifyContent="space-between">
-                                <Dt size="s">Available:</Dt>
-                                <Dd size="s">{amount}</Dd>
-                              </DlGroup>
-                              <DlGroup justifyContent="space-between">
-                                <Dt size="s">Total:</Dt>
-                                <Dd size="s">{amount}</Dd>
-                              </DlGroup>
-                            </Dl>
-                          </Card>
-                        )
-                      )
-                    ) : (
-                      <Flex justifyContent="center" flex={1}>
-                        <P>No Coins</P>
-                      </Flex>
-                    )}
-                  </StyledBRC20List>
-                </TabsItem>
-                <TabsItem key="nfts" title="NFT">
-                  <StyledBRC20List wrap gap="spacing4">
-                    {nfts && nfts?.length !== 0 ? (
-                      nfts.map((nft) => (
-                        <Card
-                          background="secondary"
-                          padding="spacing0"
-                          variant="bordered"
-                          gap="spacing2"
-                          key={nft.inscriptionId}
-                        >
-                          <StyledNFT
-                            height={150}
-                            width={150}
-                            src={`https://testnet.ordinals.com/content/${nft.inscriptionId}`}
-                          />
-                        </Card>
-                      ))
-                    ) : (
-                      <Flex justifyContent="center" flex={1}>
-                        <P>No Assets</P>
-                      </Flex>
-                    )}
-                  </StyledBRC20List>
-                </TabsItem>
-                {/* <TabsItem key="activity" title="Activity">
-                  <StyledBRC20List justifyContent="center" gap="spacing4">
-                    <Span>No Activity</Span>
-                  </StyledBRC20List>
-                </TabsItem> */}
-              </Tabs>
-            </Flex>
-          ) : (
-            <Flex direction="column" gap="spacing6">
-              <H2 size="xl">Connect Wallet</H2>
-              <Card
-                alignItems="center"
-                isPressable
-                isHoverable
-                onPress={() => {
-                  connect();
-                }}
-                direction="row"
-                variant="bordered"
-                background="secondary"
-                padding="spacing4"
-                gap="spacing4"
-              >
-                <img
-                  height={40}
-                  src="https://unisat.io/logo/color.svg"
-                  alt="unisat"
-                ></img>
-                Unisat Wallet
-              </Card>
-            </Flex>
-          )}
-        </StyledRelative>
-      </StyledDrawer>{" "}
+            )}
+          </StyledRelative>
+        </Flex>
+      </StyledDrawer>
     </>
   );
 };
