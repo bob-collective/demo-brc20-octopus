@@ -1,9 +1,19 @@
-import { Card, ColumnProps, H2, Table } from "@interlay/ui";
+import {
+  Card,
+  ColumnProps,
+  Flex,
+  H2,
+  LoadingSpinner,
+  Table,
+  Tabs,
+  TabsItem,
+} from "@interlay/ui";
+import { Key } from "react";
 import { useGetBrc20List } from "../../hooks/useGetBrc20List";
 import { StyledWrapper } from "./Home.style";
 
 function Home() {
-  const { data: list } = useGetBrc20List();
+  const { data: list, type, setType } = useGetBrc20List();
 
   const columns: ColumnProps[] = [
     { id: "index", name: "#" },
@@ -21,10 +31,39 @@ function Home() {
 
   return (
     <StyledWrapper direction="column" gap="spacing4">
-      <H2>BRC-20 Market</H2>
-      <Card>
-        <Table columns={columns} rows={rows} />
-      </Card>
+      <H2 align="center">Market</H2>
+      <Tabs
+        selectedKey={type}
+        onSelectionChange={(key: Key) => setType(key as typeof type)}
+      >
+        <TabsItem key="all" title="All">
+          {""}
+        </TabsItem>
+        <TabsItem key="in-progress" title="In progress">
+          {""}
+        </TabsItem>
+        <TabsItem key="completed" title="Complete">
+          {""}
+        </TabsItem>
+      </Tabs>
+      {rows.length > 0 ? (
+        <Card>
+          <Table columns={columns} rows={rows} />
+        </Card>
+      ) : (
+        <Flex
+          style={{ minHeight: 200 }}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <LoadingSpinner
+            color="secondary"
+            variant="indeterminate"
+            diameter={36}
+            thickness={4}
+          />
+        </Flex>
+      )}
     </StyledWrapper>
   );
 }

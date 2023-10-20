@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home/Home";
 import Transfer from "./pages/Transfer/Transfer";
 import Inscription from "./pages/Inscription/Inscription";
+import "./utils/yup.custom";
 
 function App() {
   return (

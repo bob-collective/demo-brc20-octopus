@@ -5,6 +5,12 @@ import { useAccount } from "./useAccount";
 
 type Balance = Record<string, number>;
 
+// const queryFn = async (address: string): Promise<BRC20Summary> => {
+//   const res = await api.unisat.getBrc20Summary(address);
+
+//   return res.data.data;
+// };
+
 const queryFn = async () => {
   const inscriptions = await window.unisat.getInscriptions(0, 100);
 

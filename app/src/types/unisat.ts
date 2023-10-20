@@ -40,6 +40,11 @@ type Unisat = {
   ) => Promise<SendInscriptionsResult>;
   switchNetwork: (network: "livenet" | "testnet") => Promise<void>;
   getBalance: () => Promise<Balance>;
+  sendBitcoin: (
+    address: string,
+    atomicAmount: number,
+    options?: { feeRate: number }
+  ) => Promise<string>;
 };
 
 declare global {

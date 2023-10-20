@@ -93,7 +93,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                 <BTC />
                 <H2 size="xl">{balance?.total || 0} sats</H2>
               </Flex>
-              <Tabs fullWidth>
+              <Tabs defaultSelectedKey="tokens" fullWidth>
                 <TabsItem key="all" title="All">
                   <StyledBRC20List wrap gap="spacing4">
                     {inscriptions && inscriptions?.list.length > 0 ? (
@@ -152,7 +152,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                   </StyledBRC20List>
                 </TabsItem>
                 <TabsItem key="tokens" title="BRC-20">
-                  <StyledBRC20List gap="spacing4">
+                  <StyledBRC20List wrap gap="spacing4">
                     {Object.entries(brc20Balances || {}).length > 0 ? (
                       Object.entries(brc20Balances || {}).map(
                         ([ticker, amount]) => (
@@ -190,7 +190,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                   </StyledBRC20List>
                 </TabsItem>
                 <TabsItem key="nfts" title="NFT">
-                  <StyledBRC20List gap="spacing4">
+                  <StyledBRC20List wrap gap="spacing4">
                     {nfts && nfts?.length !== 0 ? (
                       nfts.map((nft) => (
                         <Card

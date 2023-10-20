@@ -14,11 +14,17 @@ export class OpenAPIService extends ApiService {
 
   public getBrc20Summary(address: string) {
     return this.getData<UniSatResponse<BRC20Summary>>(
-      `/address/${address}/brc20/summary?start=0&limit=200`
+      `/address/${address}/brc-20/balance`
     );
   }
 
-  public getBrc20List() {
-    return this.getData<UniSatResponse<BRC20List>>(`/brc-20/list`);
+  public getBrc20List(type: "all" | "in-progress" | "completed") {
+    const sort =
+      type === "all" ? "deploy" : type === "in-progress" ? "minted" : "deploy";
+    const complete =
+      type === "all" ? "" : type === "in-progress" ? "no" : "yes";
+    return this.getData<UniSatResponse<BRC20List>>(
+      `/brc-20/list?sort=${sort}&complete=${complete}`
+    );
   }
 }
