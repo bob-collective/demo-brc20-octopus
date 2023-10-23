@@ -154,35 +154,33 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                   </TabsItem>
                   <TabsItem key="tokens" title="BRC-20">
                     <StyledBRC20List wrap gap="spacing4">
-                      {Object.entries(brc20Balances || {}).length > 0 ? (
-                        Object.entries(brc20Balances || {}).map(
-                          ([ticker, amount]) => (
-                            <Card
-                              padding="spacing3"
-                              flex="0"
-                              variant="bordered"
-                              background="secondary"
-                              gap="spacing2"
-                              key={ticker}
-                            >
-                              <H3 size="lg">{ticker}</H3>
-                              <Dl direction="column" gap="spacing0">
-                                <DlGroup justifyContent="space-between">
-                                  <Dt size="s">Transferable:</Dt>
-                                  <Dd size="s">{0}</Dd>
-                                </DlGroup>
-                                <DlGroup justifyContent="space-between">
-                                  <Dt size="s">Available:</Dt>
-                                  <Dd size="s">{amount}</Dd>
-                                </DlGroup>
-                                <DlGroup justifyContent="space-between">
-                                  <Dt size="s">Total:</Dt>
-                                  <Dd size="s">{amount}</Dd>
-                                </DlGroup>
-                              </Dl>
-                            </Card>
-                          )
-                        )
+                      {(brc20Balances?.detail || []).length > 0 ? (
+                        (brc20Balances?.detail || []).map((balances) => (
+                          <Card
+                            padding="spacing3"
+                            flex="0"
+                            variant="bordered"
+                            background="secondary"
+                            gap="spacing2"
+                            key={balances.ticker}
+                          >
+                            <H3 size="lg">{balances.ticker}</H3>
+                            <Dl direction="column" gap="spacing0">
+                              <DlGroup justifyContent="space-between">
+                                <Dt size="s">Transferable:</Dt>
+                                <Dd size="s">{balances.transferableBalance}</Dd>
+                              </DlGroup>
+                              <DlGroup justifyContent="space-between">
+                                <Dt size="s">Available:</Dt>
+                                <Dd size="s">{balances.availableBalance}</Dd>
+                              </DlGroup>
+                              <DlGroup justifyContent="space-between">
+                                <Dt size="s">Total:</Dt>
+                                <Dd size="s">{balances.overallBalance}</Dd>
+                              </DlGroup>
+                            </Dl>
+                          </Card>
+                        ))
                       ) : (
                         <Flex justifyContent="center" flex={1}>
                           <P>No Coins</P>
