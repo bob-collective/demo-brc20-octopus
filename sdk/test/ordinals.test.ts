@@ -2,7 +2,7 @@ import { assert } from "chai";
 import * as ecc from "tiny-secp256k1";
 import * as ECPairFactory from "ecpair";
 import { RemoteSigner, createOrdinal } from "../src/ordinals";
-import { Network, Payment, Psbt, Transaction, initEccLib } from "bitcoinjs-lib";
+import { Network, Psbt, Transaction, address, initEccLib } from "bitcoinjs-lib";
 import { bitcoin } from "bitcoinjs-lib/src/networks";
 
 const ECPair = ECPairFactory.default(ecc);
@@ -16,7 +16,7 @@ class StaticSigner implements RemoteSigner {
         this.keyPair = ECPair.fromPrivateKey(privateKey);
     }
 
-    network(): Network {
+    async network(): Promise<Network> {
         return bitcoin;
     }
 
@@ -24,13 +24,13 @@ class StaticSigner implements RemoteSigner {
         return this.keyPair.publicKey.toString("hex");
     }
 
-    async sendToAddress(address: Payment, amount: number): Promise<string> {
+    async sendToAddress(toAddress: string, amount: number): Promise<string> {
         const tx = new Transaction();
-        tx.addOutput(address.output!, amount);
+        tx.addOutput(address.toOutputScript(toAddress), amount);
         return tx.getId();
     }
 
-    async getUtxoIndex(_address: Payment, _txId: string): Promise<number> {
+    async getUtxoIndex(_toAddress: string, _txId: string): Promise<number> {
         return 0;
     }
 

@@ -127,10 +127,10 @@ function createRevealTx(
 }
 
 export interface RemoteSigner {
-  network(): bitcoinjsLib.Network;
+  network(): Promise<bitcoinjsLib.Network>;
   getPublicKey(): Promise<string>;
-  sendToAddress(address: bitcoinjsLib.payments.Payment, amount: number): Promise<string>;
-  getUtxoIndex(address: bitcoinjsLib.payments.Payment, txId: string): Promise<number>;
+  sendToAddress(toAddress: string, amount: number): Promise<string>;
+  getUtxoIndex(toAddress: string, txId: string): Promise<number>;
   signPsbt(inputIndex: number, psbt: bitcoinjsLib.Psbt): Promise<bitcoinjsLib.Psbt>;
 };
 
@@ -144,8 +144,8 @@ async function signRevealTx(
   const { outputScript, tapLeafScript } = commitTxData;
 
   // we have to construct our witness script in a custom finalizer
-  const customFinalizer = (_inputIndex: number, input: any) => {
-    const witness = [input.tapScriptSig[0].signature]
+  const customFinalizer = (inputIndex: number, input: any) => {
+    const witness = [input.tapScriptSig[inputIndex].signature]
       .concat(outputScript)
       .concat(tapLeafScript.controlBlock);
 
@@ -164,7 +164,7 @@ export async function createOrdinal(
   toAddress: string,
   text: string,
 ) {
-  const bitcoinNetwork = signer.network();
+  const bitcoinNetwork = await signer.network();
   const publicKey = Buffer.from(await signer.getPublicKey(), "hex");
 
   const inscription = createTextInscription({ text });
@@ -177,8 +177,9 @@ export async function createOrdinal(
 
   const commitTxAmount = 550 + minersFee + padding;
   
-  const commitTxId = await signer.sendToAddress(commitTxData.scriptTaproot, commitTxAmount);
-  const commitUtxoIndex = await signer.getUtxoIndex(commitTxData.scriptTaproot, commitTxId);
+  const commitAddress = commitTxData.scriptTaproot.address!;
+  const commitTxId = await signer.sendToAddress(commitAddress, commitTxAmount);
+  const commitUtxoIndex = await signer.getUtxoIndex(commitAddress, commitTxId);
 
   const commitTxResult = {
     txId: commitTxId,

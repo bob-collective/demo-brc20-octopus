@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@bitcoin-js/tiny-secp256k1-asmjs": "^2.2.3",
     "@interlay/coin-icons": "^0.0.7",
     "@interlay/hooks": "^0.0.7",
     "@interlay/icons": "^0.0.6",
@@ -21,11 +22,13 @@
     "@tanstack/react-query-devtools": "^5.0.3",
     "axios": "^1.5.1",
     "big.js": "^6.2.1",
+    "bitcoinjs-lib": "^6.1.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-modern-drawer": "^1.2.2",
     "react-pro-sidebar": "1.1.0-alpha.1",
     "react-router-dom": "^6.17.0",
+    "sdk": "file:../sdk",
     "styled-components": "^6.1.0",
     "vite-plugin-node-polyfills": "^0.15.0",
     "yup": "^0.32.11"

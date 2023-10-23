@@ -2,12 +2,63 @@ import { useForm } from "@interlay/hooks";
 import { Flex, Input } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
 import { AuthCTA } from "../../../../components/AuthCTA";
-import { textFormSchema } from "../../../../utils/schemas";
 import { isFormDisabled } from "../../../../utils/validation";
+import { createOrdinal, RemoteSigner } from "sdk/src/ordinals";
+import { Network, Psbt, Transaction, address } from "bitcoinjs-lib";
+import { bitcoin, testnet } from "bitcoinjs-lib/src/networks";
+import * as ecc from '@bitcoin-js/tiny-secp256k1-asmjs';
+import * as bitcoinjs from "bitcoinjs-lib";
+
+bitcoinjs.initEccLib(ecc);
+
+class UniSatSigner implements RemoteSigner {
+  async network(): Promise<Network> {
+      switch (await window.unisat.getNetwork()) {
+        case "livenet":
+          return bitcoin;
+        case "testnet":
+          return testnet;
+        default:
+          throw new Error("Unknown network");
+      }
+  }
+
+  async getPublicKey(): Promise<string> {
+      return window.unisat.getPublicKey();
+  }
+
+  async sendToAddress(toAddress: string, amount: number): Promise<string> {
+    const txid = await window.unisat.sendBitcoin(toAddress, amount);
+    return txid;
+  }
+
+  async getUtxoIndex(toAddress: string, txId: string): Promise<number> {
+    const res = await fetch(`https://blockstream.info/testnet/api/tx/${txId}/hex`);
+    const tx = Transaction.fromHex(await res.text());
+    const bitcoinNetwork = await this.network();
+    const scriptPubKey = address.toOutputScript(toAddress, bitcoinNetwork);
+    const utxoIndex = tx.outs.findIndex(out => out.script.equals(scriptPubKey));
+    return utxoIndex;
+  }
+
+  async signPsbt(inputIndex: number, psbt: Psbt): Promise<Psbt> {
+    const publicKey = await this.getPublicKey();
+    const psbtHex = await window.unisat.signPsbt(psbt.toHex(), {
+      autoFinalized: false,
+      toSignInputs: [
+        {
+          index: inputIndex,
+          publicKey,
+          disableTweakSigner: true,
+        }
+      ]
+    });
+    return Psbt.fromHex(psbtHex);
+  }
+}
 
 type TextFormData = {
   text: string;
-  address: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -18,16 +69,25 @@ const TextForm = (): JSX.Element => {
     mutationFn: (form: TextFormData) => 2 as Promise<number>,
   });
 
-  const handleSubmit = (values: TextFormData) => {
+  const handleSubmit = async (values: TextFormData) => {
+    const accounts = await window.unisat.getAccounts();
+    const signer = new UniSatSigner();
+    const tx = await createOrdinal(signer, accounts[0], values.text);
+    
+    const res = await fetch('https://blockstream.info/testnet/api/tx', {
+      method: 'POST',
+      body: tx.toHex()
+    });
+    const txid = await res.text();    
+    console.log(txid);
+
     mutation.mutate(values);
   };
 
   const form = useForm<TextFormData>({
     initialValues: {
       text: "",
-      address: "",
     },
-    validationSchema: textFormSchema(),
     onSubmit: handleSubmit,
     hideErrors: "untouched",
   });
@@ -42,11 +102,6 @@ const TextForm = (): JSX.Element => {
             label="Text"
             placeholder="Enter text to be inscribed"
             {...form.getFieldProps("text")}
-          />
-          <Input
-            label="Bitcoin Address"
-            placeholder="Enter your bitcoin address"
-            {...form.getFieldProps("address")}
           />
         </Flex>
 

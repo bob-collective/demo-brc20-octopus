@@ -26,7 +26,7 @@ type Balance = { confirmed: number; unconfirmed: number; total: number };
 
 type Unisat = {
   requestAccounts: () => Promise<string[]>;
-  getAccounts: () => Promise<string>;
+  getAccounts: () => Promise<string[]>;
   on: AccountsChangedEvent;
   removeListener: AccountsChangedEvent;
   getInscriptions: (
@@ -39,11 +39,26 @@ type Unisat = {
     options?: { feeRate: number }
   ) => Promise<SendInscriptionsResult>;
   switchNetwork: (network: "livenet" | "testnet") => Promise<void>;
+  getNetwork: () => Promise<string>;
+  getPublicKey: () => Promise<string>;
   getBalance: () => Promise<Balance>;
   sendBitcoin: (
     address: string,
     atomicAmount: number,
     options?: { feeRate: number }
+  ) => Promise<string>;
+  signPsbt: (
+    psbtHex: string,
+    options?: {
+      autoFinalized?: boolean,
+      toSignInputs: {
+        index: number,
+        address?: string,
+        publicKey?: string,
+        sighashTypes?: number[],
+        disableTweakSigner?: boolean
+      }[]
+    }
   ) => Promise<string>;
 };
 
