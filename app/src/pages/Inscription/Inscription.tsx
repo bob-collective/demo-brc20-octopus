@@ -27,6 +27,8 @@ function Inscription() {
 
         const json = await res.json();
 
+        console.log(json);
+
         if (json.p && json.op && json.tick && json.amt) {
           return setTransferable(false);
         }
@@ -48,7 +50,7 @@ function Inscription() {
     if (id) {
       getInscription();
     }
-  }, []);
+  }, [id]);
 
   return (
     <StyledWrapper direction="column" gap="spacing4">

@@ -123,7 +123,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                               <StyledIFrameWrapper>
                                 <iframe
                                   onClick={console.log}
-                                  src={inscription.preview}
+                                  src={`https://testnet.ordinals.com/preview/${inscription.inscriptionId}`}
                                   sandbox="allow-scripts"
                                   scrolling="no"
                                   loading="lazy"
