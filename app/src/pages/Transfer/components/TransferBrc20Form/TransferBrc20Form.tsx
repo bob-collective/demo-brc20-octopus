@@ -42,7 +42,12 @@ const TransferBrc20Form = (): JSX.Element => {
 
   const inputBalance =
     ticker && balances
-      ? new Amount(Bitcoin, balances[ticker], true).toBig()
+      ? new Amount(
+          Bitcoin,
+          balances.detail.find((balance) => balance.ticker === ticker)
+            ?.transferableBalance || 0,
+          true
+        ).toBig()
       : new Big(0);
 
   const schemaParams: TransferBTCSchemaParams = {
@@ -82,13 +87,11 @@ const TransferBrc20Form = (): JSX.Element => {
             valueUSD={0}
             selectProps={mergeProps(
               {
-                items: Object.entries(balances || []).map(
-                  ([ticker, balance]) => ({
-                    value: ticker,
-                    balance: balance,
-                    balanceUSD: 0,
-                  })
-                ),
+                items: (balances?.detail || []).map((balance) => ({
+                  value: balance.ticker,
+                  balance: balance.overallBalance,
+                  balanceUSD: 0,
+                })),
                 onSelectionChange: (key: Key) => setTicker(key as string),
               },
               form.getSelectFieldProps("ticker")

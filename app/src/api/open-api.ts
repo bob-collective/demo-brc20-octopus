@@ -9,7 +9,7 @@ type UniSatResponse<T> = {
 
 export class OpenAPIService extends ApiService {
   constructor() {
-    super("http://localhost:3000/api");
+    super(import.meta.env.VITE_API_URL);
   }
 
   public getBrc20Summary(address: string) {
@@ -23,6 +23,7 @@ export class OpenAPIService extends ApiService {
       type === "all" ? "deploy" : type === "in-progress" ? "minted" : "deploy";
     const complete =
       type === "all" ? "" : type === "in-progress" ? "no" : "yes";
+
     return this.getData<UniSatResponse<BRC20List>>(
       `/brc-20/list?sort=${sort}&complete=${complete}`
     );
