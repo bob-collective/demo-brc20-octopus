@@ -27,6 +27,7 @@
     "react-pro-sidebar": "1.1.0-alpha.1",
     "react-router-dom": "^6.17.0",
     "styled-components": "^6.1.0",
+    "vite-plugin-node-polyfills": "^0.15.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
