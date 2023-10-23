@@ -43,7 +43,17 @@ export const transferInscriptionSchema = () => {
 
 export const textFormSchema = () => {
   return yup.object().shape({
-    address: yup.string().required("Please enter bitcoin address").address(),
     text: yup.string().required("Please enter text to be inscribed"),
+  });
+};
+
+export const brc20FormSchema = () => {
+  return yup.object().shape({
+    amount: yup.string().required("Please enter amount to be minted"),
+    ticker: yup
+      .string()
+      .required("Please enter tick to be minted")
+      .min(4, "Please enter tick with exactly 4 characters")
+      .max(4, "Please enter tick with exactly 4 characters"),
   });
 };

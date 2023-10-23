@@ -3,7 +3,10 @@ import { Flex, Input } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
 import { AuthCTA } from "../../../../components/AuthCTA";
 import { isFormDisabled } from "../../../../utils/validation";
-import { submitOrdinal } from "../../unisat";
+import { createOrdinal } from "sdk/src/ordinals";
+import { UniSatSigner } from "../../../../utils/unisat";
+import { useAccount } from "../../../../hooks/useAccount";
+import { textFormSchema } from "../../../../utils/schemas";
 
 type TextFormData = {
   text: string;
@@ -13,13 +16,26 @@ type TextFormData = {
 type TextFormProps = {};
 
 const TextForm = (): JSX.Element => {
+  const { data: address } = useAccount();
+
   const mutation = useMutation({
-    mutationFn: (_form: TextFormData) => Promise.resolve(),
+    mutationFn: async (values: TextFormData) => {
+      if (!address) return;
+
+      const signer = new UniSatSigner();
+
+      const tx = await createOrdinal(signer, address, values.text);
+
+      const res = await fetch("https://blockstream.info/testnet/api/tx", {
+        method: "POST",
+        body: tx.toHex(),
+      });
+      const txid = await res.text();
+      return txid;
+    },
   });
 
   const handleSubmit = async (values: TextFormData) => {
-    const txid = await submitOrdinal(values.text);
-    console.log(txid);
     mutation.mutate(values);
   };
 
@@ -29,6 +45,7 @@ const TextForm = (): JSX.Element => {
     },
     onSubmit: handleSubmit,
     hideErrors: "untouched",
+    validationSchema: textFormSchema(),
   });
 
   const isSubmitDisabled = isFormDisabled(form);
