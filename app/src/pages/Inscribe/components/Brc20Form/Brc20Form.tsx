@@ -1,9 +1,11 @@
 import { useForm } from "@interlay/hooks";
 import { Flex, Input, NumberInput } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
+import { createOrdinal } from "sdk/src/ordinals";
 import { AuthCTA } from "../../../../components/AuthCTA";
 import { useAccount } from "../../../../hooks/useAccount";
 import { brc20FormSchema } from "../../../../utils/schemas";
+import { UniSatSigner } from "../../../../utils/unisat";
 import { isFormDisabled } from "../../../../utils/validation";
 
 type Brc20FormData = {
@@ -21,16 +23,27 @@ const Brc20Form = (): JSX.Element => {
     mutationFn: async (values: Brc20FormData) => {
       if (!address) return;
 
-      // const signer = new UniSatSigner();
+      const signer = new UniSatSigner();
 
-      // const tx = await createOrdinal(signer, address, values.text);
+      const inscriptionObg = {
+        p: "brc-20",
+        op: "mint",
+        tick: values.ticker,
+        amt: values.amount,
+      };
 
-      // const res = await fetch("https://blockstream.info/testnet/api/tx", {
-      //   method: "POST",
-      //   body: tx.toHex(),
-      // });
-      // const txid = await res.text();
-      // return txid;
+      const tx = await createOrdinal(
+        signer,
+        address,
+        JSON.stringify(inscriptionObg)
+      );
+
+      const res = await fetch("https://blockstream.info/testnet/api/tx", {
+        method: "POST",
+        body: tx.toHex(),
+      });
+      const txid = await res.text();
+      return txid;
     },
   });
 
