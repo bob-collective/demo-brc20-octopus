@@ -4,14 +4,17 @@ import { mergeProps } from "@react-aria/utils";
 import { useMutation } from "@tanstack/react-query";
 import Big from "big.js";
 import { Key, useEffect, useState } from "react";
+import { createOrdinal } from "sdk/src/ordinals";
 import { AuthCTA } from "../../../../components/AuthCTA";
 import { Bitcoin } from "../../../../constants/currencies";
+import { useAccount } from "../../../../hooks/useAccount";
 import { useBrc20Balances } from "../../../../hooks/useBrc20Balances";
 import { Amount } from "../../../../utils/amount";
 import {
   TransferBTCSchemaParams,
-  transferBtcSchema,
+  transferBrc20Schema,
 } from "../../../../utils/schemas";
+import { UniSatSigner } from "../../../../utils/unisat";
 import { isFormDisabled } from "../../../../utils/validation";
 
 type TransferBrc20FormData = {
@@ -26,14 +29,35 @@ type TransferBrc20FormProps = {};
 const TransferBrc20Form = (): JSX.Element => {
   const [ticker, setTicker] = useState("");
 
+  const { data: address } = useAccount();
   const { data: balances } = useBrc20Balances();
 
   const mutation = useMutation({
-    mutationFn: (form: TransferBrc20FormData) =>
-      window.unisat.sendBitcoin(
+    mutationFn: async (form: TransferBrc20FormData) => {
+      if (!address) return;
+
+      const signer = new UniSatSigner();
+
+      const inscriptionObg = {
+        p: "brc-20",
+        op: "transfer",
+        tick: form.ticker,
+        amt: form.amount,
+      };
+
+      const tx = await createOrdinal(
+        signer,
         form.address,
-        new Amount(Bitcoin, form.amount, true).toAtomic()
-      ),
+        JSON.stringify(inscriptionObg)
+      );
+
+      const res = await fetch("https://blockstream.info/testnet/api/tx", {
+        method: "POST",
+        body: tx.toHex(),
+      });
+
+      return res.text();
+    },
   });
 
   const handleSubmit = (values: TransferBrc20FormData) => {
@@ -45,7 +69,7 @@ const TransferBrc20Form = (): JSX.Element => {
       ? new Amount(
           Bitcoin,
           balances.detail.find((balance) => balance.ticker === ticker)
-            ?.transferableBalance || 0,
+            ?.availableBalance || 0,
           true
         ).toBig()
       : new Big(0);
@@ -62,7 +86,7 @@ const TransferBrc20Form = (): JSX.Element => {
       amount: "",
       address: "",
     },
-    validationSchema: transferBtcSchema(schemaParams),
+    validationSchema: transferBrc20Schema(schemaParams),
     onSubmit: handleSubmit,
     hideErrors: "untouched",
   });
@@ -89,7 +113,7 @@ const TransferBrc20Form = (): JSX.Element => {
               {
                 items: (balances?.detail || []).map((balance) => ({
                   value: balance.ticker,
-                  balance: balance.overallBalance,
+                  balance: balance.availableBalance,
                   balanceUSD: 0,
                 })),
                 onSelectionChange: (key: Key) => setTicker(key as string),
