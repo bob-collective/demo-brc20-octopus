@@ -8,6 +8,9 @@ dependencies:
   '@bitcoin-js/tiny-secp256k1-asmjs':
     specifier: ^2.2.3
     version: 2.2.3
+  '@gobob/bob-sdk':
+    specifier: ^1.1.0
+    version: 1.1.0
   '@interlay/coin-icons':
     specifier: ^0.0.7
     version: 0.0.7(react-dom@18.2.0)(react@18.2.0)(styled-components@6.1.0)
@@ -65,9 +68,6 @@ dependencies:
   react-router-dom:
     specifier: ^6.17.0
     version: 6.17.0(react-dom@18.2.0)(react@18.2.0)
-  sdk:
-    specifier: file:../sdk
-    version: file:../sdk
   styled-components:
     specifier: ^6.1.0
     version: 6.1.0(react-dom@18.2.0)(react@18.2.0)
@@ -713,6 +713,12 @@ packages:
     resolution: {integrity: sha512-BGdtJFmaNJy5An/Zan4OId/yR9Ih1OojFjcduX/xOvq798OgWSyDtd6Qd5jqJXwJs1ipe4Fxu9+cshic5Ox2tA==}
     dependencies:
       tslib: 2.6.2
+    dev: false
+
+  /@gobob/bob-sdk@1.1.0:
+    resolution: {integrity: sha512-20bg+fWb24WCFKZ1NhtF1zxcWun+htVm2ZwhmNvXs6i2yJMtSD2o56zV2D4EetFLe7a/t5n2aGRZGdH7K4aUSg==}
+    dependencies:
+      bitcoinjs-lib: 6.1.5
     dev: false
 
   /@humanwhocodes/config-array@0.11.13:
@@ -4475,11 +4481,4 @@ packages:
       nanoclone: 0.2.1
       property-expr: 2.0.6
       toposort: 2.0.2
-    dev: false
-
-  file:../sdk:
-    resolution: {directory: ../sdk, type: directory}
-    name: sdk
-    dependencies:
-      bitcoinjs-lib: 6.1.5
     dev: false

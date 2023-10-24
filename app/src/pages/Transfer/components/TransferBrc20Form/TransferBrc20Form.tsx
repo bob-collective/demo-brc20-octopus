@@ -4,7 +4,6 @@ import { mergeProps } from "@react-aria/utils";
 import { useMutation } from "@tanstack/react-query";
 import Big from "big.js";
 import { Key, useEffect, useState } from "react";
-import { createOrdinal } from "sdk/src/ordinals";
 import { AuthCTA } from "../../../../components/AuthCTA";
 import { Bitcoin } from "../../../../constants/currencies";
 import { useAccount } from "../../../../hooks/useAccount";
@@ -14,7 +13,7 @@ import {
   TransferBTCSchemaParams,
   transferBrc20Schema,
 } from "../../../../utils/schemas";
-import { UniSatSigner } from "../../../../utils/unisat";
+import { createOrdinal } from "../../../../utils/unisat";
 import { isFormDisabled } from "../../../../utils/validation";
 import { useGetAccountInscriptionUtxo } from "../../../../hooks/useGetAccountInscriptionUtxo";
 
@@ -41,29 +40,21 @@ const TransferBrc20Form = (): JSX.Element => {
     mutationFn: async (form: TransferBrc20FormData) => {
       if (!address) return;
 
-      const signer = new UniSatSigner();
-
-      const inscriptionObg = {
+      const inscriptionObj = {
         p: "brc-20",
         op: "transfer",
         tick: form.ticker,
         amt: form.amount,
       };
 
-      const tx = await createOrdinal(
-        signer,
+      const txid = await createOrdinal(
         address,
-        JSON.stringify(inscriptionObg)
+        JSON.stringify(inscriptionObj),
       );
-
-      const res = await fetch("https://blockstream.info/testnet/api/tx", {
-        method: "POST",
-        body: tx.toHex(),
-      });
 
       setWaitingUtxo(true);
 
-      return res.text();
+      return txid;
     },
   });
 

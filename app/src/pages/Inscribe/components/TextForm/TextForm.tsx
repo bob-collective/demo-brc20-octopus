@@ -3,8 +3,7 @@ import { Flex, Input } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
 import { AuthCTA } from "../../../../components/AuthCTA";
 import { isFormDisabled } from "../../../../utils/validation";
-import { createOrdinal } from "sdk/src/ordinals";
-import { UniSatSigner } from "../../../../utils/unisat";
+import { createOrdinal } from "../../../../utils/unisat";
 import { useAccount } from "../../../../hooks/useAccount";
 import { textFormSchema } from "../../../../utils/schemas";
 
@@ -18,17 +17,7 @@ const TextForm = (): JSX.Element => {
   const mutation = useMutation({
     mutationFn: async (values: TextFormData) => {
       if (!address) return;
-
-      const signer = new UniSatSigner();
-
-      // fee rate is 1 for testnet
-      const tx = await createOrdinal(signer, address, 1, values.text, 546);
-
-      const res = await fetch("https://blockstream.info/testnet/api/tx", {
-        method: "POST",
-        body: tx.toHex(),
-      });
-      const txid = await res.text();
+      const txid = await createOrdinal(address, values.text);
       return txid;
     },
   });

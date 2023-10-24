@@ -3,7 +3,7 @@ import * as retry from "async-retry";
 import * as bitcoinjs from "bitcoinjs-lib";
 import { address, Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { bitcoin, testnet } from "bitcoinjs-lib/src/networks";
-import { RemoteSigner } from "sdk/src/ordinals";
+import { RemoteSigner, inscribeText } from "@gobob/bob-sdk/dist/ordinals";
 
 bitcoinjs.initEccLib(ecc);
 
@@ -34,7 +34,7 @@ async function getTxHex(txId: string) {
 }
 
 export class UniSatSigner implements RemoteSigner {
-  async network(): Promise<Network> {
+  async getNetwork(): Promise<Network> {
     switch (await window.unisat.getNetwork()) {
       case "livenet":
         return bitcoin;
@@ -57,7 +57,7 @@ export class UniSatSigner implements RemoteSigner {
   async getUtxoIndex(toAddress: string, txId: string): Promise<number> {
     const txHex = await getTxHex(txId);
     const tx = Transaction.fromHex(txHex);
-    const bitcoinNetwork = await this.network();
+    const bitcoinNetwork = await this.getNetwork();
     const scriptPubKey = address.toOutputScript(toAddress, bitcoinNetwork);
     const utxoIndex = tx.outs.findIndex((out) =>
       out.script.equals(scriptPubKey)
@@ -79,4 +79,19 @@ export class UniSatSigner implements RemoteSigner {
     });
     return Psbt.fromHex(psbtHex);
   }
+}
+
+export async function createOrdinal(
+  address: string,
+  text: string
+) {
+  const signer = new UniSatSigner();
+  // fee rate is 1 for testnet
+  const tx = await inscribeText(signer, address, 1, text, 546);
+  const res = await fetch('https://blockstream.info/testnet/api/tx', {
+    method: 'POST',
+    body: tx.toHex()
+  });
+  const txid = await res.text();    
+  return txid;
 }
