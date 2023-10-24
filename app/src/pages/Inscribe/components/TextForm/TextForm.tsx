@@ -12,9 +12,6 @@ type TextFormData = {
   text: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type TextFormProps = {};
-
 const TextForm = (): JSX.Element => {
   const { data: address } = useAccount();
 
@@ -77,4 +74,4 @@ const TextForm = (): JSX.Element => {
 };
 
 export { TextForm };
-export type { TextFormData, TextFormProps };
+export type { TextFormData };
