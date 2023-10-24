@@ -1,5 +1,5 @@
 import { ApiService } from "./api-service";
-import { BRC20List, BRC20Summary } from "./types";
+import { BRC20List, BRC20Summary, InscriptionUTXOData } from "./types";
 
 type UniSatResponse<T> = {
   code: number;
@@ -26,6 +26,12 @@ export class OpenAPIService extends ApiService {
 
     return this.getData<UniSatResponse<BRC20List>>(
       `/brc-20/list?sort=${sort}&complete=${complete}`
+    );
+  }
+
+  public getAddressInscriptionUTXO(address: string) {
+    return this.getData<UniSatResponse<InscriptionUTXOData>>(
+      `/address/${address}/inscription-utxo-data`
     );
   }
 }
