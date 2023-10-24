@@ -43,3 +43,33 @@ export type BRC20Summary = InscriptionRange & {
 export type BRC20List = InscriptionRange & {
   detail: BRC20Info[];
 };
+
+type InscriptionUTXOItem = {
+  txid: string;
+  vout: number;
+  satoshi: number;
+  scriptType: string;
+  scriptPk: string;
+  codeType: number;
+  address: string;
+  height: number;
+  idx: number;
+  isOpInRBF: boolean;
+  inscriptions: {
+    inscriptionNumber: number;
+    inscriptionId: string;
+    offset: number;
+    moved: boolean;
+    sequence: number;
+    isBRC20: boolean;
+  }[];
+};
+
+export type InscriptionUTXOData = {
+  cursor: number;
+  total: number;
+  totalConfirmed: number;
+  totalUnconfirmed: number;
+  totalUnconfirmedSpend: number;
+  utxo: InscriptionUTXOItem[];
+};

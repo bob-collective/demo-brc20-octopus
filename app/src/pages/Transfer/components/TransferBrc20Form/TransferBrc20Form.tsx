@@ -16,6 +16,7 @@ import {
 } from "../../../../utils/schemas";
 import { UniSatSigner } from "../../../../utils/unisat";
 import { isFormDisabled } from "../../../../utils/validation";
+import { useGetAccountInscriptionUtxo } from "../../../../hooks/useGetAccountInscriptionUtxo";
 
 type TransferBrc20FormData = {
   ticker: string;
@@ -28,11 +29,15 @@ type TransferBrc20FormProps = {};
 
 const TransferBrc20Form = (): JSX.Element => {
   const [ticker, setTicker] = useState("");
+  const [isWaitingUtxo, setWaitingUtxo] = useState(false);
 
   const { data: address } = useAccount();
   const { data: balances } = useBrc20Balances();
+  const { data: inscriptionsUtxo } = useGetAccountInscriptionUtxo({
+    refetchInterval: isWaitingUtxo ? 2000 : 60000,
+  });
 
-  const mutation = useMutation({
+  const inscribeMutation = useMutation({
     mutationFn: async (form: TransferBrc20FormData) => {
       if (!address) return;
 
@@ -47,7 +52,7 @@ const TransferBrc20Form = (): JSX.Element => {
 
       const tx = await createOrdinal(
         signer,
-        form.address,
+        address,
         JSON.stringify(inscriptionObg)
       );
 
@@ -56,12 +61,52 @@ const TransferBrc20Form = (): JSX.Element => {
         body: tx.toHex(),
       });
 
+      setWaitingUtxo(true);
+
       return res.text();
     },
   });
 
+  const sendInscriptionMutation = useMutation({
+    mutationFn: async (inscriptionId: string) => {
+      return window.unisat.sendInscription(form.values.address, inscriptionId);
+    },
+  });
+
+  useEffect(
+    () => {
+      const getInscription = async (txId: string) => {
+        const txData = inscriptionsUtxo?.utxo.find(
+          (item) => item.txid === txId
+        );
+
+        if (!txData) return;
+
+        const [{ inscriptionId }] = txData.inscriptions;
+
+        if (inscriptionId) {
+          try {
+            await sendInscriptionMutation.mutate(inscriptionId);
+
+            form.resetForm();
+
+            setWaitingUtxo(false);
+          } catch (e) {
+            setWaitingUtxo(false);
+          }
+        }
+      };
+
+      if (inscribeMutation.data && inscriptionsUtxo && isWaitingUtxo) {
+        getInscription(inscribeMutation.data);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    isWaitingUtxo ? [inscriptionsUtxo] : []
+  );
+
   const handleSubmit = (values: TransferBrc20FormData) => {
-    mutation.mutate(values);
+    inscribeMutation.mutate(values);
   };
 
   const inputBalance =
@@ -98,6 +143,11 @@ const TransferBrc20Form = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [balances]);
 
+  const isLoading =
+    inscribeMutation.isLoading ||
+    isWaitingUtxo ||
+    sendInscriptionMutation.isLoading;
+
   const isSubmitDisabled = isFormDisabled(form);
 
   return (
@@ -130,7 +180,7 @@ const TransferBrc20Form = (): JSX.Element => {
         </Flex>
 
         <AuthCTA
-          loading={mutation.isLoading}
+          loading={isLoading}
           disabled={isSubmitDisabled}
           size="large"
           type="submit"

@@ -200,6 +200,7 @@ export async function createOrdinal(
     commitTxData,
     revealPsbt
   );
+  
 
   return revealTx;
 }
