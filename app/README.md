@@ -20,4 +20,4 @@ Copy `.env.example` to `.env` and set the environment variables.
       pnpm run dev
    ```
 
-> NOTE: make sure you have UniSat Wallet chrome extension
+> NOTE: install the UniSat Wallet chrome extension

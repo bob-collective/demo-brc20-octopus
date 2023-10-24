@@ -24,7 +24,8 @@ const TextForm = (): JSX.Element => {
 
       const signer = new UniSatSigner();
 
-      const tx = await createOrdinal(signer, address, values.text);
+      // fee rate is 1 for testnet
+      const tx = await createOrdinal(signer, address, 1, values.text, 546);
 
       const res = await fetch("https://blockstream.info/testnet/api/tx", {
         method: "POST",

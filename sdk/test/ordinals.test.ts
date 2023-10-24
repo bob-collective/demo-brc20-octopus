@@ -45,7 +45,7 @@ describe("Ordinal Tests", () => {
         const secret = "fc7458de3d5616e7803fdc81d688b9642641be32fee74c4558ce680cac3d4111";
         const signer = new StaticSigner(secret);
         const toAddress = "bc1pxaneaf3w4d27hl2y93fuft2xk6m4u3wc4rafevc6slgd7f5tq2dqyfgy06";
-        const tx = await createOrdinal(signer, toAddress, "Hello World!");
-        assert(tx.getId(), "fff2e6496bda91a5b2918b34617988e07c46afab70f044c4bd72ddd2b883b4ff");
+        const tx = await createOrdinal(signer, toAddress, 1, "Hello World!", 546);
+        assert(tx.getId() == "5fbafffdccaecb857c2a405c4e9bb54094b10c2c3cc548222bb57d25a3f69b82");
     });
 });

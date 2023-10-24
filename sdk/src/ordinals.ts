@@ -12,13 +12,12 @@ function toXOnly(pubkey: Buffer) {
 interface Inscription {
   contentType: Buffer;
   content: Buffer;
-  postage: number;
 }
 
-function createTextInscription({ text, postage = 10000 }: { text: string, postage?: number }): Inscription {
+function createTextInscription(text: string): Inscription {
   const contentType = Buffer.from(encoder.encode("text/plain;charset=utf-8"));
   const content = Buffer.from(encoder.encode(text));
-  return { contentType, content, postage };
+  return { contentType, content };
 }
 
 function createInscriptionScript(xOnlyPublicKey: Buffer, inscription: Inscription) {
@@ -51,6 +50,7 @@ interface CommitTxData {
   }
 }
 
+// requires caller to initialize ecc lib
 function createCommitTxData(
   network: bitcoinjsLib.Network,
   publicKey: Buffer,
@@ -139,6 +139,7 @@ async function signRevealTx(
   commitTxData: CommitTxData,
   psbt: bitcoinjsLib.Psbt
 ) {
+  // reveal should only have one input
   psbt = await signer.signPsbt(0, psbt);
 
   const { outputScript, tapLeafScript } = commitTxData;
@@ -154,28 +155,85 @@ async function signRevealTx(
     };
   };
 
+  // finalize that input
   psbt.finalizeInput(0, customFinalizer);
 
   return psbt.extractTransaction();
 }
 
+class DummySigner implements bitcoinjsLib.Signer {
+  publicKey: Buffer;
+  constructor(publicKey: Buffer) {
+    this.publicKey = publicKey;
+  }
+  sign(_hash: Buffer, _lowR?: boolean | undefined): Buffer {
+    // https://github.com/bitcoin/bitcoin/blob/607d5a46aa0f5053d8643a3e2c31a69bfdeb6e9f/src/script/sign.cpp#L611
+    return Buffer.from("304502210100000000000000000000000000000000000000000000000000000000000000000220010000000000000000000000000000000000000000000000000000000000000001", "hex");
+  }
+  signSchnorr(hash: Buffer): Buffer {
+    // https://github.com/bitcoin/bitcoin/blob/607d5a46aa0f5053d8643a3e2c31a69bfdeb6e9f/src/script/sign.cpp#L626
+    return Buffer.alloc(64, 0);
+  }
+}
+
+function estimateTxSize(
+  network: bitcoinjsLib.Network,
+  publicKey: Buffer,
+  commitTxData: CommitTxData,
+  toAddress: string,
+  amount: number,
+) {
+  const { outputScript, scriptTaproot, tapLeafScript } = commitTxData;
+
+  const psbt = new bitcoinjsLib.Psbt({ network });
+  psbt.addInput({
+    hash: Buffer.alloc(32, 0),
+    index: 0,
+    witnessUtxo: {
+      value: amount,
+      script: scriptTaproot.output!,
+    },
+    tapLeafScript: [tapLeafScript],
+  });
+  psbt.addOutput({
+    value: amount,
+    address: toAddress,
+  });
+  psbt.signInput(0, new DummySigner(publicKey));
+
+  const customFinalizer = (inputIndex: number, input: any) => {
+    const witness = [input.tapScriptSig[inputIndex].signature]
+      .concat(outputScript)
+      .concat(tapLeafScript.controlBlock);
+    return {
+      finalScriptWitness: witnessStackToScriptWitness(witness),
+    };
+  };
+
+  psbt.finalizeInput(0, customFinalizer);
+  const tx = psbt.extractTransaction();
+  return tx.virtualSize();
+}
+
 export async function createOrdinal(
   signer: RemoteSigner,
   toAddress: string,
+  feeRate: number, // satoshi / byte
   text: string,
+  postage = 10000,
 ) {
   const bitcoinNetwork = await signer.network();
   const publicKey = Buffer.from(await signer.getPublicKey(), "hex");
 
-  const inscription = createTextInscription({ text });
+  const inscription = createTextInscription(text);
   const commitTxData = createCommitTxData(bitcoinNetwork, publicKey, inscription);
   
-  const padding = 549;
-  const txSize = 600 + Math.floor(inscription.content.length / 4);
-  const feeRate = 2; // TODO: use actual fee rate
-  const minersFee = txSize * feeRate;
+  const revealTxSize = estimateTxSize(bitcoinNetwork, publicKey, commitTxData, toAddress, postage);
 
-  const commitTxAmount = 550 + minersFee + padding;
+  // https://github.com/ordinals/ord/blob/ea1c7c8f73e1c30df547000ac7ccd82051cb60af/src/subcommand/wallet/inscribe/batch.rs#L501
+  const revealFee = revealTxSize * feeRate;
+  // https://github.com/ordinals/ord/blob/ea1c7c8f73e1c30df547000ac7ccd82051cb60af/src/subcommand/wallet/inscribe/batch.rs#L327
+  const commitTxAmount = revealFee + postage;
   
   const commitAddress = commitTxData.scriptTaproot.address!;
   const commitTxId = await signer.sendToAddress(commitAddress, commitTxAmount);
@@ -192,7 +250,7 @@ export async function createOrdinal(
     commitTxData,
     commitTxResult,
     toAddress,
-    padding,
+    postage,
   );
 
   const revealTx = await signRevealTx(
