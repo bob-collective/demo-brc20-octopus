@@ -35,7 +35,7 @@ const StyledDrawer = styled(Drawer)`
   width: 377px !important;
 `;
 
-const StyledRelative = styled.div`
+const StyledWrapper = styled.div`
   width: 100%;
   flex: 1;
   position: relative;
@@ -101,7 +101,7 @@ export {
   StyledLogo,
   StyledMain,
   StyledNFT,
-  StyledRelative,
+  StyledWrapper,
   StyledIFrameWrapper,
   StyledContent,
 };

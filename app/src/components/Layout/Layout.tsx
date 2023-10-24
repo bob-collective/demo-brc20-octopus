@@ -31,7 +31,7 @@ import {
   StyledIFrameWrapper,
   StyledMain,
   StyledNFT,
-  StyledRelative,
+  StyledWrapper,
 } from "./Layout.styles";
 
 function shortAddress(address?: string, len = 5) {
@@ -68,7 +68,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
           <StyledClose onClick={() => setOpen(false)}>
             <ChevronRight />
           </StyledClose>
-          <StyledRelative>
+          <StyledWrapper>
             {address ? (
               <Flex direction="column" gap="spacing6">
                 <Flex alignItems="center" gap="spacing2">
@@ -213,11 +213,6 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                       )}
                     </StyledBRC20List>
                   </TabsItem>
-                  {/* <TabsItem key="activity" title="Activity">
-                  <StyledBRC20List justifyContent="center" gap="spacing4">
-                    <Span>No Activity</Span>
-                  </StyledBRC20List>
-                </TabsItem> */}
                 </Tabs>
               </Flex>
             ) : (
@@ -245,7 +240,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                 </Card>
               </Flex>
             )}
-          </StyledRelative>
+          </StyledWrapper>
         </Flex>
       </StyledDrawer>
     </>

@@ -100,8 +100,8 @@ const TransferBrc20Form = (): JSX.Element => {
       if (inscribeMutation.data && inscriptionsUtxo && isWaitingUtxo) {
         getInscription(inscribeMutation.data);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     isWaitingUtxo ? [inscriptionsUtxo] : []
   );
 

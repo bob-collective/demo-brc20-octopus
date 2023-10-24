@@ -13,9 +13,6 @@ type Brc20FormData = {
   amount: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type Brc20FormProps = {};
-
 const Brc20Form = (): JSX.Element => {
   const { data: address } = useAccount();
 
@@ -93,4 +90,4 @@ const Brc20Form = (): JSX.Element => {
 };
 
 export { Brc20Form };
-export type { Brc20FormData, Brc20FormProps };
+export type { Brc20FormData };
