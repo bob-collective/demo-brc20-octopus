@@ -18,6 +18,7 @@
     "@interlay/system": "^0.0.1",
     "@interlay/theme": "^0.0.6",
     "@interlay/ui": "^0.0.7",
+    "@metamask/providers": "^12.0.0",
     "@react-aria/utils": "^3.21.0",
     "@tanstack/react-query": "^4.36.1",
     "@tanstack/react-query-devtools": "^5.0.3",
@@ -36,6 +37,7 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@typechain/ethers-v6": "^0.5.0",
     "@types/big.js": "^6.2.1",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
