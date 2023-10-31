@@ -1,7 +1,7 @@
 # BRC20 Octopus
 
 Comprehensive BRC20 / Ordinal web app which can display Bitcoin NFTs and BRC20 balances.
-Uses the UniSat Wallet extension to send Bitcoin or Ordinals and inscribe new data.
+Uses the Metamask wallet with btcsnap extension to send Bitcoin or Ordinals and inscribe new data.
 
 ## Getting Started
 
