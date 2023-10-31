@@ -52,6 +52,8 @@ const Layout = (props: HTMLAttributes<unknown>) => {
   const { data: address } = useAccount();
   const { data: nfts } = useGetNfts();
 
+  console.log("inscriptions", inscriptions);
+
   return (
     <>
       <Flex direction="column">
@@ -107,6 +109,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                             gap="spacing2"
                             key={inscription.inscriptionId}
                           >
+                            <p>dswdw</p>
                             {inscription.contentType === "image/png" ? (
                               <StyledIFrameWrapper>
                                 <StyledNFT
