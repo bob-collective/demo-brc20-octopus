@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRef } from "react";
 import { QueryConfig } from "../types/query";
-import { useAccount } from "./useAccount";
 import { getInscriptionsResult } from "../types/unisat";
+import { useConnectMetamask } from "./useConnectMetamask";
 
-const queryFn = async () => window.unisat.getInscriptions(0, 100);
+const queryFn = async () => console.log("log");
 
 type UseGetInscriptionsProps = QueryConfig<
   getInscriptionsResult,
@@ -13,11 +13,11 @@ type UseGetInscriptionsProps = QueryConfig<
 >;
 
 const useGetInscriptions = (props: UseGetInscriptionsProps = {}) => {
-  const account = useAccount();
+  const { bitcoinAddress } = useConnectMetamask();
 
-  const query = useQuery(["inscriptions", account.data], queryFn, {
+  const query = useQuery(["inscriptions", bitcoinAddress], queryFn, {
     ...props,
-    enabled: !!account.data,
+    enabled: false,
     onSuccess: (data) => {
       previousAccountRef.current = data;
     },

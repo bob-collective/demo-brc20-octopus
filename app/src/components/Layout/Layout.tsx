@@ -58,8 +58,6 @@ const Layout = (props: HTMLAttributes<unknown>) => {
 
   const { connect, evmAccount, bitcoinAddress } = useConnectMetamask();
 
-  console.log("inscriptions", inscriptions);
-
   return (
     <>
       <CTA size="small" onPress={() => connect()}>
