@@ -1,23 +1,29 @@
-import { List, ListItem } from "@interlay/ui";
+// import { List, ListItem } from "@interlay/ui";
 import { StyledWrapper } from "./Inscriptions.style";
-import { useGetInscriptions } from "../../hooks/useGetInscriptions";
-import { Link } from "react-router-dom";
+import { useGetInscriptionIds } from "../../hooks/useGetInscriptionIds";
+import { H2 } from "@interlay/ui";
+// import { Link } from "react-router-dom";
 
-const Inscriptions = (): JSX.Element => {
-  const { data: inscriptions } = useGetInscriptions();
-  console.log(inscriptions);
+type Props = {
+  bitcoinAddress?: string;
+};
+
+const Inscriptions = ({ bitcoinAddress }: Props): JSX.Element => {
+  const inscriptionIds = useGetInscriptionIds(bitcoinAddress);
+  console.log(inscriptionIds);
 
   return (
     <StyledWrapper direction="column" gap="spacing4">
-      <List>
-        {inscriptions?.list.map((inscription) => (
+      <H2>Inscriptions</H2>
+      {/* <List>
+        {inscriptionIds?.list.map((inscription) => (
           <ListItem key={inscription.inscriptionId}>
             <Link to={`/inscription/${inscription.inscriptionId}`}>
               {inscription.inscriptionId}
             </Link>
           </ListItem>
         ))}
-      </List>
+      </List> */}
     </StyledWrapper>
   );
 };

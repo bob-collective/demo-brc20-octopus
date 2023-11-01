@@ -27,7 +27,6 @@ import "react-modern-drawer/dist/index.css";
 // import { useGetInscriptions } from "../../hooks/useGetInscriptions";
 // import { useGetNfts } from "../../hooks/useGetNfts";
 import { Header } from "./Header";
-import { useConnectMetamask } from "../../hooks/useConnectMetamask";
 import {
   // StyledBRC20List,
   // StyledClose,
@@ -37,6 +36,7 @@ import {
   // StyledNFT,
   // StyledWrapper,
 } from "./Layout.styles";
+import { HexString } from "../../types/metamask";
 
 // function shortAddress(address?: string, len = 5) {
 //   if (!address) return "";
@@ -44,7 +44,15 @@ import {
 //   return address.slice(0, len) + "..." + address.slice(address.length - len);
 // }
 
-const Layout = (props: HTMLAttributes<unknown>) => {
+type MetamaskConnectProps = {
+  evmAccount?: HexString;
+  connect: () => void;
+  bitcoinAddress?: string;
+};
+
+type Props = HTMLAttributes<unknown> & MetamaskConnectProps;
+
+const Layout = ({ evmAccount, bitcoinAddress, connect, ...props }: Props) => {
   // const [isOpen, setOpen] = useState(false);
   // const { connect } = useConnect({
   //   onSuccess: () => setOpen(false),
@@ -55,8 +63,6 @@ const Layout = (props: HTMLAttributes<unknown>) => {
   // const { data: brc20Balances } = useBrc20Balances();
   // const { data: address } = useAccount();
   // const { data: nfts } = useGetNfts();
-
-  const { connect, evmAccount, bitcoinAddress } = useConnectMetamask();
 
   return (
     <>
