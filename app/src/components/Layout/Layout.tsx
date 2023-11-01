@@ -58,6 +58,8 @@ const Layout = (props: HTMLAttributes<unknown>) => {
 
   const { connect, evmAccount, bitcoinAddress } = useConnectMetamask();
 
+  console.log("inscriptions", inscriptions);
+
   return (
     <>
       <CTA size="small" onPress={() => connect()}>
@@ -126,6 +128,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                             gap="spacing2"
                             key={inscription.inscriptionId}
                           >
+                            <p>dswdw</p>
                             {inscription.contentType === "image/png" ? (
                               <StyledIFrameWrapper>
                                 <StyledNFT
