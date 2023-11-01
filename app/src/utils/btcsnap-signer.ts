@@ -1,15 +1,30 @@
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as retry from "async-retry";
 import * as bitcoinjs from "bitcoinjs-lib";
+import { BIP32Factory } from "bip32";
 import { address, Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { bitcoin, testnet } from "bitcoinjs-lib/src/networks";
 import { RemoteSigner, inscribeText } from "@gobob/bob-sdk/dist/ordinals";
 import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getNetworkInSnap, signPsbt } from "./btcsnap-utils";
 
 bitcoinjs.initEccLib(ecc);
+const bip32 = BIP32Factory(ecc);
 
-// TODO: handle more intelligently
-const hardcodedScriptType = BitcoinScriptType.P2PKH;
+// TODO: revisit if we want to add config, or use script type dynamically
+const hardcodedScriptType = BitcoinScriptType.P2WPKH;
+
+function getDerivationPurpose(scriptType: BitcoinScriptType): string {
+  switch (scriptType) {
+    case BitcoinScriptType.P2PKH:
+      return "44";
+    case BitcoinScriptType.P2SH_P2WPKH:
+      return "49";
+    case BitcoinScriptType.P2WPKH:
+      return "84";
+    default:
+      throw Error(`Missing purpose definition for script type: ${scriptType}`);
+  }
+}
 
 async function getTxHex(txId: string) {
   return await retry(
@@ -53,10 +68,23 @@ export class BtcSnapSigner implements RemoteSigner {
   }
 
   async getPublicKey(): Promise<string> {
-    // TODO: just getting xpub for now, pretty sure it's not what we want here
+    const bitcoinNetwork = await this._getBtcSnapNetwork();
     const extKey = await getExtendedPublicKey(await this._getBtcSnapNetwork(), hardcodedScriptType);
 
-    return extKey.xpub;
+    const network = bitcoinNetwork === BitcoinNetwork.Test ? testnet : bitcoin;
+    const purpose = getDerivationPurpose(hardcodedScriptType);
+    // bitcoin or testnet (0 or 1)
+    const coinType = network === testnet ? "1" : "0";
+    // account index
+    const account = "0";
+    // receive (0) or change (1)
+    const change = "0";
+    const path = `m/${purpose}'/${coinType}'/${account}'/${change}`;
+
+    // getExtendedPublicKey returns xpub in base58
+    const pubkey = bip32.fromBase58(extKey.xpub, network).derivePath(path).publicKey;
+    // TODO: check if this needs to be returned in a different format
+    return pubkey.toString("hex");
   }
 
   async sendToAddress(toAddress: string, amount: number): Promise<string> {
