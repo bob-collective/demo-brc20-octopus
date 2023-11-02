@@ -68,10 +68,11 @@ export class BtcSnapSigner implements RemoteSigner {
   }
 
   async getPublicKey(): Promise<string> {
-    const bitcoinNetwork = await this._getBtcSnapNetwork();
-    const extKey = await getExtendedPublicKey(await this._getBtcSnapNetwork(), hardcodedScriptType);
+    const network = await this.getNetwork();
+    const snapNetwork = network === bitcoin ? BitcoinNetwork.Main : BitcoinNetwork.Test;
 
-    const network = bitcoinNetwork === BitcoinNetwork.Test ? testnet : bitcoin;
+    const extKey = await getExtendedPublicKey(snapNetwork, hardcodedScriptType);
+
     const purpose = getDerivationPurpose(hardcodedScriptType);
     // bitcoin or testnet (0 or 1)
     const coinType = network === testnet ? "1" : "0";
@@ -88,7 +89,33 @@ export class BtcSnapSigner implements RemoteSigner {
   }
 
   async sendToAddress(toAddress: string, amount: number): Promise<string> {
-    // TODO: figure out how to send bitcoin, remove console.log (added so eslint doesn't complain about unused params)
+    // TODO: this needs bob-sdk version that includes the changes from this PR: https://github.com/bob-collective/bob/pull/80
+    // const network = await this.getNetwork();
+    // const networkName = network === testnet ? "testnet" : "mainnet";
+    // const electrsClient = new DefaultElectrsClient(networkName);
+
+    // const senderPubKey = Buffer.from(await this.getPublicKey(), "hex");
+    // const senderAddress = bitcoinjs.payments.p2wpkh({pubkey: senderPubKey});
+
+    // electrsClient.getAddressUtxos(senderAddress);
+
+    // const output: bitcoinjs.TxOutput = {
+    //   script: ???,
+    //   value: amount
+    // }
+
+    // // create wallet w. interfaces
+    // const wallet = {
+    //   getAddress: () => Promise.resolve(sendererAddress),
+    //   signPsbt: (psbt: Psbt) => this.signPsbt(0, psbt);
+    // }
+
+    // below needs draft pr to be merged and newer version tagged
+    // const tx = await createAndFundTransaction(electrsClient, wallet, network, [output]);
+
+    // return electrsClient.broadcastTx(tx.toHex());
+
+    // TODO: remove this throw once the above can be implemented
     console.log(`toAddress: ${toAddress}, amount: ${amount}`);
     throw Error("not implemented yet");
   }
