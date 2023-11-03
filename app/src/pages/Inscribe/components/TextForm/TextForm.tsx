@@ -3,21 +3,20 @@ import { Flex, Input } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
 import { AuthCTA } from "../../../../components/AuthCTA";
 import { isFormDisabled } from "../../../../utils/validation";
-import { createOrdinal } from "../../../../utils/unisat";
-import { useAccount } from "../../../../hooks/useAccount";
+import { createOrdinal } from "../../../../utils/btcsnap-signer";
 import { textFormSchema } from "../../../../utils/schemas";
 
 type TextFormData = {
   text: string;
 };
 
-const TextForm = (): JSX.Element => {
-  const { data: address } = useAccount();
+const btcAddress = "tb1q7fhcdqszmwqzk75p9f43kz6zt4jhjx6e5edfph";
 
+const TextForm = (): JSX.Element => {
   const mutation = useMutation({
     mutationFn: async (values: TextFormData) => {
-      if (!address) return;
-      const txid = await createOrdinal(address, values.text);
+      if (!btcAddress) return;
+      const txid = await createOrdinal(btcAddress, values.text);
       return txid;
     },
   });

@@ -5,7 +5,13 @@ import { BIP32Factory } from "bip32";
 import { address, Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { bitcoin, testnet } from "bitcoinjs-lib/src/networks";
 import { RemoteSigner, inscribeText } from "@gobob/bob-sdk/dist/ordinals";
-import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getNetworkInSnap, signPsbt } from "./btcsnap-utils";
+import {
+  BitcoinNetwork,
+  BitcoinScriptType,
+  getExtendedPublicKey,
+  getNetworkInSnap,
+  signPsbt,
+} from "./btcsnap-utils";
 
 bitcoinjs.initEccLib(ecc);
 const bip32 = BIP32Factory(ecc);
@@ -54,7 +60,9 @@ async function getTxHex(txId: string) {
 
 export class BtcSnapSigner implements RemoteSigner {
   async _getBtcSnapNetwork(): Promise<BitcoinNetwork> {
-    return (await getNetworkInSnap()) === "test" ? BitcoinNetwork.Test : BitcoinNetwork.Main;
+    return (await getNetworkInSnap()) === "test"
+      ? BitcoinNetwork.Test
+      : BitcoinNetwork.Main;
   }
 
   async getNetwork(): Promise<Network> {
@@ -69,9 +77,14 @@ export class BtcSnapSigner implements RemoteSigner {
 
   async getPublicKey(): Promise<string> {
     const network = await this.getNetwork();
-    const snapNetwork = network === bitcoin ? BitcoinNetwork.Main : BitcoinNetwork.Test;
+    console.log("network", network);
+    const snapNetwork =
+      network === bitcoin ? BitcoinNetwork.Main : BitcoinNetwork.Test;
+
+    console.log("snapNetwork", snapNetwork);
 
     const extKey = await getExtendedPublicKey(snapNetwork, hardcodedScriptType);
+    console.log(extKey);
 
     const purpose = getDerivationPurpose(hardcodedScriptType);
     // bitcoin or testnet (0 or 1)
@@ -83,8 +96,9 @@ export class BtcSnapSigner implements RemoteSigner {
     const path = `m/${purpose}'/${coinType}'/${account}'/${change}`;
 
     // getExtendedPublicKey returns xpub in base58
-    const pubkey = bip32.fromBase58(extKey.xpub, network).derivePath(path).publicKey;
+    const pubkey = bip32.fromBase58(extKey.xpub).derivePath(path).publicKey;
     // TODO: check if this needs to be returned in a different format
+    console.log('pubkey.toString("hex")', pubkey.toString("hex"));
     return pubkey.toString("hex");
   }
 
@@ -135,22 +149,20 @@ export class BtcSnapSigner implements RemoteSigner {
     // TODO: investigate if we can select input index in btcsnap
     const network = await this._getBtcSnapNetwork();
     const tx = await signPsbt(psbt.toBase64(), network, hardcodedScriptType);
-    
+
     return Psbt.fromHex(tx.txHex);
   }
 }
 
-export async function createOrdinal(
-  address: string,
-  text: string
-) {
+export async function createOrdinal(address: string, text: string) {
   const signer = new BtcSnapSigner();
   // fee rate is 1 for testnet
   const tx = await inscribeText(signer, address, 1, text, 546);
-  const res = await fetch('https://blockstream.info/testnet/api/tx', {
-    method: 'POST',
-    body: tx.toHex()
+  const res = await fetch("https://blockstream.info/testnet/api/tx", {
+    method: "POST",
+    body: tx.toHex(),
   });
-  const txid = await res.text();    
+  const txid = await res.text();
+  console.log("uh what?");
   return txid;
 }
