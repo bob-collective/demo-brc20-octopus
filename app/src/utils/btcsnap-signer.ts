@@ -5,13 +5,9 @@ import { BIP32Factory } from "bip32";
 import { address, Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { bitcoin, testnet } from "bitcoinjs-lib/src/networks";
 import { RemoteSigner, inscribeText } from "@gobob/bob-sdk/dist/ordinals";
-import {
-  BitcoinNetwork,
-  BitcoinScriptType,
-  getExtendedPublicKey,
-  getNetworkInSnap,
-  signPsbt,
-} from "./btcsnap-utils";
+import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getNetworkInSnap, signPsbt } from "./btcsnap-utils";
+import { DefaultElectrsClient } from "@gobob/bob-sdk";
+import { broadcastTx, createAndFundTransaction } from "./sdk-helpers";
 
 bitcoinjs.initEccLib(ecc);
 const bip32 = BIP32Factory(ecc);
@@ -60,9 +56,7 @@ async function getTxHex(txId: string) {
 
 export class BtcSnapSigner implements RemoteSigner {
   async _getBtcSnapNetwork(): Promise<BitcoinNetwork> {
-    return (await getNetworkInSnap()) === "test"
-      ? BitcoinNetwork.Test
-      : BitcoinNetwork.Main;
+    return (await getNetworkInSnap()) === "test" ? BitcoinNetwork.Test : BitcoinNetwork.Main;
   }
 
   async getNetwork(): Promise<Network> {
@@ -77,14 +71,9 @@ export class BtcSnapSigner implements RemoteSigner {
 
   async getPublicKey(): Promise<string> {
     const network = await this.getNetwork();
-    console.log("network", network);
-    const snapNetwork =
-      network === bitcoin ? BitcoinNetwork.Main : BitcoinNetwork.Test;
-
-    console.log("snapNetwork", snapNetwork);
+    const snapNetwork = network === bitcoin ? BitcoinNetwork.Main : BitcoinNetwork.Test;
 
     const extKey = await getExtendedPublicKey(snapNetwork, hardcodedScriptType);
-    console.log(extKey);
 
     const purpose = getDerivationPurpose(hardcodedScriptType);
     // bitcoin or testnet (0 or 1)
@@ -96,42 +85,36 @@ export class BtcSnapSigner implements RemoteSigner {
     const path = `m/${purpose}'/${coinType}'/${account}'/${change}`;
 
     // getExtendedPublicKey returns xpub in base58
-    const pubkey = bip32.fromBase58(extKey.xpub).derivePath(path).publicKey;
+    const pubkey = bip32.fromBase58(extKey.xpub, network).derivePath(path).publicKey;
     // TODO: check if this needs to be returned in a different format
-    console.log('pubkey.toString("hex")', pubkey.toString("hex"));
     return pubkey.toString("hex");
   }
 
   async sendToAddress(toAddress: string, amount: number): Promise<string> {
     // TODO: this needs bob-sdk version that includes the changes from this PR: https://github.com/bob-collective/bob/pull/80
-    // const network = await this.getNetwork();
-    // const networkName = network === testnet ? "testnet" : "mainnet";
-    // const electrsClient = new DefaultElectrsClient(networkName);
+    // currently using copied methods
+    const network = await this.getNetwork();
+    const networkName = network === testnet ? "testnet" : "mainnet";
+    const electrsClient = new DefaultElectrsClient(networkName);
 
-    // const senderPubKey = Buffer.from(await this.getPublicKey(), "hex");
-    // const senderAddress = bitcoinjs.payments.p2wpkh({pubkey: senderPubKey});
+    const senderPubKey = Buffer.from(await this.getPublicKey(), "hex");
+    const senderAddress = bitcoinjs.payments.p2wpkh({pubkey: senderPubKey}).address!;
 
-    // electrsClient.getAddressUtxos(senderAddress);
+    const output = {
+      address: toAddress,
+      value: amount
+    };
 
-    // const output: bitcoinjs.TxOutput = {
-    //   script: ???,
-    //   value: amount
-    // }
-
-    // // create wallet w. interfaces
-    // const wallet = {
-    //   getAddress: () => Promise.resolve(sendererAddress),
-    //   signPsbt: (psbt: Psbt) => this.signPsbt(0, psbt);
-    // }
+    // create wallet w. interfaces
+    const wallet = {
+      getAddress: () => Promise.resolve(senderAddress),
+      signPsbt: (psbt: Psbt) => this.signPsbt(0, psbt),
+    }
 
     // below needs draft pr to be merged and newer version tagged
-    // const tx = await createAndFundTransaction(electrsClient, wallet, network, [output]);
+    const tx = await createAndFundTransaction(electrsClient, wallet, network, [output]);
 
-    // return electrsClient.broadcastTx(tx.toHex());
-
-    // TODO: remove this throw once the above can be implemented
-    console.log(`toAddress: ${toAddress}, amount: ${amount}`);
-    throw Error("not implemented yet");
+    return broadcastTx(electrsClient, tx.toHex());
   }
 
   async getUtxoIndex(toAddress: string, txId: string): Promise<number> {
@@ -149,20 +132,22 @@ export class BtcSnapSigner implements RemoteSigner {
     // TODO: investigate if we can select input index in btcsnap
     const network = await this._getBtcSnapNetwork();
     const tx = await signPsbt(psbt.toBase64(), network, hardcodedScriptType);
-
+    
     return Psbt.fromHex(tx.txHex);
   }
 }
 
-export async function createOrdinal(address: string, text: string) {
+export async function createOrdinal(
+  address: string,
+  text: string
+) {
   const signer = new BtcSnapSigner();
   // fee rate is 1 for testnet
   const tx = await inscribeText(signer, address, 1, text, 546);
-  const res = await fetch("https://blockstream.info/testnet/api/tx", {
-    method: "POST",
-    body: tx.toHex(),
+  const res = await fetch('https://blockstream.info/testnet/api/tx', {
+    method: 'POST',
+    body: tx.toHex()
   });
-  const txid = await res.text();
-  console.log("uh what?");
+  const txid = await res.text();    
   return txid;
 }
