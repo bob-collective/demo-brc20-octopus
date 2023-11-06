@@ -62,6 +62,9 @@ dependencies:
   bitcoinjs-lib:
     specifier: ^6.1.5
     version: 6.1.5
+  coinselect:
+    specifier: ^3.1.13
+    version: 3.1.13
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -2895,6 +2898,10 @@ packages:
   /clsx@1.2.1:
     resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
     engines: {node: '>=6'}
+    dev: false
+
+  /coinselect@3.1.13:
+    resolution: {integrity: sha512-iJOrKH/7N9gX0jRkxgOHuGjvzvoxUMSeylDhH1sHn+CjLjdin5R0Hz2WEBu/jrZV5OrHcm+6DMzxwu9zb5mSZg==}
     dev: false
 
   /color-convert@1.9.3:
