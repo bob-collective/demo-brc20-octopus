@@ -29,6 +29,7 @@
     "big.js": "^6.2.1",
     "bip32": "^4.0.0",
     "bitcoinjs-lib": "^6.1.5",
+    "bs58check": "^2.1.2",
     "coinselect": "^3.1.13",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -45,6 +46,7 @@
   "devDependencies": {
     "@typechain/ethers-v6": "^0.5.0",
     "@types/big.js": "^6.2.1",
+    "@types/bs58check": "^2.1.2",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",

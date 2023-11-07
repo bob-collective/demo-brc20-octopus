@@ -62,6 +62,9 @@ dependencies:
   bitcoinjs-lib:
     specifier: ^6.1.5
     version: 6.1.5
+  bs58check:
+    specifier: ^2.1.2
+    version: 2.1.2
   coinselect:
     specifier: ^3.1.13
     version: 3.1.13
@@ -106,6 +109,9 @@ devDependencies:
   '@types/big.js':
     specifier: ^6.2.1
     version: 6.2.1
+  '@types/bs58check':
+    specifier: ^2.1.2
+    version: 2.1.2
   '@types/react':
     specifier: ^18.2.15
     version: 18.2.31
@@ -2169,6 +2175,12 @@ packages:
 
   /@types/big.js@6.2.1:
     resolution: {integrity: sha512-dKzZVT10m3ELZgYIShPJ+3Os/E1s3aDQS+wr1ne7VCLU/8hc/R+z/+gkm9WabxSkV9E8wJhTl5wC+0fD9nitsw==}
+    dev: true
+
+  /@types/bs58check@2.1.2:
+    resolution: {integrity: sha512-xpXaQlOIY1KoXlA/ytHGHpEIU87PJt+g9SH7nC6HdCgaBwT2IEZIwBMHbjuX6BpnfbiUMlmwqurdLDwXpcdmSA==}
+    dependencies:
+      '@types/node': 18.15.13
     dev: true
 
   /@types/debug@4.1.10:

@@ -8,25 +8,13 @@ import { RemoteSigner, inscribeText } from "@gobob/bob-sdk/dist/ordinals";
 import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getNetworkInSnap, signPsbt } from "./btcsnap-utils";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
 import { broadcastTx, createAndFundTransaction } from "./sdk-helpers";
+import bs58check from "bs58check";
 
 bitcoinjs.initEccLib(ecc);
 const bip32 = BIP32Factory(ecc);
 
 // TODO: revisit if we want to add config, or use script type dynamically
 const hardcodedScriptType = BitcoinScriptType.P2WPKH;
-
-function getDerivationPurpose(scriptType: BitcoinScriptType): string {
-  switch (scriptType) {
-    case BitcoinScriptType.P2PKH:
-      return "44";
-    case BitcoinScriptType.P2SH_P2WPKH:
-      return "49";
-    case BitcoinScriptType.P2WPKH:
-      return "84";
-    default:
-      throw Error(`Missing purpose definition for script type: ${scriptType}`);
-  }
-}
 
 async function getTxHex(txId: string) {
   return await retry(
@@ -54,6 +42,20 @@ async function getTxHex(txId: string) {
   );
 }
 
+// force x/y/z/v pub key into xpub/tpub format
+function anyPubToXpub(xyzpub: string, network: Network) {
+  let data = bs58check.decode(xyzpub);
+  data = data.subarray(4);
+
+  // force to xpub/tpub format
+  const tpubPrefix = "043587cf";
+  const xpubPrefix = "0488b21e";
+  const prefix = network === testnet ? tpubPrefix : xpubPrefix;
+
+  data = Buffer.concat([Buffer.from(prefix,"hex"), data]);
+  return bs58check.encode(data);
+}
+
 export class BtcSnapSigner implements RemoteSigner {
   async _getBtcSnapNetwork(): Promise<BitcoinNetwork> {
     return (await getNetworkInSnap()) === "test" ? BitcoinNetwork.Test : BitcoinNetwork.Main;
@@ -75,17 +77,13 @@ export class BtcSnapSigner implements RemoteSigner {
 
     const extKey = await getExtendedPublicKey(snapNetwork, hardcodedScriptType);
 
-    const purpose = getDerivationPurpose(hardcodedScriptType);
-    // bitcoin or testnet (0 or 1)
-    const coinType = network === testnet ? "1" : "0";
-    // account index
-    const account = "0";
-    // receive (0) or change (1)
-    const change = "0";
-    const path = `m/${purpose}'/${coinType}'/${account}'/${change}`;
+    // convert vpub to xpub/tpub
+    const forcedXpub = anyPubToXpub(extKey.xpub, network);
+    // console.log(`original xpub: ${extKey.xpub}`);
+    // console.log(`converted xpub: ${forcedXpub}`);
 
-    // getExtendedPublicKey returns xpub in base58
-    const pubkey = bip32.fromBase58(extKey.xpub, network).derivePath(path).publicKey;
+    const pubkey = bip32.fromBase58(forcedXpub, network).derive(0).derive(network === testnet ? 1 : 0).publicKey;
+
     // TODO: check if this needs to be returned in a different format
     return pubkey.toString("hex");
   }
