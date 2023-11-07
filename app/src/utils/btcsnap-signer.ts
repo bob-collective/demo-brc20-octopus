@@ -77,12 +77,11 @@ export class BtcSnapSigner implements RemoteSigner {
 
     const extKey = await getExtendedPublicKey(snapNetwork, hardcodedScriptType);
 
-    // convert vpub to xpub/tpub
+    // extKey.xpub is a vpub with purpose and cointype (mainnet vs testnet) path embedded
+    // convert to xpub/tpub before getting pubkey
     const forcedXpub = anyPubToXpub(extKey.xpub, network);
-    // console.log(`original xpub: ${extKey.xpub}`);
-    // console.log(`converted xpub: ${forcedXpub}`);
 
-    const pubkey = bip32.fromBase58(forcedXpub, network).derive(0).derive(network === testnet ? 1 : 0).publicKey;
+    const pubkey = bip32.fromBase58(forcedXpub, network).derive(0).publicKey;
 
     // TODO: check if this needs to be returned in a different format
     return pubkey.toString("hex");
