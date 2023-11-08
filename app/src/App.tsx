@@ -4,11 +4,12 @@ import Inscribe from "./pages/Inscribe/Inscribe";
 import Inscriptions from "./pages/Inscriptions/Inscriptions";
 import Inscription from "./pages/Inscription/Inscription";
 import "./utils/yup.custom";
-import { useConnectMetamask } from "./hooks/useConnectMetamask";
+import { useMetamask } from "./hooks/useMetamask";
 import Transfer from "./pages/Transfer/Transfer";
 
 function App() {
-  const { connect, evmAccount, bitcoinAddress } = useConnectMetamask();
+  const { connect, evmAccount, bitcoinAddress } = useMetamask();
+
   return (
     <BrowserRouter>
       <Layout

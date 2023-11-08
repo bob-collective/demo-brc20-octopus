@@ -91,10 +91,7 @@ const getClientsAndAccounts = async () => {
     BitcoinScriptType.P2WPKH
   );
   // derive public address from xpub
-  const bitcoinAddress = addressFromExtPubKey(
-    xpub.xpub,
-    bitcoinNetwork,
-  )!;
+  const bitcoinAddress = addressFromExtPubKey(xpub.xpub, bitcoinNetwork)!;
 
   return {
     publicClient,
@@ -105,7 +102,7 @@ const getClientsAndAccounts = async () => {
   };
 };
 
-const useConnectMetamask = () => {
+const useMetamask = () => {
   const [connected, setConnected] = useState(false);
   const [publicClient, setPublicClient] = useState<PublicClient>();
   const [walletClient, setWalletClient] = useState<WalletClient>();
@@ -141,4 +138,4 @@ const useConnectMetamask = () => {
   };
 };
 
-export { L2_CHAIN_CONFIG, L2_METADATA, L2_PROJECT_ID, useConnectMetamask };
+export { L2_CHAIN_CONFIG, L2_METADATA, L2_PROJECT_ID, useMetamask };
