@@ -1,64 +1,89 @@
-import { BTC } from "@interlay/coin-icons";
-import { ChevronRight } from "@interlay/icons";
+// import { BTC } from "@interlay/coin-icons";
+// import { ChevronRight } from "@interlay/icons";
+import truncateEthAddress from "truncate-eth-address";
+import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
 import {
-  Card,
-  Dd,
-  Dl,
-  DlGroup,
-  Dt,
+  CTA,
+  // Card,
+  // Dd,
+  // Dl,
+  // DlGroup,
+  // Dt,
   Flex,
-  H2,
-  H3,
-  P,
+  // H2,
+  // H3,
+  // P,
   Span,
-  Tabs,
-  TabsItem,
+  // Tabs,
+  // TabsItem,
 } from "@interlay/ui";
-import { HTMLAttributes, useState } from "react";
+import { HTMLAttributes } from "react";
 import "react-modern-drawer/dist/index.css";
-import { Link } from "react-router-dom";
-import { useAccount } from "../../hooks/useAccount";
-import { useBalance } from "../../hooks/useBalance";
-import { useBrc20Balances } from "../../hooks/useBrc20Balances";
-import { useConnect } from "../../hooks/useConnect";
-import { useGetInscriptions } from "../../hooks/useGetInscriptions";
-import { useGetNfts } from "../../hooks/useGetNfts";
+// import { Link } from "react-router-dom";
+// import { useAccount } from "../../hooks/useAccount";
+// import { useBalance } from "../../hooks/useBalance";
+// import { useBrc20Balances } from "../../hooks/useBrc20Balances";
+// import { useConnect } from "../../hooks/useConnect";
+// import { useGetInscriptions } from "../../hooks/useGetInscriptions";
+// import { useGetNfts } from "../../hooks/useGetNfts";
 import { Header } from "./Header";
 import {
-  StyledBRC20List,
-  StyledClose,
-  StyledDrawer,
-  StyledIFrameWrapper,
+  // StyledBRC20List,
+  // StyledClose,
+  // StyledDrawer,
+  // StyledIFrameWrapper,
   StyledMain,
-  StyledNFT,
-  StyledWrapper,
+  // StyledNFT,
+  // StyledWrapper,
 } from "./Layout.styles";
+import { HexString } from "../../types/metamask";
 
-function shortAddress(address?: string, len = 5) {
-  if (!address) return "";
-  if (address.length <= len * 2) return address;
-  return address.slice(0, len) + "..." + address.slice(address.length - len);
-}
+// function shortAddress(address?: string, len = 5) {
+//   if (!address) return "";
+//   if (address.length <= len * 2) return address;
+//   return address.slice(0, len) + "..." + address.slice(address.length - len);
+// }
 
-const Layout = (props: HTMLAttributes<unknown>) => {
-  const [isOpen, setOpen] = useState(false);
-  const { connect } = useConnect({
-    onSuccess: () => setOpen(false),
-  });
+type MetamaskConnectProps = {
+  evmAccount?: HexString;
+  connect: () => void;
+  bitcoinAddress?: string;
+};
 
-  const { data: inscriptions } = useGetInscriptions();
-  const { data: balance } = useBalance();
-  const { data: brc20Balances } = useBrc20Balances();
-  const { data: address } = useAccount();
-  const { data: nfts } = useGetNfts();
+type Props = HTMLAttributes<unknown> & MetamaskConnectProps;
+
+const Layout = ({ evmAccount, bitcoinAddress, connect, ...props }: Props) => {
+  // const [isOpen, setOpen] = useState(false);
+  // const { connect } = useConnect({
+  //   onSuccess: () => setOpen(false),
+  // });
+
+  // const { data: inscriptions } = useGetInscriptions();
+  // const { data: balance } = useBalance();
+  // const { data: brc20Balances } = useBrc20Balances();
+  // const { data: address } = useAccount();
+  // const { data: nfts } = useGetNfts();
 
   return (
     <>
+      <CTA size="small" onPress={() => connect()}>
+        {evmAccount ? (
+          <Flex elementType="span" gap="spacing2">
+            <Jazzicon diameter={20} seed={jsNumberForAddress(evmAccount)} />
+            <Span style={{ color: "inherit" }} size="s" color="tertiary">
+              {truncateEthAddress(evmAccount)} | bitcoin: {bitcoinAddress}
+            </Span>
+          </Flex>
+        ) : (
+          "Connect Wallet"
+        )}
+      </CTA>
       <Flex direction="column">
-        <Header onClickAccount={() => setOpen(true)} />
+        {/* <Header onClickAccount={() => setOpen(true)} /> */}
+        <Header onClickAccount={() => console.log("log")} />
         <StyledMain direction="column" {...props} />
       </Flex>
-      <StyledDrawer
+      {/* <StyledDrawer
         enableOverlay={false}
         open={isOpen}
         onClose={() => setOpen(false)}
@@ -107,6 +132,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
                             gap="spacing2"
                             key={inscription.inscriptionId}
                           >
+                            <p>dswdw</p>
                             {inscription.contentType === "image/png" ? (
                               <StyledIFrameWrapper>
                                 <StyledNFT
@@ -242,7 +268,7 @@ const Layout = (props: HTMLAttributes<unknown>) => {
             )}
           </StyledWrapper>
         </Flex>
-      </StyledDrawer>
+      </StyledDrawer> */}
     </>
   );
 };

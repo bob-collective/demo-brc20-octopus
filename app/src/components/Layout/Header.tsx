@@ -1,17 +1,18 @@
-import { CTA, Flex, Span } from "@interlay/ui";
+import { Flex, Span } from "@interlay/ui";
 import { Link } from "react-router-dom";
-import { useAccount } from "../../hooks/useAccount";
+// import { useAccount } from "../../hooks/useAccount";
 import { StyledHeader } from "./Layout.styles";
 import { Logo } from "./Logo";
 
-function shortAddress(address?: string, len = 5) {
-  if (!address) return "";
-  if (address.length <= len * 2) return address;
-  return address.slice(0, len) + "..." + address.slice(address.length - len);
-}
+// function shortAddress(address?: string, len = 5) {
+//   if (!address) return "";
+//   if (address.length <= len * 2) return address;
+//   return address.slice(0, len) + "..." + address.slice(address.length - len);
+// }
 
 const Header = ({ onClickAccount }: { onClickAccount: () => void }) => {
-  const { data: address } = useAccount();
+  console.log(onClickAccount);
+  // const { data: address } = useAccount();
 
   return (
     <StyledHeader
@@ -36,11 +37,11 @@ const Header = ({ onClickAccount }: { onClickAccount: () => void }) => {
           </Flex>
         </nav>
       </Flex>
-      <Flex>
+      {/* <Flex>
         <CTA size="small" onPress={onClickAccount}>
           {address ? shortAddress(address) : "Connect Wallet"}
         </CTA>
-      </Flex>
+      </Flex> */}
     </StyledHeader>
   );
 };

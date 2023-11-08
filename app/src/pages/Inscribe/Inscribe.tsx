@@ -1,6 +1,6 @@
 import { Card, Tabs, TabsItem } from "@interlay/ui";
 import { StyledWrapper } from "./Inscribe.style";
-import { Brc20Form, TextForm } from "./components";
+import { TextForm } from "./components";
 
 function Inscribe() {
   return (
@@ -10,9 +10,9 @@ function Inscribe() {
           <TabsItem title="Text" key="text">
             <TextForm />
           </TabsItem>
-          <TabsItem title="BRC-20" key="brc20">
+          {/* <TabsItem title="BRC-20" key="brc20">
             <Brc20Form />
-          </TabsItem>
+          </TabsItem> */}
         </Tabs>
       </Card>
     </StyledWrapper>
