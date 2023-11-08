@@ -23,9 +23,9 @@ import {
   connect as connectWithBtcSnap,
   getExtendedPublicKey,
 } from "../utils/btcsnap-utils";
-import { addressFromExtPubKey } from "@unspentio/xpub-lib";
 import { useCallback, useEffect, useState } from "react";
 import { HexString } from "../types/metamask";
+import { addressFromExtPubKey } from "../utils/btcsnap-signer";
 
 const L2_PROJECT_ID = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID as string;
 
@@ -91,16 +91,16 @@ const getClientsAndAccounts = async () => {
     BitcoinScriptType.P2WPKH
   );
   // derive public address from xpub
-  const bitcoinAddress = addressFromExtPubKey({
-    extPubKey: xpub.xpub,
-    network: bitcoinNetwork,
-  });
+  const bitcoinAddress = addressFromExtPubKey(
+    xpub.xpub,
+    bitcoinNetwork,
+  )!;
 
   return {
     publicClient,
     walletClient,
     evmAddress,
-    bitcoinAddress: bitcoinAddress?.address,
+    bitcoinAddress,
     xpub,
   };
 };

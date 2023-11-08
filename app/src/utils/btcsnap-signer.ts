@@ -43,6 +43,13 @@ async function getTxHex(txId: string) {
   );
 }
 
+export function addressFromExtPubKey(xyzpub: string, bitcoinNetwork: BitcoinNetwork) {
+  const network = bitcoinNetwork === BitcoinNetwork.Test ? testnet : bitcoin
+  const forcedXpub = anyPubToXpub(xyzpub, network);
+  const pubkey = bip32.fromBase58(forcedXpub, network).derive(0).derive(0).publicKey;
+  return bitcoinjs.payments.p2wpkh({ pubkey, network }).address;
+}
+
 // force x/y/z/v pub key into xpub/tpub format
 function anyPubToXpub(xyzpub: string, network: Network) {
   let data = bs58check.decode(xyzpub);
