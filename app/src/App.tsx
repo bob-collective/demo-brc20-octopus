@@ -5,6 +5,7 @@ import Inscriptions from "./pages/Inscriptions/Inscriptions";
 import Inscription from "./pages/Inscription/Inscription";
 import "./utils/yup.custom";
 import { useConnectMetamask } from "./hooks/useConnectMetamask";
+import Transfer from "./pages/Transfer/Transfer";
 
 function App() {
   const { connect, evmAccount, bitcoinAddress } = useConnectMetamask();
@@ -17,6 +18,7 @@ function App() {
       >
         <Routes>
           <Route element={<Inscribe />} path="/inscribe" />
+          <Route element={<Transfer />} path="/transfer" />
           <Route
             element={<Inscriptions bitcoinAddress={bitcoinAddress} />}
             path="/"

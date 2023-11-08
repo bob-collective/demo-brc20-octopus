@@ -5,10 +5,11 @@ import { BIP32Factory } from "bip32";
 import { address, Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { bitcoin, testnet } from "bitcoinjs-lib/src/networks";
 import { RemoteSigner, inscribeText } from "@gobob/bob-sdk/dist/ordinals";
-import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getNetworkInSnap, signPsbt } from "./btcsnap-utils";
+import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getMasterFingerprint, getNetworkInSnap, signPsbt } from "./btcsnap-utils";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
-import { broadcastTx, createAndFundTransaction } from "./sdk-helpers";
+import { broadcastTx, getAddressUtxos } from "./sdk-helpers";
 import bs58check from "bs58check";
+import coinSelect from "coinselect";
 
 bitcoinjs.initEccLib(ecc);
 const bip32 = BIP32Factory(ecc);
@@ -52,7 +53,7 @@ function anyPubToXpub(xyzpub: string, network: Network) {
   const xpubPrefix = "0488b21e";
   const prefix = network === testnet ? tpubPrefix : xpubPrefix;
 
-  data = Buffer.concat([Buffer.from(prefix,"hex"), data]);
+  data = Buffer.concat([Buffer.from(prefix, "hex"), data]);
   return bs58check.encode(data);
 }
 
@@ -81,9 +82,8 @@ export class BtcSnapSigner implements RemoteSigner {
     // convert to xpub/tpub before getting pubkey
     const forcedXpub = anyPubToXpub(extKey.xpub, network);
 
-    const pubkey = bip32.fromBase58(forcedXpub, network).derive(0).publicKey;
-
-    // TODO: check if this needs to be returned in a different format
+    // child is m/84'/1'/0'/0/0
+    const pubkey = bip32.fromBase58(forcedXpub, network).derive(0).derive(0).publicKey;
     return pubkey.toString("hex");
   }
 
@@ -95,23 +95,80 @@ export class BtcSnapSigner implements RemoteSigner {
     const electrsClient = new DefaultElectrsClient(networkName);
 
     const senderPubKey = Buffer.from(await this.getPublicKey(), "hex");
-    const senderAddress = bitcoinjs.payments.p2wpkh({pubkey: senderPubKey}).address!;
+    const senderAddress = bitcoinjs.payments.p2wpkh({ pubkey: senderPubKey, network }).address!;
 
-    const output = {
+    const txOutputs = [{
       address: toAddress,
       value: amount
-    };
+    }];
 
-    // create wallet w. interfaces
-    const wallet = {
-      getAddress: () => Promise.resolve(senderAddress),
-      signPsbt: (psbt: Psbt) => this.signPsbt(0, psbt),
+    const utxos = await getAddressUtxos(electrsClient, senderAddress);
+
+    const { inputs, outputs } = coinSelect(
+      utxos.map(utxo => {
+        return {
+          txId: utxo.txid,
+          vout: utxo.vout,
+          value: utxo.value,
+        }
+      }),
+      txOutputs,
+      1 // fee rate
+    );
+
+    if (inputs === undefined) {
+      throw Error("No inputs returned/selected by coinSelect");
     }
 
-    // below needs draft pr to be merged and newer version tagged
-    const tx = await createAndFundTransaction(electrsClient, wallet, network, [output]);
+    if (outputs === undefined) {
+      throw Error("No outputs returned/selected by coinSelect");
+    }
 
-    return broadcastTx(electrsClient, tx.toHex());
+    const psbt = new Psbt({ network });
+
+    for (const input of inputs) {
+      const txHex = await electrsClient.getTransactionHex(input.txId);
+      const utx = Transaction.fromHex(txHex);
+
+      const witnessUtxo = {
+        script: utx.outs[input.vout].script,
+        value: input.value,
+      };
+      const nonWitnessUtxo = utx.toBuffer()
+
+      psbt.addInput({
+        hash: input.txId,
+        index: input.vout,
+        nonWitnessUtxo,
+        witnessUtxo,
+        bip32Derivation: [
+          {
+            masterFingerprint: Buffer.from(await getMasterFingerprint() as any, "hex"),
+            path: "m/84'/1'/0'/0/0",
+            pubkey: senderPubKey,
+          }
+        ]
+      });
+    }
+
+    const changeAddress = senderAddress;
+    outputs.forEach(output => {
+      // watch out, outputs may have been added that you need to provide
+      // an output address/script for
+      if (!output.address) {
+        output.address = changeAddress;
+      }
+
+      psbt.addOutput({
+        address: output.address,
+        value: output.value,
+      })
+    });
+
+    const snapNetwork = await this._getBtcSnapNetwork();
+    const tx = await signPsbt(psbt.toBase64(), snapNetwork, hardcodedScriptType);
+
+    return broadcastTx(electrsClient, tx.txHex);
   }
 
   async getUtxoIndex(toAddress: string, txId: string): Promise<number> {
@@ -129,7 +186,7 @@ export class BtcSnapSigner implements RemoteSigner {
     // TODO: investigate if we can select input index in btcsnap
     const network = await this._getBtcSnapNetwork();
     const tx = await signPsbt(psbt.toBase64(), network, hardcodedScriptType);
-    
+
     return Psbt.fromHex(tx.txHex);
   }
 }
@@ -145,6 +202,6 @@ export async function createOrdinal(
     method: 'POST',
     body: tx.toHex()
   });
-  const txid = await res.text();    
+  const txid = await res.text();
   return txid;
 }

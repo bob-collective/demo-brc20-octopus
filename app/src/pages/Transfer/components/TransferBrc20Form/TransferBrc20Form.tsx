@@ -10,7 +10,7 @@ import { useAccount } from "../../../../hooks/useAccount";
 import { useBrc20Balances } from "../../../../hooks/useBrc20Balances";
 import { Amount } from "../../../../utils/amount";
 import {
-  TransferBTCSchemaParams,
+  TransferBtcSchemaParams,
   transferBrc20Schema,
 } from "../../../../utils/schemas";
 import { createOrdinal } from "../../../../utils/unisat";
@@ -103,14 +103,14 @@ const TransferBrc20Form = (): JSX.Element => {
   const inputBalance =
     ticker && balances
       ? new Amount(
-          Bitcoin,
-          balances.detail.find((balance) => balance.ticker === ticker)
-            ?.availableBalance || 0,
-          true
-        ).toBig()
+        Bitcoin,
+        balances.detail.find((balance) => balance.ticker === ticker)
+          ?.availableBalance || 0,
+        true
+      ).toBig()
       : new Big(0);
 
-  const schemaParams: TransferBTCSchemaParams = {
+  const schemaParams: TransferBtcSchemaParams = {
     amount: {
       maxAmount: inputBalance !== undefined ? inputBalance : undefined,
     },

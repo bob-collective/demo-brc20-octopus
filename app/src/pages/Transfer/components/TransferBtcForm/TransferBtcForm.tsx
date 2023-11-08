@@ -6,17 +6,23 @@ import { Bitcoin } from "../../../../constants/currencies";
 import { useBalance } from "../../../../hooks/useBalance";
 import { Amount } from "../../../../utils/amount";
 import {
-  TransferBrc20SchemaParams,
-  transferBrc20Schema,
+  TransferBtcSchemaParams,
+  transferBtcSchema,
 } from "../../../../utils/schemas";
 import { Flex, Input, TokenInput } from "@interlay/ui";
 import { isFormDisabled } from "../../../../utils/validation";
 import { AuthCTA } from "../../../../components/AuthCTA";
+import { BtcSnapSigner } from "../../../../utils/btcsnap-signer";
 
 type TransferBTCForm = {
   amount: string;
   address: string;
 };
+
+async function sendBitcoin(toAddress: string, amount: number): Promise<string> {
+  const signer = new BtcSnapSigner();
+  return signer.sendToAddress(toAddress, amount);
+}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type TransferBtcFormProps = {};
@@ -26,7 +32,7 @@ const TransferBtcForm = (): JSX.Element => {
 
   const mutation = useMutation({
     mutationFn: (form: TransferBTCForm) =>
-      window.unisat.sendBitcoin(
+      sendBitcoin(
         form.address,
         new Amount(Bitcoin, form.amount, true).toAtomic()
       ),
@@ -40,7 +46,7 @@ const TransferBtcForm = (): JSX.Element => {
     ? new Amount(Bitcoin, balance.confirmed).toBig()
     : new Big(0);
 
-  const schemaParams: TransferBrc20SchemaParams = {
+  const schemaParams: TransferBtcSchemaParams = {
     amount: {
       maxAmount: inputBalance !== undefined ? inputBalance : undefined,
     },
@@ -51,7 +57,7 @@ const TransferBtcForm = (): JSX.Element => {
       amount: "",
       address: "",
     },
-    validationSchema: transferBrc20Schema(schemaParams),
+    validationSchema: transferBtcSchema(schemaParams),
     onSubmit: handleSubmit,
     hideErrors: "untouched",
   });
