@@ -1,25 +1,24 @@
-import truncateEthAddress from "truncate-eth-address";
-import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
-import { CTA, Flex, Span } from "@interlay/ui";
-import { HTMLAttributes } from "react";
+// import truncateEthAddress from "truncate-eth-address";
+// import Jazzicon, { jsNumberForAddress } from "react-jazzicon";
+import { CTA, Flex } from "@interlay/ui";
+// import { HTMLAttributes } from "react";
 import "react-modern-drawer/dist/index.css";
 import { Header } from "./Header";
 import { StyledMain } from "./Layout.styles";
-import { HexString } from "../../types/metamask";
+import { connect } from "../../utils/btcsnap-utils";
+import { useState } from "react";
 
-type MetamaskConnectProps = {
-  evmAccount?: HexString;
-  connect: () => void;
-  bitcoinAddress?: string;
-};
+const Layout = ({ ...props }) => {
+  const [isConnected, setIsConnected] = useState<boolean>();
 
-type Props = HTMLAttributes<unknown> & MetamaskConnectProps;
-
-const Layout = ({ evmAccount, bitcoinAddress, connect, ...props }: Props) => {
   return (
     <>
-      <CTA size="small" onPress={() => connect()}>
-        {evmAccount ? (
+      <CTA
+        size="small"
+        onPress={() => connect((connected) => setIsConnected(connected))}
+      >
+        {isConnected ? "Connected" : "Connect Metamask"}
+        {/* {evmAccount ? (
           <Flex elementType="span" gap="spacing2">
             <Jazzicon diameter={20} seed={jsNumberForAddress(evmAccount)} />
             <Span style={{ color: "inherit" }} size="s" color="tertiary">
@@ -28,7 +27,7 @@ const Layout = ({ evmAccount, bitcoinAddress, connect, ...props }: Props) => {
           </Flex>
         ) : (
           "Connect Wallet"
-        )}
+        )} */}
       </CTA>
       <Flex direction="column">
         <Header />

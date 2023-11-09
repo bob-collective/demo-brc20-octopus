@@ -1,5 +1,4 @@
-import { createWalletClient, custom, defineChain } from "viem";
-import { Chain } from "viem";
+import { defineChain, Chain } from "viem";
 
 import {
   L2_BLOCK_EXPLORER,
@@ -11,13 +10,10 @@ import {
 import {
   BitcoinNetwork,
   BitcoinScriptType,
-  ExtendedPublicKey,
-  connect as connectWithBtcSnap,
   getExtendedPublicKey,
 } from "../utils/btcsnap-utils";
-import { useCallback, useEffect, useState } from "react";
-import { HexString } from "../types/metamask";
 import { addressFromExtPubKey } from "../utils/btcsnap-signer";
+import { useQuery } from "@tanstack/react-query";
 
 const L2_CHAIN_CONFIG = {
   id: L2_CHAIN_ID,
@@ -47,12 +43,6 @@ export const l2chain = defineChain(L2_CHAIN_CONFIG);
 const bitcoinNetwork = BitcoinNetwork.Test;
 
 const getClientsAndAccounts = async () => {
-  const walletClient = createWalletClient({
-    chain: l2chain,
-    transport: custom(window.ethereum),
-  });
-  const [evmAddress] = await walletClient.requestAddresses();
-
   // get segwit xpub
   const xpub = await getExtendedPublicKey(
     bitcoinNetwork,
@@ -62,39 +52,25 @@ const getClientsAndAccounts = async () => {
   const bitcoinAddress = addressFromExtPubKey(xpub.xpub, bitcoinNetwork)!;
 
   return {
-    evmAddress,
     bitcoinAddress,
     xpub,
   };
 };
 
-const useMetamask = () => {
-  const [connected, setConnected] = useState(false);
-  const [evmAccount, setEvmAccount] = useState<HexString>();
-  const [bitcoinAddress, setBitcoinAddress] = useState<string>();
-  const [xpub, setXpub] = useState<ExtendedPublicKey>();
-
-  const connect = useCallback(() => {
-    connectWithBtcSnap(() => setConnected(true));
-  }, []);
-
-  useEffect(() => {
-    if (connected) {
-      (async () => {
-        const { evmAddress, bitcoinAddress, xpub } =
-          await getClientsAndAccounts();
-        setEvmAccount(evmAddress);
-        setBitcoinAddress(bitcoinAddress);
-        setXpub(xpub);
-      })();
+const useMetamask = (connected: boolean) => {
+  console.log("in hook", connected);
+  const { data } = useQuery(
+    ["metamasksnapdata"],
+    async () => await getClientsAndAccounts(),
+    {
+      enabled: false,
+      refetchInterval: Infinity,
+      refetchOnMount: false,
     }
-  }, [connected]);
+  );
 
   return {
-    connect,
-    evmAccount,
-    bitcoinAddress,
-    xpub,
+    data,
   };
 };
 
