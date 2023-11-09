@@ -10,9 +10,9 @@ type TextFormData = {
   text: string;
 };
 
-const btcAddress = "tb1q7fhcdqszmwqzk75p9f43kz6zt4jhjx6e5edfph";
-
 const TextForm = (): JSX.Element => {
+  const btcAddress = "tb1q7fhcdqszmwqzk75p9f43kz6zt4jhjx6e5edfph";
+
   const mutation = useMutation({
     mutationFn: async (values: TextFormData) => {
       if (!btcAddress) return;
