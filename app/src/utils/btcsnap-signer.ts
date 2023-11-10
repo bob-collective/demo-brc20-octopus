@@ -2,20 +2,23 @@ import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as retry from "async-retry";
 import * as bitcoinjs from "bitcoinjs-lib";
 import { BIP32Factory } from "bip32";
-import { address, Network, Psbt, Transaction } from "bitcoinjs-lib";
+import { Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { bitcoin, testnet } from "bitcoinjs-lib/src/networks";
-import { RemoteSigner, inscribeText } from "@gobob/bob-sdk/dist/ordinals";
-import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getMasterFingerprint, getNetworkInSnap, signPsbt } from "./btcsnap-utils";
+// import { RemoteSigner, inscribeText } from "@gobob/bob-sdk/dist/ordinals";
+import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getMasterFingerprint, getNetworkInSnap, signInput, signPsbt, updateNetworkInSnap } from "./btcsnap-utils";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
 import { broadcastTx, getAddressUtxos } from "./sdk-helpers";
 import bs58check from "bs58check";
 import coinSelect from "coinselect";
+import { inscribeText, RemoteSigner } from "./ordinals";
 
 bitcoinjs.initEccLib(ecc);
 const bip32 = BIP32Factory(ecc);
 
 // TODO: revisit if we want to add config, or use script type dynamically
 const hardcodedScriptType = BitcoinScriptType.P2WPKH;
+
+const DEFAULT_BIP32_PATH = "m/84'/1'/0'/0/0";
 
 async function getTxHex(txId: string) {
   return await retry(
@@ -81,15 +84,19 @@ export class BtcSnapSigner implements RemoteSigner {
 
   async getPublicKey(): Promise<string> {
     const network = await this.getNetwork();
+    if (network === bitcoin) {
+      await updateNetworkInSnap(BitcoinNetwork.Test)
+    }
     const snapNetwork = network === bitcoin ? BitcoinNetwork.Main : BitcoinNetwork.Test;
 
+    // https://github.com/snapdao/btcsnap/blob/7bad370a45b744b3c108308e75ce7fa2a7a7061f/packages/snap/src/rpc/getExtendedPublicKey.ts#L10-L14
     const extKey = await getExtendedPublicKey(snapNetwork, hardcodedScriptType);
 
     // extKey.xpub is a vpub with purpose and cointype (mainnet vs testnet) path embedded
     // convert to xpub/tpub before getting pubkey
     const forcedXpub = anyPubToXpub(extKey.xpub, network);
 
-    // child is m/84'/1'/0'/0/0
+    // child is m/84'/1'/0'/0/0 (same as DEFAULT_BIP32_PATH)
     const pubkey = bip32.fromBase58(forcedXpub, network).derive(0).derive(0).publicKey;
     return pubkey.toString("hex");
   }
@@ -151,7 +158,7 @@ export class BtcSnapSigner implements RemoteSigner {
         bip32Derivation: [
           {
             masterFingerprint: Buffer.from(await getMasterFingerprint() as any, "hex"),
-            path: "m/84'/1'/0'/0/0",
+            path: DEFAULT_BIP32_PATH,
             pubkey: senderPubKey,
           }
         ]
@@ -160,8 +167,7 @@ export class BtcSnapSigner implements RemoteSigner {
 
     const changeAddress = senderAddress;
     outputs.forEach(output => {
-      // watch out, outputs may have been added that you need to provide
-      // an output address/script for
+      // output may have been added for change
       if (!output.address) {
         output.address = changeAddress;
       }
@@ -173,28 +179,22 @@ export class BtcSnapSigner implements RemoteSigner {
     });
 
     const snapNetwork = await this._getBtcSnapNetwork();
-    const tx = await signPsbt(psbt.toBase64(), snapNetwork, hardcodedScriptType);
+    const txResult = await signPsbt(psbt.toBase64(), snapNetwork, hardcodedScriptType);
 
-    return broadcastTx(electrsClient, tx.txHex);
+    return broadcastTx(electrsClient, txResult.txHex);
   }
 
-  async getUtxoIndex(toAddress: string, txId: string): Promise<number> {
+  async getTransaction(txId: string): Promise<Transaction> {
     const txHex = await getTxHex(txId);
     const tx = Transaction.fromHex(txHex);
-    const bitcoinNetwork = await this.getNetwork();
-    const scriptPubKey = address.toOutputScript(toAddress, bitcoinNetwork);
-    const utxoIndex = tx.outs.findIndex((out) =>
-      out.script.equals(scriptPubKey)
-    );
-    return utxoIndex;
+    return tx;
   }
 
-  async signPsbt(_inputIndex: number, psbt: Psbt): Promise<Psbt> {
+  async signPsbt(inputIndex: number, psbt: Psbt): Promise<Psbt> {
     // TODO: investigate if we can select input index in btcsnap
     const network = await this._getBtcSnapNetwork();
-    const tx = await signPsbt(psbt.toBase64(), network, hardcodedScriptType);
-
-    return Psbt.fromHex(tx.txHex);
+    const psbtBase64 = await signInput(psbt.toBase64(), network, hardcodedScriptType, inputIndex, DEFAULT_BIP32_PATH);
+    return Psbt.fromBase64(psbtBase64);
   }
 }
 
