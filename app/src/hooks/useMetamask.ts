@@ -5,6 +5,7 @@ import {
 } from "../utils/btcsnap-utils";
 import { addressFromExtPubKey } from "../utils/btcsnap-signer";
 import { useQuery } from "@tanstack/react-query";
+import { connect } from "../utils/btcsnap-utils";
 
 const bitcoinNetwork = BitcoinNetwork.Test;
 
@@ -23,6 +24,8 @@ const getClientsAndAccounts = async () => {
   };
 };
 
+const useConnectMetamask = () => connect;
+
 const useMetamask = (connected: boolean) => {
   const { data } = useQuery(
     ["metamasksnapdata"],
@@ -39,4 +42,4 @@ const useMetamask = (connected: boolean) => {
   };
 };
 
-export { useMetamask };
+export { useMetamask, useConnectMetamask };
