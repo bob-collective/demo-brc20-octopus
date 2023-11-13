@@ -205,8 +205,19 @@ const { ethereum } = window;
 
 const snapId = "npm:btcsnap";
 
+export async function checkConnection(): Promise<boolean> {
+  const snaps = await ethereum.request({
+    method: "wallet_getSnaps",
+  });
+
+  const hasMySnap = Object.keys(snaps || []).includes(snapId);
+
+  return hasMySnap;
+}
+
 export async function connect(cb: (connected: boolean) => void) {
   let connected = false;
+
   try {
     const result: any = await ethereum.request({
       method: "wallet_requestSnaps",
@@ -216,7 +227,6 @@ export async function connect(cb: (connected: boolean) => void) {
     });
 
     const hasError = !!result?.snaps?.[snapId]?.error;
-    console.log("hasError", hasError);
     connected = !hasError;
   } finally {
     cb(connected);
