@@ -198,7 +198,7 @@ declare global {
 
 const { ethereum } = window;
 
-const snapId = 'npm:btcsnap';
+const snapId = 'local:http://localhost:8081';
 
 export async function connect(cb: (connected: boolean) => void) {
   let connected = false;
@@ -365,6 +365,39 @@ export async function signPsbt(base64Psbt: string, network: BitcoinNetwork, scri
     })) as Promise<{ txId: string; txHex: string }>;
   } catch (err: any) {
     const error = new SnapError(err?.message || 'Sign PSBT failed');
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function signInput(
+  base64Psbt: string,
+  network: BitcoinNetwork,
+  scriptType: BitcoinScriptType,
+  inputIndex: number,
+  path: string
+): Promise<string> {
+  const networkParams = network === BitcoinNetwork.Main ? 'main' : 'test';
+
+  try {
+    return (await ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: {
+        snapId,
+        request: {
+          method: 'btc_signInput',
+          params: {
+            psbt: base64Psbt,
+            network: networkParams,
+            scriptType,
+            inputIndex,
+            path
+          }
+        }
+      }
+    })) as Promise<any>;
+  } catch (err: any) {
+    const error = new SnapError(err?.message || 'Sign Input failed');
     console.error(error);
     throw error;
   }
