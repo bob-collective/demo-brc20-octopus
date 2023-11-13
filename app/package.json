@@ -36,6 +36,7 @@
     "react-modern-drawer": "^1.2.2",
     "react-pro-sidebar": "1.1.0-alpha.1",
     "react-router-dom": "^6.17.0",
+    "react-use": "^17.4.0",
     "styled-components": "^6.1.0",
     "truncate-eth-address": "^1.0.2",
     "viem": "^1.18.2",

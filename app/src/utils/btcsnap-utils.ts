@@ -1,7 +1,7 @@
 // liberally borrowed from https://github.com/bob-collective/demo-unified-assets-tracker/blob/1475ef915518d45103cd4581c3901ede216a6197/ui/src/utils/btcsnap.ts
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MetaMaskInpageProvider } from '@metamask/providers';
+import { MetaMaskInpageProvider } from "@metamask/providers";
 
 // btcsnap code
 
@@ -9,92 +9,92 @@ import { MetaMaskInpageProvider } from '@metamask/providers';
 export const PsbtValidateErrors = [
   {
     code: 10001,
-    name: 'InputsDataInsufficient',
-    message: 'Not all inputs have prev Tx raw hex'
+    name: "InputsDataInsufficient",
+    message: "Not all inputs have prev Tx raw hex",
   },
   {
     code: 10002,
-    name: 'InputsNetworkNotMatch',
-    message: 'Not every input matches network'
+    name: "InputsNetworkNotMatch",
+    message: "Not every input matches network",
   },
   {
     code: 10003,
-    name: 'OutputsNetworkNotMatch',
-    message: 'Not every input matches network'
+    name: "OutputsNetworkNotMatch",
+    message: "Not every input matches network",
   },
   {
     code: 10004,
-    name: 'InputNotSpendable',
-    message: 'Not all inputs belongs to current account'
+    name: "InputNotSpendable",
+    message: "Not all inputs belongs to current account",
   },
   {
     code: 10005,
-    name: 'ChangeAddressInvalid',
-    message: "Change address doesn't belongs to current account"
+    name: "ChangeAddressInvalid",
+    message: "Change address doesn't belongs to current account",
   },
   {
     code: 10006,
-    name: 'FeeTooHigh',
-    message: 'Too much fee'
+    name: "FeeTooHigh",
+    message: "Too much fee",
   },
   {
     code: 10007,
-    name: 'AmountNotMatch',
-    message: 'Transaction input amount not match'
-  }
+    name: "AmountNotMatch",
+    message: "Transaction input amount not match",
+  },
 ];
 
 export const SnapRequestErrors = [
   {
     code: 20000,
-    name: 'NoPermission',
-    message: 'Unauthorized to perform action.'
+    name: "NoPermission",
+    message: "Unauthorized to perform action.",
   },
   {
     code: 20001,
-    name: 'RejectKey',
-    message: 'User reject to access the key'
+    name: "RejectKey",
+    message: "User reject to access the key",
   },
   {
     code: 20002,
-    name: 'RejectSign',
-    message: 'User reject the sign request'
+    name: "RejectSign",
+    message: "User reject the sign request",
   },
   {
     code: 20003,
-    name: 'SignInvalidPath',
-    message: 'invalid path'
+    name: "SignInvalidPath",
+    message: "invalid path",
   },
   {
     code: 20004,
-    name: 'SignFailed',
-    message: 'Sign transaction failed'
+    name: "SignFailed",
+    message: "Sign transaction failed",
   },
   {
     code: 20005,
-    name: 'NetworkNotMatch',
-    message: 'Network not match'
+    name: "NetworkNotMatch",
+    message: "Network not match",
   },
   {
     code: 20006,
-    name: 'ScriptTypeNotSupport',
-    message: 'ScriptType is not supported.'
+    name: "ScriptTypeNotSupport",
+    message: "ScriptType is not supported.",
   },
   {
     code: 20007,
-    name: 'MethodNotSupport',
-    message: 'Method not found.'
+    name: "MethodNotSupport",
+    message: "Method not found.",
   },
   {
     code: 20008,
-    name: 'ActionNotSupport',
-    message: 'Action not supported'
+    name: "ActionNotSupport",
+    message: "Action not supported",
   },
   {
     code: 20009,
-    name: 'UserReject',
-    message: 'User rejected the request.'
-  }
+    name: "UserReject",
+    message: "User rejected the request.",
+  },
 ];
 
 export class BaseError extends Error {
@@ -118,55 +118,60 @@ export class SnapError extends BaseError {
 }
 
 export const mapErrorToUserFriendlyError = (message: string) => {
-  const psbtValidateError = PsbtValidateErrors.find((item) => message.startsWith(item.message));
-  const snapRequestError = SnapRequestErrors.find((item) => message.startsWith(item.message));
+  const psbtValidateError = PsbtValidateErrors.find((item) =>
+    message.startsWith(item.message)
+  );
+  const snapRequestError = SnapRequestErrors.find((item) =>
+    message.startsWith(item.message)
+  );
 
   if (psbtValidateError) {
     switch (psbtValidateError.name) {
-      case 'FeeTooHigh':
-        return { ...psbtValidateError, message: 'Fee too high' };
+      case "FeeTooHigh":
+        return { ...psbtValidateError, message: "Fee too high" };
       default:
-        return { ...psbtValidateError, message: 'Transaction is invalid' };
+        return { ...psbtValidateError, message: "Transaction is invalid" };
     }
   }
 
   if (snapRequestError) {
     switch (snapRequestError.name) {
-      case 'NoPermission':
+      case "NoPermission":
         return {
           ...snapRequestError,
-          message: 'This error is usually caused by resetting the recovery phrase, please try to reinstall MetaMask'
+          message:
+            "This error is usually caused by resetting the recovery phrase, please try to reinstall MetaMask",
         };
-      case 'SignInvalidPath':
-        return { ...snapRequestError, message: 'Sign transaction failed' };
-      case 'ScriptTypeNotSupport':
-      case 'MethodNotSupport':
-      case 'ActionNotSupport':
-        return { ...snapRequestError, message: 'Request error' };
+      case "SignInvalidPath":
+        return { ...snapRequestError, message: "Sign transaction failed" };
+      case "ScriptTypeNotSupport":
+      case "MethodNotSupport":
+      case "ActionNotSupport":
+        return { ...snapRequestError, message: "Request error" };
       default:
         return snapRequestError;
     }
   }
 
-  return { message: message, code: 0, name: 'UnknownSnapError' };
+  return { message: message, code: 0, name: "UnknownSnapError" };
 };
 
 // types
 export enum BitcoinNetwork {
-  Main = 'mainnet',
-  Test = 'testnet'
+  Main = "mainnet",
+  Test = "testnet",
 }
 
 export enum BitcoinScriptType {
-  P2PKH = 'P2PKH',
-  P2SH_P2WPKH = 'P2SH-P2WPKH',
-  P2WPKH = 'P2WPKH'
+  P2PKH = "P2PKH",
+  P2SH_P2WPKH = "P2SH-P2WPKH",
+  P2WPKH = "P2WPKH",
 }
 
 export enum BitcoinUnit {
-  BTC = 'BTC',
-  Sats = 'sats',
-  Currency = 'Currency'
+  BTC = "BTC",
+  Sats = "sats",
+  Currency = "Currency",
 }
 
 export type Utxo = {
@@ -186,8 +191,8 @@ export type Address = {
 };
 
 export enum WalletType {
-  BitcoinWallet = 'bitcoinWallet',
-  LightningWallet = 'lightningWallet'
+  BitcoinWallet = "bitcoinWallet",
+  LightningWallet = "lightningWallet",
 }
 
 declare global {
@@ -198,19 +203,20 @@ declare global {
 
 const { ethereum } = window;
 
-const snapId = 'npm:btcsnap';
+const snapId = "npm:btcsnap";
 
 export async function connect(cb: (connected: boolean) => void) {
   let connected = false;
   try {
     const result: any = await ethereum.request({
-      method: 'wallet_requestSnaps',
+      method: "wallet_requestSnaps",
       params: {
-        [snapId]: {}
-      }
+        [snapId]: {},
+      },
     });
 
     const hasError = !!result?.snaps?.[snapId]?.error;
+    console.log("hasError", hasError);
     connected = !hasError;
   } finally {
     cb(connected);
@@ -236,24 +242,26 @@ export async function getExtendedPublicKey(
   network: BitcoinNetwork,
   scriptType: BitcoinScriptType
 ): Promise<ExtendedPublicKey> {
-  const networkParams = network === BitcoinNetwork.Main ? 'main' : 'test';
+  const networkParams = network === BitcoinNetwork.Main ? "main" : "test";
 
   try {
     return (await ethereum.request({
-      method: 'wallet_invokeSnap',
+      method: "wallet_invokeSnap",
       params: {
         snapId,
         request: {
-          method: 'btc_getPublicExtendedKey',
+          method: "btc_getPublicExtendedKey",
           params: {
             network: networkParams,
-            scriptType
-          }
-        }
-      }
+            scriptType,
+          },
+        },
+      },
     })) as ExtendedPublicKey;
   } catch (err: any) {
-    const error = new SnapError(err?.message || 'Get extended public key failed');
+    const error = new SnapError(
+      err?.message || "Get extended public key failed"
+    );
     console.error(error);
     throw error;
   }
@@ -267,17 +275,19 @@ interface AllXpubs {
 export async function getAllExtendedPublicKeys(): Promise<AllXpubs> {
   try {
     return (await ethereum.request({
-      method: 'wallet_invokeSnap',
+      method: "wallet_invokeSnap",
       params: {
         snapId,
         request: {
-          method: 'btc_getAllXpubs',
-          params: {}
-        }
-      }
+          method: "btc_getAllXpubs",
+          params: {},
+        },
+      },
     })) as AllXpubs;
   } catch (err: any) {
-    const error = new SnapError(err?.message || 'Get extended public key failed');
+    const error = new SnapError(
+      err?.message || "Get extended public key failed"
+    );
     console.error(error);
     throw error;
   }
@@ -286,39 +296,41 @@ export async function getAllExtendedPublicKeys(): Promise<AllXpubs> {
 export async function getMasterFingerprint() {
   try {
     return await ethereum.request({
-      method: 'wallet_invokeSnap',
+      method: "wallet_invokeSnap",
       params: {
         snapId,
         request: {
-          method: 'btc_getMasterFingerprint'
-        }
-      }
+          method: "btc_getMasterFingerprint",
+        },
+      },
     });
   } catch (err: any) {
-    const error = new SnapError(err?.message || 'Snap get master fingerprint failed');
+    const error = new SnapError(
+      err?.message || "Snap get master fingerprint failed"
+    );
     console.error(error);
-    return '';
+    return "";
   }
 }
 
 export async function updateNetworkInSnap(network: BitcoinNetwork) {
-  const networkParams = network === BitcoinNetwork.Main ? 'main' : 'test';
+  const networkParams = network === BitcoinNetwork.Main ? "main" : "test";
   try {
     return await ethereum.request({
-      method: 'wallet_invokeSnap',
+      method: "wallet_invokeSnap",
       params: {
         snapId,
         request: {
-          method: 'btc_network',
+          method: "btc_network",
           params: {
-            action: 'set',
-            network: networkParams
-          }
-        }
-      }
+            action: "set",
+            network: networkParams,
+          },
+        },
+      },
     });
   } catch (err: any) {
-    const error = new SnapError(err?.message || 'Snap set Network failed');
+    const error = new SnapError(err?.message || "Snap set Network failed");
     console.error(error);
     throw error;
   }
@@ -327,73 +339,81 @@ export async function updateNetworkInSnap(network: BitcoinNetwork) {
 export async function getNetworkInSnap() {
   try {
     return await ethereum.request({
-      method: 'wallet_invokeSnap',
+      method: "wallet_invokeSnap",
       params: {
         snapId,
         request: {
-          method: 'btc_network',
+          method: "btc_network",
           params: {
-            action: 'get'
-          }
-        }
-      }
+            action: "get",
+          },
+        },
+      },
     });
   } catch (err: any) {
-    const error = new SnapError(err?.message || 'Get Snap Network failed');
+    const error = new SnapError(err?.message || "Get Snap Network failed");
     console.error(error);
     throw error;
   }
 }
 
-export async function signPsbt(base64Psbt: string, network: BitcoinNetwork, scriptType: BitcoinScriptType) {
-  const networkParams = network === BitcoinNetwork.Main ? 'main' : 'test';
+export async function signPsbt(
+  base64Psbt: string,
+  network: BitcoinNetwork,
+  scriptType: BitcoinScriptType
+) {
+  const networkParams = network === BitcoinNetwork.Main ? "main" : "test";
 
   try {
     return (await ethereum.request({
-      method: 'wallet_invokeSnap',
+      method: "wallet_invokeSnap",
       params: {
         snapId,
         request: {
-          method: 'btc_signPsbt',
+          method: "btc_signPsbt",
           params: {
             psbt: base64Psbt,
             network: networkParams,
-            scriptType
-          }
-        }
-      }
+            scriptType,
+          },
+        },
+      },
     })) as Promise<{ txId: string; txHex: string }>;
   } catch (err: any) {
-    const error = new SnapError(err?.message || 'Sign PSBT failed');
+    const error = new SnapError(err?.message || "Sign PSBT failed");
     console.error(error);
     throw error;
   }
 }
 
 export enum GetLNWalletDataKey {
-  Password = 'password',
-  Credential = 'credential',
-  PubKey = 'pubkey'
+  Password = "password",
+  Credential = "credential",
+  PubKey = "pubkey",
 }
 
-export async function getLNWalletData(key: GetLNWalletDataKey, walletId?: string, type?: 'get' | 'refresh') {
+export async function getLNWalletData(
+  key: GetLNWalletDataKey,
+  walletId?: string,
+  type?: "get" | "refresh"
+) {
   try {
     return await ethereum.request<string>({
-      method: 'wallet_invokeSnap',
+      method: "wallet_invokeSnap",
       params: {
         snapId,
         request: {
-          method: 'btc_getLNDataFromSnap',
+          method: "btc_getLNDataFromSnap",
           params: {
             key,
             ...(walletId && { walletId }),
-            ...(type && { type })
-          }
-        }
-      }
+            ...(type && { type }),
+          },
+        },
+      },
     });
   } catch (err: any) {
-    const error = new SnapError(err?.message || 'Get LNWalletData failed');
+    const error = new SnapError(err?.message || "Get LNWalletData failed");
     console.error(error);
     throw error;
   }
@@ -404,45 +424,51 @@ export interface SaveLNData {
   password: string;
 }
 
-export async function saveLNDataToSnap({ walletId, credential, password }: SaveLNData) {
+export async function saveLNDataToSnap({
+  walletId,
+  credential,
+  password,
+}: SaveLNData) {
   try {
     return await ethereum.request<string>({
-      method: 'wallet_invokeSnap',
+      method: "wallet_invokeSnap",
       params: {
         snapId,
         request: {
-          method: 'btc_saveLNDataToSnap',
+          method: "btc_saveLNDataToSnap",
           params: {
             walletId,
             credential,
-            password
-          }
-        }
-      }
+            password,
+          },
+        },
+      },
     });
   } catch (err: any) {
-    const error = new SnapError(err?.message || 'Save LNData failed');
+    const error = new SnapError(err?.message || "Save LNData failed");
     console.error(error);
     throw error;
   }
 }
 
-export async function signLNInvoice(invoice: string): Promise<string | undefined | null> {
+export async function signLNInvoice(
+  invoice: string
+): Promise<string | undefined | null> {
   try {
     return ethereum.request<string>({
-      method: 'wallet_invokeSnap',
+      method: "wallet_invokeSnap",
       params: {
         snapId,
         request: {
-          method: 'btc_signLNInvoice',
+          method: "btc_signLNInvoice",
           params: {
-            invoice
-          }
-        }
-      }
+            invoice,
+          },
+        },
+      },
     });
   } catch (err: any) {
-    const error = new SnapError(err?.message || 'Sign invoice failed');
+    const error = new SnapError(err?.message || "Sign invoice failed");
     console.error(error);
     throw error;
   }
