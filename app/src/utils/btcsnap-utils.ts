@@ -198,16 +198,26 @@ declare global {
 
 const { ethereum } = window;
 
-const snapId = 'local:http://localhost:8081';
+const snapId = "local:http://localhost:8081";
+
+export async function checkConnection(): Promise<boolean> {
+  const snaps = await ethereum.request({
+    method: "wallet_getSnaps",
+  });
+
+  const hasMySnap = Object.keys(snaps || []).includes(snapId);
+
+  return hasMySnap;
+}
 
 export async function connect(cb: (connected: boolean) => void) {
   let connected = false;
   try {
     const result: any = await ethereum.request({
-      method: 'wallet_requestSnaps',
+      method: "wallet_requestSnaps",
       params: {
-        [snapId]: {}
-      }
+        [snapId]: {},
+      },
     });
 
     const hasError = !!result?.snaps?.[snapId]?.error;

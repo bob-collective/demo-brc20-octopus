@@ -5,18 +5,19 @@ import { AuthCTA } from "../../../../components/AuthCTA";
 import { isFormDisabled } from "../../../../utils/validation";
 import { createOrdinal } from "../../../../utils/btcsnap-signer";
 import { textFormSchema } from "../../../../utils/schemas";
+import { useBtcSnap } from "../../../../hooks/useBtcSnap";
 
 type TextFormData = {
   text: string;
 };
 
-const btcAddress = "tb1q7fhcdqszmwqzk75p9f43kz6zt4jhjx6e5edfph";
-
 const TextForm = (): JSX.Element => {
+  const { bitcoinAddress } = useBtcSnap();
+
   const mutation = useMutation({
     mutationFn: async (values: TextFormData) => {
-      if (!btcAddress) return;
-      const txid = await createOrdinal(btcAddress, values.text);
+      if (!bitcoinAddress) return;
+      const txid = await createOrdinal(bitcoinAddress, values.text);
       return txid;
     },
   });
