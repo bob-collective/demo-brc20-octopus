@@ -1,2 +1,2 @@
-export * from "./TextForm";
-export * from "./Brc20Form";
+export { TextForm } from "./TextForm";
+export type { TextFormData } from "./TextForm";

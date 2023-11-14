@@ -10,9 +10,6 @@ function Inscribe() {
           <TabsItem title="Text" key="text">
             <TextForm />
           </TabsItem>
-          {/* <TabsItem title="BRC-20" key="brc20">
-            <Brc20Form />
-          </TabsItem> */}
         </Tabs>
       </Card>
     </StyledWrapper>

@@ -1,15 +1,13 @@
 import { useForm } from "@interlay/hooks";
 import { Flex, Input } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
-import { Key, useEffect, useState } from "react";
+import { useState } from "react";
 import { AuthCTA } from "../../../../components/AuthCTA";
-import { useAccount } from "../../../../hooks/useAccount";
 import {
   TransferOrdSchemaParams,
   transferOrdSchema,
 } from "../../../../utils/schemas";
 import { isFormDisabled } from "../../../../utils/validation";
-import { useGetAccountInscriptionUtxo } from "../../../../hooks/useGetAccountInscriptionUtxo";
 import { sendInscription } from "../../../../utils/btcsnap-signer";
 
 type TransferOrdFormData = {
@@ -23,13 +21,9 @@ type TransferOrdFormProps = {};
 const TransferOrdForm = (): JSX.Element => {
   const [isWaitingUtxo, setWaitingUtxo] = useState(false);
 
-  const { data: inscriptionsUtxo } = useGetAccountInscriptionUtxo({
-    refetchInterval: isWaitingUtxo ? 2000 : 60000,
-  });
-
   const inscribeMutation = useMutation({
     mutationFn: async (form: TransferOrdFormData) => {
-      const txid = await sendInscription(form.address, form.inscriptionId);   
+      const txid = await sendInscription(form.address, form.inscriptionId);
       setWaitingUtxo(true);
       return txid;
     },
@@ -83,9 +77,7 @@ const TransferOrdForm = (): JSX.Element => {
     hideErrors: "untouched",
   });
 
-  const isLoading =
-    inscribeMutation.isLoading ||
-    isWaitingUtxo;
+  const isLoading = inscribeMutation.isLoading || isWaitingUtxo;
 
   const isSubmitDisabled = isFormDisabled(form);
 

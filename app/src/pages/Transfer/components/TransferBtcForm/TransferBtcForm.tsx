@@ -1,9 +1,7 @@
 import { useForm } from "@interlay/hooks";
 import { useMutation } from "@tanstack/react-query";
 import Big from "big.js";
-import { useEffect } from "react";
 import { Bitcoin } from "../../../../constants/currencies";
-import { useBalance } from "../../../../hooks/useBalance";
 import { Amount } from "../../../../utils/amount";
 import {
   TransferBtcSchemaParams,
@@ -28,8 +26,6 @@ async function sendBitcoin(toAddress: string, amount: number): Promise<string> {
 type TransferBtcFormProps = {};
 
 const TransferBtcForm = (): JSX.Element => {
-  const { data: balance } = useBalance();
-
   const mutation = useMutation({
     mutationFn: (form: TransferBTCForm) =>
       sendBitcoin(
@@ -42,9 +38,7 @@ const TransferBtcForm = (): JSX.Element => {
     mutation.mutate(values);
   };
 
-  const inputBalance = balance
-    ? new Amount(Bitcoin, balance.confirmed).toBig()
-    : new Big(0);
+  const inputBalance = new Big(0);
 
   const schemaParams: TransferBtcSchemaParams = {
     amount: {
@@ -61,13 +55,6 @@ const TransferBtcForm = (): JSX.Element => {
     onSubmit: handleSubmit,
     hideErrors: "untouched",
   });
-
-  useEffect(() => {
-    if (!balance) return;
-
-    form.validateForm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [balance]);
 
   const isSubmitDisabled = isFormDisabled(form);
 
