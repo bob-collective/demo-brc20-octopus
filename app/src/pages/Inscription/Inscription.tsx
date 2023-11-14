@@ -14,6 +14,7 @@ import { useParams } from "react-router-dom";
 import { StyledWrapper } from "./Inscription.style";
 import { useEffect, useState } from "react";
 import { TransferInscriptionForm } from "./components";
+import { TESTNET_ORD_BASE_PATH } from "../../utils/ordinals-client";
 
 function Inscription() {
   const [isTransferable, setTransferable] = useState(false);
@@ -23,7 +24,7 @@ function Inscription() {
   useEffect(() => {
     const getInscription = async () => {
       try {
-        const res = await fetch(`https://testnet.ordinals.com/content/${id}`);
+        const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
 
         const json = await res.json();
 
@@ -36,7 +37,7 @@ function Inscription() {
         return setTransferable(true);
       } catch (e) {
         try {
-          const res = await fetch(`https://testnet.ordinals.com/content/${id}`);
+          const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
 
           await res.text();
 
@@ -62,7 +63,7 @@ function Inscription() {
         </Flex>
       )}
       <iframe
-        src={`https://testnet.ordinals.com/preview/${id}`}
+        src={`${TESTNET_ORD_BASE_PATH}/preview/${id}`}
         sandbox="allow-scripts"
         scrolling="no"
         loading="lazy"

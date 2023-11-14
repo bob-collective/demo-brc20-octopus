@@ -1,29 +1,26 @@
-// import { List, ListItem } from "@interlay/ui";
+import { List, ListItem } from "@interlay/ui";
 import { StyledWrapper } from "./Inscriptions.style";
 import { useGetInscriptionIds } from "../../hooks/useGetInscriptionIds";
 import { H2 } from "@interlay/ui";
-// import { Link } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useBtcSnap } from "../../hooks/useBtcSnap";
 
-type Props = {
-  bitcoinAddress?: string;
-};
-
-const Inscriptions = ({ bitcoinAddress }: Props): JSX.Element => {
+const Inscriptions = (): JSX.Element => {
+  const { bitcoinAddress } = useBtcSnap();
   const inscriptionIds = useGetInscriptionIds(bitcoinAddress);
-  console.log(inscriptionIds);
 
   return (
     <StyledWrapper direction="column" gap="spacing4">
       <H2>Inscriptions</H2>
-      {/* <List>
-        {inscriptionIds?.list.map((inscription) => (
-          <ListItem key={inscription.inscriptionId}>
-            <Link to={`/inscription/${inscription.inscriptionId}`}>
-              {inscription.inscriptionId}
+      <List>
+        {inscriptionIds?.map((inscriptionId) => (
+          <ListItem key={inscriptionId}>
+            <Link to={`/inscription/${inscriptionId}`}>
+              {inscriptionId}
             </Link>
           </ListItem>
         ))}
-      </List> */}
+      </List>
     </StyledWrapper>
   );
 };
