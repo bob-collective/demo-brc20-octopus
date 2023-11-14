@@ -15,6 +15,11 @@ const Header = () => {
         <nav>
           <Flex elementType="ul" gap="spacing5">
             <li>
+              <Link to="/transfer">
+                <Span weight="bold">Transfer</Span>
+              </Link>
+            </li>
+            <li>
               <Link to="/inscribe">
                 <Span weight="bold">Inscribe</Span>
               </Link>
