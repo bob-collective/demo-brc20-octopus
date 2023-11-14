@@ -6,11 +6,12 @@ import { Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { bitcoin, testnet } from "bitcoinjs-lib/src/networks";
 // import { RemoteSigner, inscribeText } from "@gobob/bob-sdk/dist/ordinals";
 import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getMasterFingerprint, getNetworkInSnap, signInput, signPsbt, updateNetworkInSnap } from "./btcsnap-utils";
-import { DefaultElectrsClient } from "@gobob/bob-sdk";
-import { broadcastTx, getAddressUtxos } from "./sdk-helpers";
+import { DefaultElectrsClient, ElectrsClient } from "@gobob/bob-sdk";
+import { UTXO, broadcastTx, getAddressUtxos } from "./sdk-helpers";
 import bs58check from "bs58check";
 import coinSelect from "coinselect";
 import { inscribeText, RemoteSigner } from "./ordinals";
+import { DefaultOrdinalsClient, InscriptionId, OrdinalsClient } from "./ordinals-client";
 
 bitcoinjs.initEccLib(ecc);
 const bip32 = BIP32Factory(ecc);
@@ -211,4 +212,86 @@ export async function createOrdinal(
   });
   const txid = await res.text();
   return txid;
+}
+
+export async function sendInscription(address: string, inscriptionId: string): Promise<string> {
+  const signer = new BtcSnapSigner();
+
+  // fee rate is 1 for testnet
+  const txid = await transferInscription(signer, address, inscriptionId, 1);
+  return txid;
+}
+
+async function findUtxoForInscriptionId(
+  ordinalsClient: OrdinalsClient,
+  utxos: UTXO[],
+  inscriptionId: InscriptionId
+): Promise<UTXO | undefined> {
+  for (const utxo of utxos) {
+    const inscrUtxo =  await ordinalsClient.getInscriptionFromUTXO(`${utxo.txid}:${utxo.vout}`);
+    if ( inscrUtxo.inscriptions && inscrUtxo.inscriptions.includes(inscriptionId) ) {
+      return utxo;
+    }
+  }
+
+  return undefined;
+}
+
+async function transferInscription(
+  signer: BtcSnapSigner,
+  toAddress: string,
+  inscriptionId: string,
+  feeRate: number = 1,
+): Promise<string> {
+  const network = await signer.getNetwork();
+  const pubkey = Buffer.from(await signer.getPublicKey(), "hex");
+  const fromAddress = bitcoinjs.payments.p2wpkh({ pubkey, network }).address!;
+
+  const networkName = network === testnet ? "testnet" : "mainnet";
+  const ordinalsClient = new DefaultOrdinalsClient(networkName);
+  const electrsClient = new DefaultElectrsClient(networkName);
+
+  const utxos = await getAddressUtxos(electrsClient, fromAddress);
+  const inscriptionUtxo = await findUtxoForInscriptionId(ordinalsClient, utxos, inscriptionId as InscriptionId);
+
+  if (inscriptionUtxo === undefined) {
+    throw Error(`Unable to find utxo owned by address [${fromAddress}] containing inscription id [${inscriptionId}]`);
+  }
+
+  const psbt = new Psbt({ network });
+  const txHex = await electrsClient.getTransactionHex(inscriptionUtxo.txid);
+  const utx = Transaction.fromHex(txHex);
+
+  const witnessUtxo = {
+    script: utx.outs[inscriptionUtxo.vout].script,
+    value: inscriptionUtxo.value,
+  };
+  const nonWitnessUtxo = utx.toBuffer();
+  const masterFingerprint = Buffer.from(await getMasterFingerprint() as any, "hex");
+
+  // prepare single input
+  psbt.addInput({
+    hash: inscriptionUtxo.txid,
+    index: inscriptionUtxo.vout,
+    nonWitnessUtxo,
+    witnessUtxo,
+    bip32Derivation: [
+      {
+        masterFingerprint,
+        path: DEFAULT_BIP32_PATH,
+        pubkey: pubkey,
+      }
+    ]
+  });
+
+  // TODO: review output value, estimate fee
+  psbt.addOutput({
+    address: toAddress,
+    value: inscriptionUtxo.value - 100,
+  });
+
+  const snapNetwork = network === bitcoin ? BitcoinNetwork.Main : BitcoinNetwork.Test;
+  const tx = await signPsbt(psbt.toBase64(), snapNetwork, hardcodedScriptType);
+
+  return broadcastTx(electrsClient, tx.txHex);
 }
