@@ -1,7 +1,7 @@
 import { Card, Tabs, TabsItem } from "@interlay/ui";
 import { StyledWrapper } from "./Transfer.style";
 import { TransferBtcForm } from "./components";
-import { TransferBrc20Form } from "./components/TransferBrc20Form";
+import { TransferOrdForm } from "./components/TransferOrdForm";
 
 function Transfer() {
   return (
@@ -11,8 +11,8 @@ function Transfer() {
           <TabsItem title="BTC" key="btc">
             <TransferBtcForm />
           </TabsItem>
-          <TabsItem title="BRC-20" key="brc20">
-            <TransferBrc20Form />
+          <TabsItem title="Ordinal" key="ord">
+            <TransferOrdForm />
           </TabsItem>
         </Tabs>
       </Card>

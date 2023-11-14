@@ -19,19 +19,14 @@ export const transferBtcSchema = (params: TransferBtcSchemaParams) => {
   });
 };
 
-export type TransferBrc20SchemaParams = {
-  amount?: Partial<MaxAmountValidationParams & MinAmountValidationParams>;
-};
+export type TransferOrdSchemaParams = {};
 
-export const transferBrc20Schema = (params: TransferBtcSchemaParams) => {
+export const transferOrdSchema = (params: TransferBtcSchemaParams) => {
   return yup.object().shape({
-    amount: yup
+    inscriptionId: yup
       .string()
-      .requiredAmount("transfer")
-      .minAmount(params.amount as MinAmountValidationParams, "transfer")
-      .maxAmount(params.amount as MaxAmountValidationParams, "transfer"),
+      .required("Please enter inscription id"),
     address: yup.string().required("Please enter bitcoin address").address(),
-    ticker: yup.string().required(),
   });
 };
 
