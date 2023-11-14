@@ -14,7 +14,7 @@ const useGetInscriptionIds = (bitcoinAddress: string | undefined) => {
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer d4126c66d843ad55c884ecbf0412bedaaae2aef40ddd4d24b6f6731eed7d1fb7`,
+            Authorization: `Bearer ${import.meta.env.VITE_UNISAT_API_KEY}`,
             Accept: "application/json",
           },
         }
