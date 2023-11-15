@@ -44,8 +44,8 @@ const Header = () => {
             onPress={() => connectBtcSnap()}
             disabled={!!bitcoinAddress}
           >
-            {/* {bitcoinAddress ? shortAddress(bitcoinAddress) : "Connect Metamask"} */}
             {bitcoinAddress ? bitcoinAddress : "Connect Metamask"}
+            {/* {bitcoinAddress ? shortAddress(bitcoinAddress) : "Connect Metamask"} */}
           </CTA>
         </Flex>
       </StyledHeader>

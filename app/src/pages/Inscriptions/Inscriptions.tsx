@@ -20,6 +20,8 @@ const Inscriptions = (): JSX.Element => {
   const { bitcoinAddress } = useBtcSnap();
   const inscriptionIds = useGetInscriptionIds(bitcoinAddress);
 
+  console.log("inscriptionIds", inscriptionIds);
+
   const handleShowInscription = (id: string) => {
     setInscriptionId(id);
     setInscriptionOpen(true);
