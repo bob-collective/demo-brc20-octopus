@@ -5,7 +5,7 @@ import { Logo } from "./Logo";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { shortAddress } from "../../utils/format";
 
-const Header = () => {
+function Header() {
   const { bitcoinAddress, connectBtcSnap } = useBtcSnap();
 
   return (
@@ -42,6 +42,6 @@ const Header = () => {
       </Flex>
     </StyledHeader>
   );
-};
+}
 
 export { Header };
