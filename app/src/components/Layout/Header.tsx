@@ -13,10 +13,13 @@ import { Logo } from "./Logo";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { useState } from "react";
 import Inscribe from "../../pages/Inscribe/Inscribe";
+import Transfer from "../../pages/Transfer/Transfer";
 // import { shortAddress } from "../../utils/format";
 
 const Header = () => {
-  const [isOpen, setOpen] = useState(false);
+  // TODO: This can be handled with a single modal
+  const [isInscribeOpen, setInscribeOpen] = useState(false);
+  const [isTransferOpen, setTransferOpen] = useState(false);
 
   const { bitcoinAddress, connectBtcSnap } = useBtcSnap();
 
@@ -32,14 +35,14 @@ const Header = () => {
           <nav>
             <Flex elementType="ul" gap="spacing5">
               <li>
-                <Link to="/transfer">
+                <CTA onPress={() => setTransferOpen(true)}>
                   <Span weight="bold">Transfer</Span>
-                </Link>
+                </CTA>
               </li>
               <li>
-                <CTALink onPress={() => setOpen(true)}>
+                <CTA onPress={() => setInscribeOpen(true)}>
                   <Span weight="bold">Inscribe</Span>
-                </CTALink>
+                </CTA>
               </li>
             </Flex>
           </nav>
@@ -55,10 +58,16 @@ const Header = () => {
           </CTA>
         </Flex>
       </StyledHeader>
-      <Modal isOpen={isOpen} onClose={() => setOpen(false)}>
+      <Modal isOpen={isInscribeOpen} onClose={() => setInscribeOpen(false)}>
         <ModalHeader>Inscribe</ModalHeader>
         <ModalBody>
           <Inscribe />
+        </ModalBody>
+      </Modal>
+      <Modal isOpen={isTransferOpen} onClose={() => setTransferOpen(false)}>
+        <ModalHeader>Transfer</ModalHeader>
+        <ModalBody>
+          <Transfer />
         </ModalBody>
       </Modal>
     </>
