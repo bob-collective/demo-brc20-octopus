@@ -1,13 +1,4 @@
-import {
-  CTA,
-  CTALink,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  Span,
-} from "@interlay/ui";
-import { Link } from "react-router-dom";
+import { CTA, Flex, Modal, ModalBody, ModalHeader, Span } from "@interlay/ui";
 import { StyledHeader } from "./Layout.styles";
 import { Logo } from "./Logo";
 import { useBtcSnap } from "../../hooks/useBtcSnap";

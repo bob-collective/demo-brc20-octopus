@@ -1,26 +1,13 @@
-import {
-  CTA,
-  Card,
-  Dd,
-  Dl,
-  DlGroup,
-  Dt,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalHeader,
-} from "@interlay/ui";
-import { useParams } from "react-router-dom";
+import { Card, Dd, Dl, DlGroup, Dt } from "@interlay/ui";
 import { StyledWrapper } from "./Inscription.style";
-import { useEffect, useState } from "react";
-import { TransferInscriptionForm } from "./components";
+import { useEffect } from "react";
 import { TESTNET_ORD_BASE_PATH } from "../../utils/ordinals-client";
 
-function Inscription() {
-  const [isTransferable, setTransferable] = useState(false);
-  const [isOpen, setOpen] = useState(false);
-  const { id } = useParams();
+type Props = {
+  id?: string;
+};
 
+const Inscription = ({ id }: Props) => {
   useEffect(() => {
     const getInscription = async () => {
       try {
@@ -29,21 +16,13 @@ function Inscription() {
         const json = await res.json();
 
         console.log(json);
-
-        if (json.p && json.op && json.tick && json.amt) {
-          return setTransferable(false);
-        }
-
-        return setTransferable(true);
       } catch (e) {
         try {
           const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
 
           await res.text();
-
-          return setTransferable(true);
         } catch (e) {
-          return setTransferable(false);
+          console.log(e);
         }
       }
     };
@@ -55,13 +34,6 @@ function Inscription() {
 
   return (
     <StyledWrapper direction="column" gap="spacing4">
-      {isTransferable && (
-        <Flex justifyContent="flex-end">
-          <CTA size="small" onPress={() => setOpen(true)}>
-            Transfer
-          </CTA>
-        </Flex>
-      )}
       <iframe
         src={`${TESTNET_ORD_BASE_PATH}/preview/${id}`}
         sandbox="allow-scripts"
@@ -77,16 +49,8 @@ function Inscription() {
           </DlGroup>
         </Dl>
       </Card>
-      {id && (
-        <Modal isOpen={isOpen} onClose={() => setOpen(false)}>
-          <ModalHeader>Transfer Inscription</ModalHeader>
-          <ModalBody>
-            <TransferInscriptionForm inscriptionId={id} />
-          </ModalBody>
-        </Modal>
-      )}
     </StyledWrapper>
   );
-}
+};
 
 export default Inscription;
