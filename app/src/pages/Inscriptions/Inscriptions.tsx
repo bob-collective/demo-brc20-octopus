@@ -13,6 +13,7 @@ import { H2 } from "@interlay/ui";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { ReactNode, useMemo, useState } from "react";
 import Inscription from "../Inscription/Inscription";
+import { TransferOrdForm } from "../Transfer/components/TransferOrdForm";
 
 enum InscriptionsTableColumns {
   INSCRIPTION = "inscription",
@@ -30,7 +31,9 @@ type InscriptionsTableRow = {
 // type InscrtipionsTableProps = Props InheritAttrs;
 
 const Inscriptions = (): JSX.Element => {
+  // TODO: This can be handled with a single modal
   const [isInscriptionOpen, setInscriptionOpen] = useState(false);
+  const [isTransferFormOpen, setTransferFormOpen] = useState(false);
   const [inscriptionId, setInscriptionId] = useState<string | undefined>();
 
   const { bitcoinAddress } = useBtcSnap();
@@ -39,12 +42,15 @@ const Inscriptions = (): JSX.Element => {
   const handleShowInscription = (id: string) => {
     setInscriptionId(id);
     setInscriptionOpen(true);
+  };
 
-    console.log(inscriptionId);
+  const handleShowTransferForm = (id: string) => {
+    setInscriptionId(id);
+    setTransferFormOpen(true);
   };
 
   const columns = [
-    { name: "Asset", id: InscriptionsTableColumns.INSCRIPTION },
+    { name: "Inscription", id: InscriptionsTableColumns.INSCRIPTION },
     { name: "", id: InscriptionsTableColumns.ACTIONS },
   ];
 
@@ -64,7 +70,7 @@ const Inscriptions = (): JSX.Element => {
                   <CTA onPress={() => handleShowInscription(id)} size="small">
                     Show
                   </CTA>
-                  <CTA onPress={() => console.log("transfer")} size="small">
+                  <CTA onPress={() => handleShowTransferForm(id)} size="small">
                     Transfer
                   </CTA>
                 </Flex>
@@ -93,6 +99,15 @@ const Inscriptions = (): JSX.Element => {
         <ModalHeader>{inscriptionId}</ModalHeader>
         <ModalBody>
           <Inscription id={inscriptionId} />
+        </ModalBody>
+      </Modal>
+      <Modal
+        isOpen={isTransferFormOpen}
+        onClose={() => setTransferFormOpen(false)}
+      >
+        <ModalHeader>Transfer</ModalHeader>
+        <ModalBody>
+          <TransferOrdForm inscriptionId={inscriptionId || ""} />
         </ModalBody>
       </Modal>
     </>

@@ -10,20 +10,23 @@ import {
 import { isFormDisabled } from "../../../../utils/validation";
 import { sendInscription } from "../../../../utils/btcsnap-signer";
 
+type Props = {
+  inscriptionId: string;
+};
+
 type TransferOrdFormData = {
   address: string;
-  inscriptionId: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type TransferOrdFormProps = {};
 
-const TransferOrdForm = (): JSX.Element => {
+const TransferOrdForm = ({ inscriptionId }: Props): JSX.Element => {
   const [isWaitingUtxo, setWaitingUtxo] = useState(false);
 
   const inscribeMutation = useMutation({
     mutationFn: async (form: TransferOrdFormData) => {
-      const txid = await sendInscription(form.address, form.inscriptionId);
+      const txid = await sendInscription(form.address, inscriptionId);
       setWaitingUtxo(true);
       return txid;
     },
@@ -70,7 +73,6 @@ const TransferOrdForm = (): JSX.Element => {
   const form = useForm<TransferOrdFormData>({
     initialValues: {
       address: "",
-      inscriptionId: "",
     },
     validationSchema: transferOrdSchema(schemaParams),
     onSubmit: handleSubmit,
@@ -89,11 +91,6 @@ const TransferOrdForm = (): JSX.Element => {
             label="Bitcoin Address"
             placeholder="Enter the bitcoin address"
             {...form.getFieldProps("address")}
-          />
-          <Input
-            label="Inscription ID"
-            placeholder="Enter the inscription id"
-            {...form.getFieldProps("inscriptionId")}
           />
         </Flex>
 

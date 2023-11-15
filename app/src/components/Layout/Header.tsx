@@ -1,4 +1,4 @@
-import { CTA, Flex, Modal, ModalBody, ModalHeader, Span } from "@interlay/ui";
+import { CTA, Flex, Modal, ModalBody, ModalHeader } from "@interlay/ui";
 import { StyledHeader } from "./Layout.styles";
 import { Logo } from "./Logo";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
@@ -26,13 +26,13 @@ const Header = () => {
           <nav>
             <Flex elementType="ul" gap="spacing5">
               <li>
-                <CTA onPress={() => setTransferOpen(true)}>
-                  <Span weight="bold">Transfer</Span>
+                <CTA onPress={() => setTransferOpen(true)} size="small">
+                  Transfer BTC
                 </CTA>
               </li>
               <li>
-                <CTA onPress={() => setInscribeOpen(true)}>
-                  <Span weight="bold">Inscribe</Span>
+                <CTA onPress={() => setInscribeOpen(true)} size="small">
+                  Inscribe
                 </CTA>
               </li>
             </Flex>

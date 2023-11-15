@@ -23,9 +23,6 @@ export type TransferOrdSchemaParams = {};
 
 export const transferOrdSchema = (params: TransferBtcSchemaParams) => {
   return yup.object().shape({
-    inscriptionId: yup
-      .string()
-      .required("Please enter inscription id"),
     address: yup.string().required("Please enter bitcoin address").address(),
   });
 };
