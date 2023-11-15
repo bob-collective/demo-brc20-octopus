@@ -5,6 +5,7 @@ import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { useState } from "react";
 import Inscribe from "../../pages/Inscribe/Inscribe";
 import Transfer from "../../pages/Transfer/Transfer";
+import { Badge } from "../Badge";
 // import { shortAddress } from "../../utils/format";
 
 const Header = () => {
@@ -21,8 +22,11 @@ const Header = () => {
         alignItems="center"
         justifyContent="space-between"
       >
-        <Flex gap="spacing6">
-          <Logo />
+        <Flex gap="spacing6" alignItems="center">
+          <Flex gap="spacing1">
+            <Logo />
+            <Badge />
+          </Flex>
           <nav>
             <Flex elementType="ul" gap="spacing5">
               <li>

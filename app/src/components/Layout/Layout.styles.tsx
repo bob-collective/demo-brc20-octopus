@@ -76,7 +76,7 @@ const StyledBRC20List = styled(Flex)`
   padding-top: ${theme.spacing.spacing4};
 `;
 
-const StyledLogo = styled.a`
+const StyledLogo = styled.div`
   display: inline-flex;
   align-items: center;
 `;

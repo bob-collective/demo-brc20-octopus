@@ -87,7 +87,7 @@ const Inscriptions = (): JSX.Element => {
   return (
     <>
       <StyledWrapper direction="column" gap="spacing4">
-        <H2>Inscriptions</H2>
+        <H2>Ordinals portfolio</H2>
         <Card>
           <Table columns={columns} rows={rows} />
         </Card>
