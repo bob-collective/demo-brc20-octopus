@@ -1,13 +1,9 @@
-import { CTA, Flex, Span } from "@interlay/ui";
+import { Flex, Span } from "@interlay/ui";
 import { Link } from "react-router-dom";
 import { StyledHeader } from "./Layout.styles";
 import { Logo } from "./Logo";
-import { useBtcSnap } from "../../hooks/useBtcSnap";
-import { shortAddress } from "../../utils/format";
 
 const Header = () => {
-  const { bitcoinAddress, connectBtcSnap } = useBtcSnap();
-
   return (
     <StyledHeader
       elementType="header"
@@ -30,15 +26,6 @@ const Header = () => {
             </li>
           </Flex>
         </nav>
-      </Flex>
-      <Flex>
-        <CTA
-          size="small"
-          onPress={() => connectBtcSnap()}
-          disabled={!!bitcoinAddress}
-        >
-          {bitcoinAddress ? shortAddress(bitcoinAddress) : "Connect Metamask"}
-        </CTA>
       </Flex>
     </StyledHeader>
   );
