@@ -4,7 +4,6 @@ import { DefaultElectrsClient } from "@gobob/bob-sdk";
 import { getAddressUtxos } from "../utils/sdk-helpers";
 
 const useGetInscriptionIds = (bitcoinAddress: string | undefined) => {
-
   const ordinalIds = useQuery({
     queryKey: ["inscription-ids", bitcoinAddress],
     enabled: !!bitcoinAddress,
@@ -12,9 +11,16 @@ const useGetInscriptionIds = (bitcoinAddress: string | undefined) => {
       const electrs = new DefaultElectrsClient("testnet");
       const ordinals = new DefaultOrdinalsClient("testnet");
       const utxos = await getAddressUtxos(electrs, bitcoinAddress!);
-      const inscriptionUtxos = await Promise.all(utxos.map(utxo => ordinals.getInscriptionFromUTXO(`${utxo.txid}:${utxo.vout}`)));
-      return inscriptionUtxos.map(inscriptionUtxo => inscriptionUtxo.inscriptions).flat();
-    }
+      const inscriptionUtxos = await Promise.all(
+        utxos.map((utxo) =>
+          ordinals.getInscriptionFromUTXO(`${utxo.txid}:${utxo.vout}`)
+        )
+      );
+      return inscriptionUtxos
+        .map((inscriptionUtxo) => inscriptionUtxo.inscriptions)
+        .flat();
+    },
+    refetchInterval: 600,
   });
 
   return ordinalIds.data;

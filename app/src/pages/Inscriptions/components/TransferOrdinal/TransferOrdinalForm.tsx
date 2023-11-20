@@ -3,10 +3,7 @@ import { Flex, Input } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { AuthCTA } from "../../../../components/AuthCTA";
-import {
-  TransferOrdSchemaParams,
-  transferOrdSchema,
-} from "../../../../utils/schemas";
+import { transferOrdinalSchema } from "../../../../utils/schemas";
 import { isFormDisabled } from "../../../../utils/validation";
 import { sendInscription } from "../../../../utils/btcsnap-signer";
 
@@ -14,67 +11,33 @@ type Props = {
   inscriptionId: string;
 };
 
-type TransferOrdFormData = {
+type TransferOrdinalFormData = {
   address: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-type TransferOrdFormProps = {};
+type TransferOrdinalFormProps = {};
 
-const TransferOrdForm = ({ inscriptionId }: Props): JSX.Element => {
+const TransferOrdinalForm = ({ inscriptionId }: Props): JSX.Element => {
   const [isWaitingUtxo, setWaitingUtxo] = useState(false);
 
   const inscribeMutation = useMutation({
-    mutationFn: async (form: TransferOrdFormData) => {
+    mutationFn: async (form: TransferOrdinalFormData) => {
       const txid = await sendInscription(form.address, inscriptionId);
       setWaitingUtxo(true);
       return txid;
     },
   });
 
-  // useEffect(
-  //   () => {
-  //     const getInscription = async (txId: string) => {
-  //       const txData = inscriptionsUtxo?.utxo.find(
-  //         (item) => item.txid === txId
-  //       );
-
-  //       if (!txData) return;
-
-  //       const [{ inscriptionId }] = txData.inscriptions;
-
-  //       if (inscriptionId) {
-  //         try {
-  //           await sendInscriptionMutation.mutate(inscriptionId);
-
-  //           form.resetForm();
-
-  //           setWaitingUtxo(false);
-  //         } catch (e) {
-  //           setWaitingUtxo(false);
-  //         }
-  //       }
-  //     };
-
-  //     if (inscribeMutation.data && inscriptionsUtxo && isWaitingUtxo) {
-  //       getTransaction(inscribeMutation.data);
-  //     }
-  //   },
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   isWaitingUtxo ? [inscriptionsUtxo] : []
-  // );
-
-  const handleSubmit = (values: TransferOrdFormData) => {
+  const handleSubmit = (values: TransferOrdinalFormData) => {
     inscribeMutation.mutate(values);
   };
 
-  const schemaParams: TransferOrdSchemaParams = {};
-
-  const form = useForm<TransferOrdFormData>({
+  const form = useForm<TransferOrdinalFormData>({
     initialValues: {
       address: "",
     },
-    validationSchema: transferOrdSchema(schemaParams),
+    validationSchema: transferOrdinalSchema(),
     onSubmit: handleSubmit,
     hideErrors: "untouched",
   });
@@ -108,5 +71,5 @@ const TransferOrdForm = ({ inscriptionId }: Props): JSX.Element => {
   );
 };
 
-export { TransferOrdForm };
-export type { TransferOrdFormData, TransferOrdFormProps };
+export { TransferOrdinalForm };
+export type { TransferOrdinalFormData, TransferOrdinalFormProps };

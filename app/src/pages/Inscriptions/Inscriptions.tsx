@@ -13,7 +13,7 @@ import { H2 } from "@interlay/ui";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { ReactNode, useMemo, useState } from "react";
 import Inscription from "../Inscription/Inscription";
-import { TransferOrdForm } from "../Transfer/components/TransferOrdForm";
+import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
 
 enum InscriptionsTableColumns {
   INSCRIPTION = "inscription",
@@ -107,7 +107,7 @@ const Inscriptions = (): JSX.Element => {
       >
         <ModalHeader>Transfer</ModalHeader>
         <ModalBody>
-          <TransferOrdForm inscriptionId={inscriptionId || ""} />
+          <TransferOrdinalForm inscriptionId={inscriptionId || ""} />
         </ModalBody>
       </Modal>
     </>

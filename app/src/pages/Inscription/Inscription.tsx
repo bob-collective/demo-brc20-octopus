@@ -37,7 +37,6 @@ const Inscription = ({ id }: Props) => {
       <iframe
         src={`${TESTNET_ORD_BASE_PATH}/preview/${id}`}
         sandbox="allow-scripts"
-        scrolling="no"
         loading="lazy"
         allow=""
       ></iframe>

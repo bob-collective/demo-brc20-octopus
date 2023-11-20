@@ -8,7 +8,7 @@ export type TransferBtcSchemaParams = {
   amount?: Partial<MaxAmountValidationParams & MinAmountValidationParams>;
 };
 
-export const transferBtcSchema = (params: TransferBtcSchemaParams) => {
+export const transferBtcSchema = () => {
   return yup.object().shape({
     // amount: yup
     //   .string()
@@ -19,9 +19,7 @@ export const transferBtcSchema = (params: TransferBtcSchemaParams) => {
   });
 };
 
-export type TransferOrdSchemaParams = {};
-
-export const transferOrdSchema = (params: TransferBtcSchemaParams) => {
+export const transferOrdinalSchema = () => {
   return yup.object().shape({
     address: yup.string().required("Please enter bitcoin address").address(),
   });
