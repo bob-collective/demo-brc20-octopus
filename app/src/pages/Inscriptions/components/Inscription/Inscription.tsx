@@ -9,6 +9,8 @@ type Props = {
 
 const Inscription = ({ id }: Props) => {
   useEffect(() => {
+    if (!id) return;
+
     const getInscription = async () => {
       try {
         const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
@@ -27,9 +29,7 @@ const Inscription = ({ id }: Props) => {
       }
     };
 
-    if (id) {
-      getInscription();
-    }
+    getInscription();
   }, [id]);
 
   return (

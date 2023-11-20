@@ -26,10 +26,6 @@ type InscriptionsTableRow = {
   [InscriptionsTableColumns.ACTIONS]: ReactNode;
 };
 
-// type InheritAttrs = Omit<TableProps, keyof Props | 'columns' | 'rows'>;
-
-// type InscrtipionsTableProps = Props InheritAttrs;
-
 const Inscriptions = (): JSX.Element => {
   // TODO: This can be handled with a single modal
   const [isInscriptionOpen, setInscriptionOpen] = useState(false);
@@ -78,11 +74,8 @@ const Inscriptions = (): JSX.Element => {
             };
           })
         : [],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [inscriptionIds]
   );
-
-  console.log("inscriptionIds", inscriptionIds);
 
   return (
     <>
