@@ -9,7 +9,7 @@ import {
 } from "../../../../utils/schemas";
 import { Flex, Input, TokenInput } from "@interlay/ui";
 import { isFormDisabled } from "../../../../utils/validation";
-import { AuthCTA } from "../../../../components/AuthCTA";
+import { AuthCTA } from "../../../AuthCTA";
 import { BtcSnapSigner } from "../../../../utils/btcsnap-signer";
 
 type TransferBTCForm = {

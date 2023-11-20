@@ -1,7 +1,7 @@
 import { useForm } from "@interlay/hooks";
 import { Flex, Input } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
-import { AuthCTA } from "../../../../components/AuthCTA";
+import { AuthCTA } from "../../../AuthCTA";
 import { isFormDisabled } from "../../../../utils/validation";
 import { createOrdinal } from "../../../../utils/btcsnap-signer";
 import { textFormSchema } from "../../../../utils/schemas";

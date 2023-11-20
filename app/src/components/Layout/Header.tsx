@@ -3,8 +3,8 @@ import { StyledHeader } from "./Layout.styles";
 import { Logo } from "./Logo";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { useState } from "react";
-import Inscribe from "../../pages/Inscribe/Inscribe";
-import Transfer from "../../pages/Transfer/Transfer";
+import Inscribe from "../Inscribe/Inscribe";
+import Transfer from "../Transfer/Transfer";
 import { Badge } from "../Badge";
 // import { shortAddress } from "../../utils/format";
 
