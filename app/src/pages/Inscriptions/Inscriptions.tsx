@@ -12,7 +12,7 @@ import { useGetInscriptionIds } from "../../hooks/useGetInscriptionIds";
 import { H2 } from "@interlay/ui";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { ReactNode, useMemo, useState } from "react";
-import Inscription from "../Inscription/Inscription";
+import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
 
 enum InscriptionsTableColumns {

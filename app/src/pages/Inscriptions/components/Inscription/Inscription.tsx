@@ -1,7 +1,7 @@
 import { Card, Dd, Dl, DlGroup, Dt } from "@interlay/ui";
 import { StyledWrapper } from "./Inscription.style";
 import { useEffect } from "react";
-import { TESTNET_ORD_BASE_PATH } from "../../utils/ordinals-client";
+import { TESTNET_ORD_BASE_PATH } from "../../../../utils/ordinals-client";
 
 type Props = {
   id?: string;
@@ -52,4 +52,4 @@ const Inscription = ({ id }: Props) => {
   );
 };
 
-export default Inscription;
+export { Inscription };

@@ -1,0 +1,1 @@
+export { Inscription } from "./Inscription";
