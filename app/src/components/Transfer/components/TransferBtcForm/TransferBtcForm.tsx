@@ -4,7 +4,7 @@ import Big from "big.js";
 import { Bitcoin } from "../../../../constants/currencies";
 import { Amount } from "../../../../utils/amount";
 import {
-  TransferBtcSchemaParams,
+  // TransferBtcSchemaParams,
   transferBtcSchema,
 } from "../../../../utils/schemas";
 import { Flex, Input, TokenInput } from "@interlay/ui";
@@ -40,18 +40,18 @@ const TransferBtcForm = (): JSX.Element => {
 
   const inputBalance = new Big(0);
 
-  const schemaParams: TransferBtcSchemaParams = {
-    amount: {
-      maxAmount: inputBalance !== undefined ? inputBalance : undefined,
-    },
-  };
+  // const schemaParams: TransferBtcSchemaParams = {
+  //   amount: {
+  //     maxAmount: inputBalance !== undefined ? inputBalance : undefined,
+  //   },
+  // };
 
   const form = useForm<TransferBTCForm>({
     initialValues: {
       amount: "",
       address: "",
     },
-    validationSchema: transferBtcSchema(schemaParams),
+    validationSchema: transferBtcSchema(),
     onSubmit: handleSubmit,
     hideErrors: "untouched",
   });
