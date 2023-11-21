@@ -11,10 +11,16 @@ import { StyledWrapper } from "./Inscriptions.style";
 import { useGetInscriptionIds } from "../../hooks/useGetInscriptionIds";
 import { H2 } from "@interlay/ui";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
 import { useLocalStorage, LocalStorageKey } from "../../hooks/useLocalStorage";
+import {
+  DefaultOrdinalsClient,
+  InscriptionId,
+} from "../../utils/ordinals-client";
+
+const ordinals = new DefaultOrdinalsClient("testnet");
 
 enum InscriptionsTableColumns {
   INSCRIPTION = "inscription",
@@ -33,14 +39,48 @@ const Inscriptions = (): JSX.Element => {
   const [isTransferFormOpen, setTransferFormOpen] = useState(false);
   const [inscriptionId, setInscriptionId] = useState<string | undefined>();
 
-  const [pendingInscriptions] = useLocalStorage(
+  const [pendingInscriptions, setPendingInscriptions] = useLocalStorage(
     LocalStorageKey.PENDING_INSCRIPTIONS
   );
 
-  console.log(pendingInscriptions);
-
   const { bitcoinAddress } = useBtcSnap();
   const inscriptionIds = useGetInscriptionIds(bitcoinAddress);
+
+  console.log(
+    "inscriptionIds, pendingInscriptions",
+    inscriptionIds,
+    pendingInscriptions
+  );
+
+  if (pendingInscriptions?.length) {
+    for (const id of pendingInscriptions) {
+      const thisOne = ordinals.getInscriptionFromId(id as InscriptionId);
+
+      console.log("thisOne", thisOne);
+    }
+  }
+
+  const duplicatedIds = pendingInscriptions?.filter((id) =>
+    inscriptionIds?.includes(id)
+  );
+
+  console.log("duplicatedIds", duplicatedIds);
+
+  useEffect(() => {
+    if (!duplicatedIds?.length) return;
+    const dedupedPendingInscriptions = pendingInscriptions?.filter(
+      (id) => !duplicatedIds.includes(id)
+    );
+
+    console.log(dedupedPendingInscriptions);
+    setPendingInscriptions(dedupedPendingInscriptions);
+  }, [duplicatedIds, pendingInscriptions, setPendingInscriptions]);
+
+  const combinedInscriptions = new Set([
+    ...(inscriptionIds || []),
+    ...(pendingInscriptions || []),
+  ]);
+  console.log("combinedInscriptions", combinedInscriptions);
 
   const handleShowInscription = (id: string) => {
     setInscriptionId(id);
