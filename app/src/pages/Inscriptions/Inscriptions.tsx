@@ -14,6 +14,7 @@ import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
+import { useLocalStorage, LocalStorageKey } from "../../hooks/useLocalStorage";
 
 enum InscriptionsTableColumns {
   INSCRIPTION = "inscription",
@@ -31,6 +32,12 @@ const Inscriptions = (): JSX.Element => {
   const [isInscriptionOpen, setInscriptionOpen] = useState(false);
   const [isTransferFormOpen, setTransferFormOpen] = useState(false);
   const [inscriptionId, setInscriptionId] = useState<string | undefined>();
+
+  const [pendingInscriptions] = useLocalStorage(
+    LocalStorageKey.PENDING_INSCRIPTIONS
+  );
+
+  console.log(pendingInscriptions);
 
   const { bitcoinAddress } = useBtcSnap();
   const inscriptionIds = useGetInscriptionIds(bitcoinAddress);

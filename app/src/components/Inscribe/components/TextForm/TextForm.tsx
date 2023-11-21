@@ -6,6 +6,10 @@ import { isFormDisabled } from "../../../../utils/validation";
 import { createOrdinal } from "../../../../utils/btcsnap-signer";
 import { textFormSchema } from "../../../../utils/schemas";
 import { useBtcSnap } from "../../../../hooks/useBtcSnap";
+import {
+  LocalStorageKey,
+  useLocalStorage,
+} from "../../../../hooks/useLocalStorage";
 
 type TextFormData = {
   text: string;
@@ -13,11 +17,27 @@ type TextFormData = {
 
 const TextForm = (): JSX.Element => {
   const { bitcoinAddress } = useBtcSnap();
+  const [pendingInscriptions, setPendingInscriptions] = useLocalStorage(
+    LocalStorageKey.PENDING_INSCRIPTIONS
+  );
+
+  console.log(pendingInscriptions);
 
   const mutation = useMutation({
     mutationFn: async (values: TextFormData) => {
       if (!bitcoinAddress) return;
       const txid = await createOrdinal(bitcoinAddress, values.text);
+
+      if (!pendingInscriptions?.length) {
+        const pendingInscriptions: string[] = [];
+        pendingInscriptions.push(txid);
+
+        setPendingInscriptions(pendingInscriptions);
+      } else {
+        pendingInscriptions.push(txid);
+        setPendingInscriptions(pendingInscriptions);
+      }
+
       return txid;
     },
   });

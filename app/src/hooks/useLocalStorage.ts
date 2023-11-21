@@ -2,10 +2,12 @@ import { useLocalStorage as useLibLocalStorage } from "react-use";
 
 enum LocalStorageKey {
   DERIVED_BTC_ADDRESS = "DERIVED_BTC_ADDRESS",
+  PENDING_INSCRIPTIONS = "PENDING_INSCRIPTIONS",
 }
 
 type LocalStorageValueTypes = {
   [LocalStorageKey.DERIVED_BTC_ADDRESS]: string;
+  [LocalStorageKey.PENDING_INSCRIPTIONS]: string[];
 };
 
 type Options<T = unknown> =
