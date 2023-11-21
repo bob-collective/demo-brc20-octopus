@@ -21,23 +21,27 @@ const TextForm = (): JSX.Element => {
     LocalStorageKey.PENDING_INSCRIPTIONS
   );
 
-  console.log(pendingInscriptions);
-
   const mutation = useMutation({
     mutationFn: async (values: TextFormData) => {
       if (!bitcoinAddress) return;
       const txid = await createOrdinal(bitcoinAddress, values.text);
 
+      // TODO: Return this value from createOrdinal method
+      const vout = "i0";
+
+      const utxo = `${txid}${vout}`;
+
       if (!pendingInscriptions?.length) {
         const pendingInscriptions: string[] = [];
-        pendingInscriptions.push(txid);
+        pendingInscriptions.push(utxo);
 
         setPendingInscriptions(pendingInscriptions);
       } else {
-        pendingInscriptions.push(txid);
+        pendingInscriptions.push(utxo);
         setPendingInscriptions(pendingInscriptions);
       }
 
+      console.log(pendingInscriptions);
       return txid;
     },
   });
