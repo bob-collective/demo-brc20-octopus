@@ -28,8 +28,8 @@ type InscriptionsTableRow = {
 
 const Inscriptions = (): JSX.Element => {
   // TODO: This can be handled with a single modal
-  const [isInscriptionOpen, setInscriptionOpen] = useState(false);
-  const [isTransferFormOpen, setTransferFormOpen] = useState(false);
+  const [isInscriptionOpen, setIsInscriptionOpen] = useState(false);
+  const [isTransferFormOpen, setIsTransferFormOpen] = useState(false);
   const [inscriptionId, setInscriptionId] = useState<string | undefined>();
 
   const { bitcoinAddress } = useBtcSnap();
@@ -37,12 +37,12 @@ const Inscriptions = (): JSX.Element => {
 
   const handleShowInscription = (id: string) => {
     setInscriptionId(id);
-    setInscriptionOpen(true);
+    setIsInscriptionOpen(true);
   };
 
   const handleShowTransferForm = (id: string) => {
     setInscriptionId(id);
-    setTransferFormOpen(true);
+    setIsTransferFormOpen(true);
   };
 
   const columns = [
@@ -91,7 +91,7 @@ const Inscriptions = (): JSX.Element => {
       </StyledWrapper>
       <Modal
         isOpen={isInscriptionOpen}
-        onClose={() => setInscriptionOpen(false)}
+        onClose={() => setIsInscriptionOpen(false)}
       >
         <ModalHeader>{inscriptionId}</ModalHeader>
         <ModalBody>
@@ -100,7 +100,7 @@ const Inscriptions = (): JSX.Element => {
       </Modal>
       <Modal
         isOpen={isTransferFormOpen}
-        onClose={() => setTransferFormOpen(false)}
+        onClose={() => setIsTransferFormOpen(false)}
       >
         <ModalHeader>Transfer</ModalHeader>
         <ModalBody>

@@ -9,14 +9,13 @@ import { Badge } from "../Badge";
 // import { shortAddress } from "../../utils/format";
 
 const Header = () => {
-  // TODO: This can be handled with a single modal
-  const [isInscribeOpen, setInscribeOpen] = useState(false);
-  const [isTransferOpen, setTransferOpen] = useState(false);
+  const [isInscribeOpen, setIsInscribeOpen] = useState(false);
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
 
   const { bitcoinAddress, connectBtcSnap } = useBtcSnap();
 
   const handleOnSuccess = () => {
-    setInscribeOpen(false);
+    setIsInscribeOpen(false);
   };
 
   return (
@@ -34,12 +33,12 @@ const Header = () => {
           <nav>
             <Flex elementType="ul" gap="spacing5">
               <li>
-                <CTA onPress={() => setTransferOpen(true)} size="small">
+                <CTA onPress={() => setIsTransferOpen(true)} size="small">
                   Transfer BTC
                 </CTA>
               </li>
               <li>
-                <CTA onPress={() => setInscribeOpen(true)} size="small">
+                <CTA onPress={() => setIsInscribeOpen(true)} size="small">
                   Inscribe
                 </CTA>
               </li>
@@ -57,13 +56,13 @@ const Header = () => {
           </CTA>
         </Flex>
       </StyledHeader>
-      <Modal isOpen={isInscribeOpen} onClose={() => setInscribeOpen(false)}>
+      <Modal isOpen={isInscribeOpen} onClose={() => setIsInscribeOpen(false)}>
         <ModalHeader>Inscribe</ModalHeader>
         <ModalBody>
           <Inscribe onSuccess={() => handleOnSuccess()} />
         </ModalBody>
       </Modal>
-      <Modal isOpen={isTransferOpen} onClose={() => setTransferOpen(false)}>
+      <Modal isOpen={isTransferOpen} onClose={() => setIsTransferOpen(false)}>
         <ModalHeader>Transfer</ModalHeader>
         <ModalBody>
           <Transfer />
