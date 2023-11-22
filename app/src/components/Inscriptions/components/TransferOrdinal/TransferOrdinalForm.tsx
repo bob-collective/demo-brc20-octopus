@@ -2,7 +2,7 @@ import { useForm } from "@interlay/hooks";
 import { Flex, Input } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { AuthCTA } from "../../../../components/AuthCTA";
+import { AuthCTA } from "../../../AuthCTA";
 import { transferOrdinalSchema } from "../../../../utils/schemas";
 import { isFormDisabled } from "../../../../utils/validation";
 import { sendInscription } from "../../../../utils/btcsnap-signer";
