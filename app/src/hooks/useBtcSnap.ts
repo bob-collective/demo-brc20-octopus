@@ -33,9 +33,8 @@ const connectionCheck = async () => {
 const useBtcSnap = () => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
-  const [bitcoinAddress, setBitcoinAddress] = useLocalStorage(
-    LocalStorageKey.DERIVED_BTC_ADDRESS
-  );
+  const [bitcoinAddress, setBitcoinAddress, removeBitcoinAddress] =
+    useLocalStorage(LocalStorageKey.DERIVED_BTC_ADDRESS);
 
   const connectBtcSnap = useCallback(async () => {
     connect(async (connected: boolean) => {
@@ -52,14 +51,14 @@ const useBtcSnap = () => {
 
       // This will reset BTC address if user has disconnected
       if (!connected && bitcoinAddress) {
-        setBitcoinAddress("");
+        removeBitcoinAddress();
       }
 
       setIsConnected(connected);
     };
 
     checkConnection();
-  }, [bitcoinAddress, isConnected, setBitcoinAddress]);
+  }, [bitcoinAddress, isConnected, removeBitcoinAddress, setBitcoinAddress]);
 
   return { connectBtcSnap, bitcoinAddress };
 };
