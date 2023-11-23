@@ -118,8 +118,8 @@ export class BtcSnapSigner implements RemoteSigner {
       value: amount
     }];
 
-    const allUtxos = await getAddressUtxos(electrsClient, senderAddress);
-    const utxos = await findUtxosWithoutInscriptions(ordinalsClient, allUtxos);
+    const allConfirmedUtxos = await getAddressUtxos(electrsClient, senderAddress, true);
+    const utxos = await findUtxosWithoutInscriptions(ordinalsClient, allConfirmedUtxos);
 
     const { inputs, outputs } = coinSelect(
       utxos.map(utxo => {
