@@ -4,16 +4,47 @@
  */
 
 import { ElectrsClient } from "@gobob/bob-sdk";
+import { OrdinalsClient } from "./ordinals-client";
+import * as bitcoin from "bitcoinjs-lib";
+import { parseInscriptions } from "./inscription";
 
 export interface UTXO {
   txid: string
   vout: number,
   value: number,
+  confirmed: boolean,
 }
 
 export interface TxOutTarget {
   address: string,
   value: number
+}
+
+export async function getInscriptionIds(electrsClient: ElectrsClient, ordinalsClient: OrdinalsClient, bitcoinAddress: string) {
+  const utxos = await getAddressUtxos(electrsClient, bitcoinAddress);
+  const inscriptionIds = await Promise.all(utxos.map(utxo => getInscriptionIdsForUtxo(electrsClient, ordinalsClient, utxo)));
+  return inscriptionIds.flat();
+}
+
+async function getInscriptionIdsForUtxo(electrsClient: ElectrsClient, ordinalsClient: OrdinalsClient, utxo: UTXO) {
+  if (utxo.confirmed) {
+    // use ord api if the tx has been included in a block
+    const inscriptionUtxo = await ordinalsClient.getInscriptionFromUTXO(`${utxo.txid}:${utxo.vout}`);
+    return inscriptionUtxo.inscriptions;
+  }
+
+  // otherwise parse the inscriptions manually
+  const txHex = await electrsClient.getTransactionHex(utxo.txid);
+  const tx = bitcoin.Transaction.fromHex(txHex);
+  const inscriptions = parseInscriptions(tx);
+  // inscription is made on the first sat of the first output
+  if (utxo.vout != 0) {
+    return [];
+  } else {
+    // NOTE: it is probably possible for the inscription to be invalid
+    // if the sat is already inscribed but the chances of that are low
+    return inscriptions.map((_, index) => `${utxo.txid}i${index}`);
+  }
 }
 
 export async function getAddressUtxos(electrsClient: ElectrsClient, address: string, confirmed?: boolean): Promise<Array<UTXO>> {
@@ -35,7 +66,8 @@ export async function getAddressUtxos(electrsClient: ElectrsClient, address: str
       return {
         txid: utxo.txid,
         vout: utxo.vout,
-        value: utxo.value
+        value: utxo.value,
+        confirmed: utxo.status.confirmed,
       }
     });
 }

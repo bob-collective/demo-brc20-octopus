@@ -15,6 +15,8 @@ import { StyledWrapper } from "./Inscription.style";
 import { useEffect, useState } from "react";
 import { TransferInscriptionForm } from "./components";
 import { TESTNET_ORD_BASE_PATH } from "../../utils/ordinals-client";
+import { getInscriptionFromId } from "../../utils/inscription";
+import { DefaultElectrsClient } from "@gobob/bob-sdk";
 
 function Inscription() {
   const [isTransferable, setTransferable] = useState(false);
@@ -25,10 +27,7 @@ function Inscription() {
     const getInscription = async () => {
       try {
         const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
-
         const json = await res.json();
-
-        console.log(json);
 
         if (json.p && json.op && json.tick && json.amt) {
           return setTransferable(false);
@@ -40,6 +39,11 @@ function Inscription() {
           const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
 
           await res.text();
+
+          // TODO: if res.status == 404 use following code to get preview
+          // const electrsClient = new DefaultElectrsClient("testnet");
+          // const inscription = await getInscriptionFromId(electrsClient, id!);
+          // const body = Buffer.concat(inscription.body);
 
           return setTransferable(true);
         } catch (e) {
