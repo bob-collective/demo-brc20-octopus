@@ -1,6 +1,6 @@
 import { Card, Dd, Dl, DlGroup, Dt } from "@interlay/ui";
 import { StyledWrapper } from "./Inscription.style";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { TESTNET_ORD_BASE_PATH } from "../../../../utils/ordinals-client";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
 import { getInscriptionFromId } from "../../../../utils/inscription";
@@ -9,56 +9,95 @@ type Props = {
   id?: string;
 };
 
+const electrsClient = new DefaultElectrsClient("testnet");
+
 const Inscription = ({ id }: Props) => {
+  const [fakeInscription, setFakeInscription] = useState<string>("");
+
   useEffect(() => {
+    if (!id) return;
+
     const getInscription = async () => {
-      try {
-        const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
+      const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
 
-        await res.json();
+      if (!res.ok) {
+        const inscription = await getInscriptionFromId(electrsClient, id!);
+        const body = Buffer.concat(inscription.body);
+        const decodedString = new TextDecoder().decode(body);
 
-        // const json = await res.json();
+        // TODO: Recreate script—move this elsewhere
+        const getFakeIframeSrc = () => {
+          return `
+            <html lang="en"><head>
+              <meta charset="utf-8">
+              <meta name="format-detection" content="telephone=no">
+              <style>
+                html {
+                  background-color: #131516;
+                  color: white;
+                  font-size: 16px;
+                  height: 100%;
+                  line-height: 1;
+                }
+                
+                body {
+                  display: grid;
+                  grid-template: 1fr / 1fr;
+                  height: 100%;
+                  margin: 0;
+                  place-items: center;
+                }
+                
+                pre {
+                  margin: 0;
+                }
+                
+                body > * {
+                  grid-column: 1 / 1;
+                  grid-row: 1 / 1;
+                }
+                
+                body > pre {
+                  opacity: 0;
+                }
+              </style>              
+              <script src="/static/preview-text.js" defer=""></script>
+            </head>
+            <body>
+              <pre style="font-size: min(5.2598vw, 95vh); opacity: 1;">${decodedString}</pre>
+              <noscript>
+                <pre>${decodedString}</pre>
+              </noscript>
+            </body>
+          </html>`;
+        };
 
-        // if (json.p && json.op && json.tick && json.amt) {
-        //   return setTransferable(false);
-        // }
+        const fakeIframeSrc = getFakeIframeSrc();
 
-        // return setTransferable(true);
-      } catch (e) {
-        try {
-          const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
-
-          await res.text();
-        } catch (e) {
-          // return setTransferable(false);
-        }
-        try {
-          const electrsClient = new DefaultElectrsClient("testnet");
-          const inscription = await getInscriptionFromId(electrsClient, id!);
-          const body = Buffer.concat(inscription.body);
-
-          const decodedString = new TextDecoder().decode(body);
-
-          return decodedString;
-        } catch (e) {
-          console.log(e);
-        }
+        setFakeInscription(fakeIframeSrc);
       }
     };
 
-    if (id) {
-      getInscription();
-    }
+    getInscription();
   }, [id]);
 
   return (
     <StyledWrapper direction="column" gap="spacing4">
-      <iframe
-        src={`${TESTNET_ORD_BASE_PATH}/preview/${id}`}
-        sandbox="allow-scripts"
-        loading="lazy"
-        allow=""
-      ></iframe>
+      {fakeInscription ? (
+        <iframe
+          srcDoc={fakeInscription}
+          sandbox="allow-scripts"
+          loading="lazy"
+          allow=""
+        />
+      ) : (
+        <iframe
+          src={`${TESTNET_ORD_BASE_PATH}/preview/${id}`}
+          sandbox="allow-scripts"
+          loading="lazy"
+          allow=""
+        ></iframe>
+      )}
       <Card>
         <Dl>
           <DlGroup flex={1} justifyContent="space-between">
