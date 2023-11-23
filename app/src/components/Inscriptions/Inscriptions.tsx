@@ -14,7 +14,6 @@ import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { ReactNode, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
-import { useGetBalance } from "../../hooks/useGetBalance";
 
 enum InscriptionsTableColumns {
   INSCRIPTION = "inscription",
@@ -34,9 +33,6 @@ const Inscriptions = (): JSX.Element => {
 
   const { bitcoinAddress } = useBtcSnap();
   const { data: inscriptionIds } = useGetInscriptionIds(bitcoinAddress);
-
-  const { data } = useGetBalance();
-  console.log("useGetBalance data", data);
 
   const handleShowInscription = (id: string) => {
     setInscriptionId(id);
