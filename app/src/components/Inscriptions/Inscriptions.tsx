@@ -23,11 +23,10 @@ enum InscriptionsTableColumns {
 type InscriptionsTableRow = {
   id: string;
   [InscriptionsTableColumns.INSCRIPTION]: ReactNode;
-  [InscriptionsTableColumns.ACTIONS]?: ReactNode;
+  [InscriptionsTableColumns.ACTIONS]: ReactNode;
 };
 
 const Inscriptions = (): JSX.Element => {
-  // TODO: This can be handled with a single modal
   const [isInscriptionOpen, setIsInscriptionOpen] = useState(false);
   const [isTransferFormOpen, setIsTransferFormOpen] = useState(false);
   const [inscriptionId, setInscriptionId] = useState<string | undefined>();
@@ -78,14 +77,6 @@ const Inscriptions = (): JSX.Element => {
             aria-label="Ordinals portfolio"
             columns={columns}
             rows={inscriptionRows}
-          />
-        </Card>
-        <H2>Pending inscriptions</H2>
-        <Card>
-          <Table
-            aria-label="Pending inscriptions"
-            columns={columns}
-            rows={[]}
           />
         </Card>
       </StyledWrapper>
