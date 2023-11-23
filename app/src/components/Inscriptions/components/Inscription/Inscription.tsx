@@ -2,6 +2,8 @@ import { Card, Dd, Dl, DlGroup, Dt } from "@interlay/ui";
 import { StyledWrapper } from "./Inscription.style";
 import { useEffect } from "react";
 import { TESTNET_ORD_BASE_PATH } from "../../../../utils/ordinals-client";
+import { DefaultElectrsClient } from "@gobob/bob-sdk";
+import { getInscriptionFromId } from "../../../../utils/inscription";
 
 type Props = {
   id?: string;
@@ -9,27 +11,44 @@ type Props = {
 
 const Inscription = ({ id }: Props) => {
   useEffect(() => {
-    if (!id) return;
-
     const getInscription = async () => {
       try {
         const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
 
-        const json = await res.json();
+        await res.json();
 
-        console.log(json);
+        // const json = await res.json();
+
+        // if (json.p && json.op && json.tick && json.amt) {
+        //   return setTransferable(false);
+        // }
+
+        // return setTransferable(true);
       } catch (e) {
         try {
           const res = await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`);
 
           await res.text();
         } catch (e) {
+          // return setTransferable(false);
+        }
+        try {
+          const electrsClient = new DefaultElectrsClient("testnet");
+          const inscription = await getInscriptionFromId(electrsClient, id!);
+          const body = Buffer.concat(inscription.body);
+
+          const decodedString = new TextDecoder().decode(body);
+
+          return decodedString;
+        } catch (e) {
           console.log(e);
         }
       }
     };
 
-    getInscription();
+    if (id) {
+      getInscription();
+    }
   }, [id]);
 
   return (
