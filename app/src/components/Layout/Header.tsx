@@ -1,33 +1,74 @@
-import { Flex, Span } from "@interlay/ui";
-import { Link } from "react-router-dom";
+import { CTA, Flex, Modal, ModalBody, ModalHeader } from "@interlay/ui";
 import { StyledHeader } from "./Layout.styles";
 import { Logo } from "./Logo";
+import { useBtcSnap } from "../../hooks/useBtcSnap";
+import { useState } from "react";
+import Inscribe from "../Inscribe/Inscribe";
+import Transfer from "../Transfer/Transfer";
+import { Badge } from "../Badge";
+// import { shortAddress } from "../../utils/format";
 
 const Header = () => {
+  const [isInscribeOpen, setIsInscribeOpen] = useState(false);
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
+
+  const { bitcoinAddress, connectBtcSnap } = useBtcSnap();
+
+  const handleOnSuccess = () => {
+    setIsInscribeOpen(false);
+  };
+
   return (
-    <StyledHeader
-      elementType="header"
-      alignItems="center"
-      justifyContent="space-between"
-    >
-      <Flex gap="spacing6">
-        <Logo />
-        <nav>
-          <Flex elementType="ul" gap="spacing5">
-            <li>
-              <Link to="/transfer">
-                <Span weight="bold">Transfer</Span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/inscribe">
-                <Span weight="bold">Inscribe</Span>
-              </Link>
-            </li>
+    <>
+      <StyledHeader
+        elementType="header"
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <Flex gap="spacing6" alignItems="center">
+          <Flex gap="spacing1">
+            <Logo />
+            <Badge />
           </Flex>
-        </nav>
-      </Flex>
-    </StyledHeader>
+          <nav>
+            <Flex elementType="ul" gap="spacing5">
+              <li>
+                <CTA onPress={() => setIsTransferOpen(true)} size="small">
+                  Transfer BTC
+                </CTA>
+              </li>
+              <li>
+                <CTA onPress={() => setIsInscribeOpen(true)} size="small">
+                  Inscribe
+                </CTA>
+              </li>
+            </Flex>
+          </nav>
+        </Flex>
+        <Flex>
+          <CTA
+            size="small"
+            onPress={() => connectBtcSnap()}
+            disabled={!!bitcoinAddress}
+          >
+            {bitcoinAddress ? bitcoinAddress : "Connect Metamask"}
+            {/* {bitcoinAddress ? shortAddress(bitcoinAddress) : "Connect Metamask"} */}
+          </CTA>
+        </Flex>
+      </StyledHeader>
+      <Modal isOpen={isInscribeOpen} onClose={() => setIsInscribeOpen(false)}>
+        <ModalHeader>Inscribe</ModalHeader>
+        <ModalBody>
+          <Inscribe onSuccess={() => handleOnSuccess()} />
+        </ModalBody>
+      </Modal>
+      <Modal isOpen={isTransferOpen} onClose={() => setIsTransferOpen(false)}>
+        <ModalHeader>Transfer</ModalHeader>
+        <ModalBody>
+          <Transfer />
+        </ModalBody>
+      </Modal>
+    </>
   );
 };
 

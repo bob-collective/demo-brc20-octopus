@@ -3,19 +3,19 @@ import { DefaultOrdinalsClient } from "../utils/ordinals-client";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
 import { getInscriptionIds } from "../utils/sdk-helpers";
 
-const useGetInscriptionIds = (bitcoinAddress: string | undefined) => {
+const electrsClient = new DefaultElectrsClient("testnet");
+const ordinalsClient = new DefaultOrdinalsClient("testnet");
 
-  const ordinalIds = useQuery({
+const useGetInscriptionIds = (bitcoinAddress: string | undefined) => {
+  const { data, refetch } = useQuery({
     queryKey: ["inscription-ids", bitcoinAddress],
     enabled: !!bitcoinAddress,
     queryFn: async () => {
-      const electrsClient = new DefaultElectrsClient("testnet");
-      const ordinalsClient = new DefaultOrdinalsClient("testnet");
       return getInscriptionIds(electrsClient, ordinalsClient, bitcoinAddress!);
-    }
+    },
   });
 
-  return ordinalIds.data;
+  return { data, refetch };
 };
 
 export { useGetInscriptionIds };
