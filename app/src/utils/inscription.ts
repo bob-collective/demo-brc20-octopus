@@ -87,10 +87,14 @@ export function parseInscriptionId(id: string): { txid: string, index: number, }
     };
 }
 
-export async function getInscriptionFromId(electrsClient: ElectrsClient, inscriptionId: string) {
-    const { txid, index } = parseInscriptionId(inscriptionId);
+export async function getTxInscriptions(electrsClient: ElectrsClient, txid: string) {
     const txHex = await electrsClient.getTransactionHex(txid);
     const tx = bitcoin.Transaction.fromHex(txHex);
-    const inscriptions = parseInscriptions(tx);
+    return parseInscriptions(tx);
+}
+
+export async function getInscriptionFromId(electrsClient: ElectrsClient, inscriptionId: string) {
+    const { txid, index } = parseInscriptionId(inscriptionId);
+    const inscriptions = await getTxInscriptions(electrsClient, txid);
     return inscriptions[index];
 }
