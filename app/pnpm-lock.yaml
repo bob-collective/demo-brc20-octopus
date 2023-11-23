@@ -71,12 +71,12 @@ dependencies:
   react-dom:
     specifier: ^18.2.0
     version: 18.2.0(react@18.2.0)
+  react-icons:
+    specifier: ^4.12.0
+    version: 4.12.0(react@18.2.0)
   react-jazzicon:
     specifier: ^1.0.4
     version: 1.0.4(react-dom@18.2.0)(react@18.2.0)
-  react-modern-drawer:
-    specifier: ^1.2.2
-    version: 1.2.2(react@18.2.0)
   react-pro-sidebar:
     specifier: 1.1.0-alpha.1
     version: 1.1.0-alpha.1(@types/react@18.2.31)(react-dom@18.2.0)(react@18.2.0)
@@ -4308,6 +4308,14 @@ packages:
     resolution: {integrity: sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==}
     dev: false
 
+  /react-icons@4.12.0(react@18.2.0):
+    resolution: {integrity: sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      react: 18.2.0
+    dev: false
+
   /react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
     dev: false
@@ -4321,15 +4329,6 @@ packages:
       mersenne-twister: 1.1.0
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-    dev: false
-
-  /react-modern-drawer@1.2.2(react@18.2.0):
-    resolution: {integrity: sha512-SXUNjofHzeoEas0kdMWWafuF2+vwdtbQD1cpkHxo7oyFj3v+2l2CMeJjc/GodYsnxVhSiYj75xosMJXXed9ykQ==}
-    engines: {node: '>=10'}
-    peerDependencies:
-      react: '>16.0.0'
-    dependencies:
-      react: 18.2.0
     dev: false
 
   /react-pro-sidebar@1.1.0-alpha.1(@types/react@18.2.31)(react-dom@18.2.0)(react@18.2.0):
