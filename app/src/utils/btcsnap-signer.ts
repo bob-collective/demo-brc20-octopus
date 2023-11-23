@@ -108,6 +108,7 @@ export class BtcSnapSigner implements RemoteSigner {
     const network = await this.getNetwork();
     const networkName = network === testnet ? "testnet" : "mainnet";
     const electrsClient = new DefaultElectrsClient(networkName);
+    const ordinalsClient = new DefaultOrdinalsClient(networkName);
 
     const senderPubKey = Buffer.from(await this.getPublicKey(), "hex");
     const senderAddress = bitcoinjs.payments.p2wpkh({ pubkey: senderPubKey, network }).address!;
@@ -117,7 +118,8 @@ export class BtcSnapSigner implements RemoteSigner {
       value: amount
     }];
 
-    const utxos = await getAddressUtxos(electrsClient, senderAddress);
+    const allUtxos = await getAddressUtxos(electrsClient, senderAddress);
+    const utxos = await findUtxosWithoutInscriptions(ordinalsClient, allUtxos);
 
     const { inputs, outputs } = coinSelect(
       utxos.map(utxo => {
@@ -294,4 +296,24 @@ async function transferInscription(
   const tx = await signPsbt(psbt.toBase64(), snapNetwork, hardcodedScriptType);
 
   return broadcastTx(electrsClient, tx.txHex);
+}
+
+/**
+ * Given an array of utxos passed in, return those that do not contain any inscriptions.
+ */
+async function findUtxosWithoutInscriptions(
+  ordinalsClient: OrdinalsClient,
+  utxos: UTXO[]
+): Promise<UTXO[]> {
+  const safeUtxos = [];
+
+  for (const utxo of utxos) {
+    // can be optimized later
+    const inscriptionUtxo = await ordinalsClient.getInscriptionFromUTXO(`${utxo.txid}:${utxo.vout}`);
+    if (inscriptionUtxo.inscriptions.length === 0) {
+      safeUtxos.push(utxo);
+    }
+  }
+
+  return safeUtxos;
 }
