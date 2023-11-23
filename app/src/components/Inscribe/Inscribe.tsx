@@ -6,7 +6,7 @@ type Props = {
   onSuccess: () => void;
 };
 
-function Inscribe({ onSuccess }: Props) {
+const Inscribe = ({ onSuccess }: Props) => {
   return (
     <StyledWrapper direction="column" gap="spacing4">
       <Card>
@@ -18,6 +18,6 @@ function Inscribe({ onSuccess }: Props) {
       </Card>
     </StyledWrapper>
   );
-}
+};
 
 export default Inscribe;

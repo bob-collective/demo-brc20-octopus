@@ -11,6 +11,7 @@ import { Flex, Input, TokenInput } from "@interlay/ui";
 import { isFormDisabled } from "../../../../utils/validation";
 import { AuthCTA } from "../../../AuthCTA";
 import { BtcSnapSigner } from "../../../../utils/btcsnap-signer";
+import { useGetBalance } from "../../../../hooks/useGetBalance";
 
 type TransferBTCForm = {
   amount: string;
@@ -26,6 +27,8 @@ async function sendBitcoin(toAddress: string, amount: number): Promise<string> {
 type TransferBtcFormProps = {};
 
 const TransferBtcForm = (): JSX.Element => {
+  const { data } = useGetBalance();
+
   const mutation = useMutation({
     mutationFn: (form: TransferBTCForm) =>
       sendBitcoin(
@@ -38,7 +41,7 @@ const TransferBtcForm = (): JSX.Element => {
     mutation.mutate(values);
   };
 
-  const inputBalance = new Big(0);
+  const inputBalance = Big(data);
 
   // const schemaParams: TransferBtcSchemaParams = {
   //   amount: {

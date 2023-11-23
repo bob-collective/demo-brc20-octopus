@@ -2,7 +2,7 @@ import { Card, Tabs, TabsItem } from "@interlay/ui";
 import { StyledWrapper } from "./Transfer.style";
 import { TransferBtcForm } from "./components";
 
-function Transfer() {
+const Transfer = () => {
   return (
     <StyledWrapper direction="column" gap="spacing4">
       <Card>
@@ -14,6 +14,6 @@ function Transfer() {
       </Card>
     </StyledWrapper>
   );
-}
+};
 
 export default Transfer;

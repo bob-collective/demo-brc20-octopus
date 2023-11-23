@@ -1,14 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
 import { getAddressUtxos } from "../utils/sdk-helpers";
-import { useBtcSnap } from "./useBtcSnap";
+import { useLocalStorage } from "react-use";
+import { LocalStorageKey } from "./useLocalStorage";
 
-const queryFn = async () => {
-  const electrs = new DefaultElectrsClient("testnet");
-  const utxos = await getAddressUtxos(
-    electrs,
-    "tb1q7fhcdqszmwqzk75p9f43kz6zt4jhjx6e5edfph"
-  );
+const electrs = new DefaultElectrsClient("testnet");
+
+const satsToBtc = (sats: number) => Number(sats) / 10 ** 8;
+
+const queryFn = async (bitcoinAddress: string) => {
+  const utxos = await getAddressUtxos(electrs, bitcoinAddress);
   const balance = utxos
     .map((utxo) => utxo.value)
     .reduce((sum, value) => sum + value, 0);
@@ -17,15 +18,20 @@ const queryFn = async () => {
 };
 
 const useGetBalance = () => {
-  const { bitcoinAddress } = useBtcSnap();
+  // TODO: Why is this type unknown?
+  const [bitcoinAddress] = useLocalStorage(LocalStorageKey.DERIVED_BTC_ADDRESS);
 
-  const query = useQuery(["sats-balance", bitcoinAddress], queryFn, {
-    enabled: !!bitcoinAddress,
-    refetchInterval: 60000,
-  });
+  const { data } = useQuery(
+    ["sats-balance", bitcoinAddress],
+    async () => await queryFn(bitcoinAddress as string),
+    {
+      enabled: !!bitcoinAddress,
+      refetchInterval: 60000,
+    }
+  );
 
   return {
-    ...query,
+    data: data ? satsToBtc(data) : 0,
   };
 };
 
