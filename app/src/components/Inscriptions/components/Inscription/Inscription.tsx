@@ -61,7 +61,6 @@ const Inscription = ({ id }: Props) => {
                   opacity: 0;
                 }
               </style>              
-              <script src="/static/preview-text.js" defer=""></script>
             </head>
             <body>
               <pre style="font-size: min(5.2598vw, 95vh); opacity: 1;">${decodedString}</pre>
@@ -84,16 +83,10 @@ const Inscription = ({ id }: Props) => {
   return (
     <StyledWrapper direction="column" gap="spacing4">
       {fakeInscription ? (
-        <iframe
-          srcDoc={fakeInscription}
-          sandbox="allow-scripts"
-          loading="lazy"
-          allow=""
-        />
+        <iframe srcDoc={fakeInscription} loading="lazy" allow="" />
       ) : (
         <iframe
           src={`${TESTNET_ORD_BASE_PATH}/preview/${id}`}
-          sandbox="allow-scripts"
           loading="lazy"
           allow=""
         ></iframe>
