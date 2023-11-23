@@ -1,5 +1,4 @@
 import { Flex } from "@interlay/ui";
-import "react-modern-drawer/dist/index.css";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { StyledMain } from "./Layout.styles";
