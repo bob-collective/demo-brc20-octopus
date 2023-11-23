@@ -24,7 +24,7 @@ const TransferOrdinalForm = ({ inscriptionId }: Props): JSX.Element => {
   const inscribeMutation = useMutation({
     mutationFn: async (form: TransferOrdinalFormData) => {
       const txid = await sendInscription(form.address, inscriptionId);
-      setWaitingUtxo(true);
+      setWaitingUtxo(false);
       return txid;
     },
   });
