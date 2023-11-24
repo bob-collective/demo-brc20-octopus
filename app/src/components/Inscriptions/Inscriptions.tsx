@@ -43,10 +43,7 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
   const [isTransferFormOpen, setIsTransferFormOpen] = useState(false);
   const [inscription, setInscription] = useState<InscriptionData | undefined>();
 
-  console.log("inscriptionIds", inscriptionIds);
-
   const { inscriptions } = useGetInscriptions(inscriptionIds);
-  console.log(inscriptions);
 
   const handleShowInscription = (inscription: InscriptionData) => {
     setInscription(inscription);
