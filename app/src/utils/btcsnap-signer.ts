@@ -10,6 +10,7 @@ import coinSelect from "coinselect";
 import { inscribeText, RemoteSigner } from "./ordinals";
 import { DefaultOrdinalsClient, OrdinalsClient } from "./ordinals-client";
 import { getTxInscriptions, parseInscriptionId } from "./inscription";
+import { createTextInscription } from "./ordinals/commit";
 
 bitcoin.initEccLib(ecc);
 const bip32 = BIP32Factory(ecc);
@@ -203,7 +204,7 @@ export async function createOrdinal(
 ) {
   const signer = new BtcSnapSigner();
   // fee rate is 1 for testnet
-  const tx = await inscribeText(signer, address, 1, text); // 546
+  const tx = await inscribeText(signer, address, 1, createTextInscription(text)); // 546
   const res = await fetch('https://blockstream.info/testnet/api/tx', {
     method: 'POST',
     body: tx.toHex()

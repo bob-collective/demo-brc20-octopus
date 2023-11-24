@@ -1,12 +1,13 @@
 import * as bitcoinjsLib from "bitcoinjs-lib";
 
 const encoder = new TextEncoder();
+const MAX_CHUNK_SIZE = 520;
 
 function toXOnly(pubkey: Buffer) {
     return pubkey.subarray(1, 33);
 }
 
-interface Inscription {
+export interface Inscription {
     contentType: Buffer;
     content: Buffer;
 }
@@ -15,6 +16,21 @@ export function createTextInscription(text: string): Inscription {
     const contentType = Buffer.from(encoder.encode("text/plain;charset=utf-8"));
     const content = Buffer.from(encoder.encode(text));
     return { contentType, content };
+}
+
+export function createImageInscription(image: Buffer): Inscription {
+    const contentType = Buffer.from(encoder.encode("image/png"));
+    return { contentType, content: image };
+}
+
+function chunkContent(data: Buffer) {
+    const body: Buffer[] = [];
+    let start = 0;
+    while (start < data.length) {
+        body.push(data.subarray(start, start + MAX_CHUNK_SIZE));
+        start += MAX_CHUNK_SIZE;
+    }
+    return body;
 }
 
 function createInscriptionScript(xOnlyPublicKey: Buffer, inscription: Inscription) {
@@ -29,7 +45,7 @@ function createInscriptionScript(xOnlyPublicKey: Buffer, inscription: Inscriptio
         1,
         inscription.contentType,
         bitcoinjsLib.opcodes.OP_0,
-        inscription.content,
+        ...chunkContent(inscription.content),
         bitcoinjsLib.opcodes.OP_ENDIF,
     ];
 }
