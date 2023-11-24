@@ -14,6 +14,7 @@ import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
+import { useGetInscriptions } from "../../hooks/useGetInscriptions";
 
 enum InscriptionsTableColumns {
   INSCRIPTION = "inscription",
@@ -33,6 +34,9 @@ const Inscriptions = (): JSX.Element => {
 
   const { bitcoinAddress } = useBtcSnap();
   const { data: inscriptionIds } = useGetInscriptionIds(bitcoinAddress);
+  const { inscriptions } = useGetInscriptions(inscriptionIds || []);
+
+  console.log("inscriptions from hook", inscriptions);
 
   const handleShowInscription = (id: string) => {
     setInscriptionId(id);
