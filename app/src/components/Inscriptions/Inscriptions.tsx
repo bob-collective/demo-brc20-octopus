@@ -8,13 +8,15 @@ import {
   Table,
 } from "@interlay/ui";
 import { StyledWrapper } from "./Inscriptions.style";
-import { useGetInscriptionIds } from "../../hooks/useGetInscriptionIds";
 import { H2 } from "@interlay/ui";
-import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
 import { useGetInscriptions } from "../../hooks/useGetInscriptions";
+
+type Props = {
+  inscriptionIds: string[];
+};
 
 enum InscriptionsTableColumns {
   INSCRIPTION = "inscription",
@@ -27,16 +29,15 @@ type InscriptionsTableRow = {
   [InscriptionsTableColumns.ACTIONS]: ReactNode;
 };
 
-const Inscriptions = (): JSX.Element => {
+const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
   const [isInscriptionOpen, setIsInscriptionOpen] = useState(false);
   const [isTransferFormOpen, setIsTransferFormOpen] = useState(false);
   const [inscriptionId, setInscriptionId] = useState<string | undefined>();
 
-  const { bitcoinAddress } = useBtcSnap();
-  const { data: inscriptionIds } = useGetInscriptionIds(bitcoinAddress);
-  const { inscriptions } = useGetInscriptions(inscriptionIds || []);
+  console.log("inscriptionIds", inscriptionIds);
 
-  console.log("inscriptions from hook", inscriptions);
+  const { inscriptions } = useGetInscriptions(inscriptionIds);
+  console.log(inscriptions);
 
   const handleShowInscription = (id: string) => {
     setInscriptionId(id);
@@ -53,31 +54,39 @@ const Inscriptions = (): JSX.Element => {
     { name: "", id: InscriptionsTableColumns.ACTIONS },
   ];
 
+  // TODO: Remove these non-null assertions
   const inscriptionRows: InscriptionsTableRow[] = useMemo(
     () =>
-      inscriptionIds
-        ? inscriptionIds.map((id) => {
-            return {
-              id: id,
-              inscription: `${id}`,
-              actions: (
-                <Flex
-                  justifyContent="flex-end"
-                  gap="spacing4"
-                  alignItems="center"
+      inscriptions &&
+      inscriptions
+        .map((inscription) => {
+          return {
+            id: inscription!.id,
+            inscription: `${inscription!.id!}`,
+            actions: (
+              <Flex
+                justifyContent="flex-end"
+                gap="spacing4"
+                alignItems="center"
+              >
+                <CTA
+                  onPress={() => handleShowInscription(inscription!.id)}
+                  size="small"
                 >
-                  <CTA onPress={() => handleShowInscription(id)} size="small">
-                    Show
-                  </CTA>
-                  <CTA onPress={() => handleShowTransferForm(id)} size="small">
-                    Transfer
-                  </CTA>
-                </Flex>
-              ),
-            };
-          })
-        : [],
-    [inscriptionIds]
+                  Show
+                </CTA>
+                <CTA
+                  onPress={() => handleShowTransferForm(inscription!.id)}
+                  size="small"
+                >
+                  Transfer
+                </CTA>
+              </Flex>
+            ),
+          };
+        })
+        .filter((row) => row !== undefined),
+    [inscriptions]
   );
 
   return (

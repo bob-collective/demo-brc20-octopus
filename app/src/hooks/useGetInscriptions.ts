@@ -41,7 +41,9 @@ const useGetInscriptions = (inscriptionIds: string[]) => {
     }),
   });
 
-  const inscriptions = results.map((inscription) => inscription.data);
+  const inscriptions = results
+    .filter((result) => result.data !== undefined)
+    .map((inscription) => inscription.data);
 
   return { inscriptions };
 };
