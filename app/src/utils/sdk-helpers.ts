@@ -23,7 +23,7 @@ export interface TxOutTarget {
 export async function getInscriptionIds(electrsClient: ElectrsClient, ordinalsClient: OrdinalsClient, bitcoinAddress: string) {
   const utxos = await getAddressUtxos(electrsClient, bitcoinAddress);
   const inscriptionIds = await Promise.all(utxos.map(utxo => getInscriptionIdsForUtxo(electrsClient, ordinalsClient, utxo)));
-  return inscriptionIds.flat();
+  return inscriptionIds.flat().sort();
 }
 
 async function getInscriptionIdsForUtxo(electrsClient: ElectrsClient, ordinalsClient: OrdinalsClient, utxo: UTXO) {

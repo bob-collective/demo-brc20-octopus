@@ -11,7 +11,7 @@ import { StyledWrapper } from "./Inscriptions.style";
 import { useGetInscriptionIds } from "../../hooks/useGetInscriptionIds";
 import { H2 } from "@interlay/ui";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
-import { ReactNode, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
 
@@ -49,24 +49,32 @@ const Inscriptions = (): JSX.Element => {
     { name: "", id: InscriptionsTableColumns.ACTIONS },
   ];
 
-  const inscriptionRows: InscriptionsTableRow[] = inscriptionIds
-    ? inscriptionIds.map((id) => {
-        return {
-          id: id,
-          inscription: `${id}`,
-          actions: (
-            <Flex justifyContent="flex-end" gap="spacing4" alignItems="center">
-              <CTA onPress={() => handleShowInscription(id)} size="small">
-                Show
-              </CTA>
-              <CTA onPress={() => handleShowTransferForm(id)} size="small">
-                Transfer
-              </CTA>
-            </Flex>
-          ),
-        };
-      })
-    : [];
+  const inscriptionRows: InscriptionsTableRow[] = useMemo(
+    () =>
+      inscriptionIds
+        ? inscriptionIds.map((id) => {
+            return {
+              id: id,
+              inscription: `${id}`,
+              actions: (
+                <Flex
+                  justifyContent="flex-end"
+                  gap="spacing4"
+                  alignItems="center"
+                >
+                  <CTA onPress={() => handleShowInscription(id)} size="small">
+                    Show
+                  </CTA>
+                  <CTA onPress={() => handleShowTransferForm(id)} size="small">
+                    Transfer
+                  </CTA>
+                </Flex>
+              ),
+            };
+          })
+        : [],
+    [inscriptionIds]
+  );
 
   return (
     <>
