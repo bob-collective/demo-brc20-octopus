@@ -226,6 +226,7 @@ async function findUtxoForInscriptionId(
   inscriptionId: string
 ): Promise<UTXO | undefined> {
   // TODO: can we get the current UTXO of the inscription from ord?
+  // we can use the satpoint for this
   const { txid, index } = parseInscriptionId(inscriptionId);
 
   for (const utxo of utxos) {
