@@ -23,7 +23,7 @@ export interface TxOutTarget {
 export async function getInscriptionIds(electrsClient: ElectrsClient, ordinalsClient: OrdinalsClient, bitcoinAddress: string) {
   const utxos = await getAddressUtxos(electrsClient, bitcoinAddress);
   const inscriptionIds = await Promise.all(utxos.map(utxo => getInscriptionIdsForUtxo(electrsClient, ordinalsClient, utxo)));
-  return inscriptionIds.flat();
+  return inscriptionIds.flat().sort();
 }
 
 async function getInscriptionIdsForUtxo(electrsClient: ElectrsClient, ordinalsClient: OrdinalsClient, utxo: UTXO) {
@@ -33,9 +33,28 @@ async function getInscriptionIdsForUtxo(electrsClient: ElectrsClient, ordinalsCl
     return inscriptionUtxo.inscriptions;
   }
 
-  // otherwise parse the inscriptions manually
   const txHex = await electrsClient.getTransactionHex(utxo.txid);
   const tx = bitcoin.Transaction.fromHex(txHex);
+
+  // NOTE: assumes inscriptions are always sent to the first output
+  // which is not always the case
+  if (utxo.vout == 0) {
+    // this handles the case where we have just transferred an inscription
+    // but the ordinal indexer has not yet confirmed it so we check if the
+    // parent utxo has an inscription instead
+    // NOTE: this won't work if the parent UTXO is not included in a block
+    const parentInscriptions = await Promise.all(tx.ins.map(async txInput => {
+      const txid = txInput.hash.reverse().toString("hex");
+      const inscriptionUtxo = await ordinalsClient.getInscriptionFromUTXO(`${txid}:${txInput.index}`);
+      return inscriptionUtxo.inscriptions;
+    }));
+    const inscriptionIds = parentInscriptions.flat();
+    if (inscriptionIds.length > 0) {
+      return inscriptionIds;
+    }
+  }
+
+  // otherwise parse the inscriptions manually
   const inscriptions = parseInscriptions(tx);
   // inscription is made on the first sat of the first output
   if (utxo.vout != 0) {
