@@ -7,15 +7,16 @@ const electrsClient = new DefaultElectrsClient("testnet");
 const ordinalsClient = new DefaultOrdinalsClient("testnet");
 
 const useGetInscriptionIds = (bitcoinAddress: string | undefined) => {
-  const { data, refetch } = useQuery({
+  const { data } = useQuery({
     queryKey: ["inscription-ids", bitcoinAddress],
     enabled: !!bitcoinAddress,
     queryFn: async () => {
       return getInscriptionIds(electrsClient, ordinalsClient, bitcoinAddress!);
     },
+    refetchInterval: 500,
   });
 
-  return { data, refetch };
+  return { data };
 };
 
 export { useGetInscriptionIds };
