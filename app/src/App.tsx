@@ -1,5 +1,5 @@
 import { Layout } from "./components";
-import Inscriptions from "./components/Inscriptions/Inscriptions";
+import { Inscriptions } from "./components/Inscriptions/Inscriptions";
 import { useBtcSnap } from "./hooks/useBtcSnap";
 import { useGetInscriptionIds } from "./hooks/useGetInscriptionIds";
 import "./utils/yup.custom";

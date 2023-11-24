@@ -13,44 +13,54 @@ import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
 import { useGetInscriptions } from "../../hooks/useGetInscriptions";
+import { shortAddress } from "../../utils/format";
 
 type Props = {
   inscriptionIds: string[];
 };
 
 enum InscriptionsTableColumns {
-  INSCRIPTION = "inscription",
+  INSCRIPTION_ID = "inscription_id",
   ACTIONS = "actions",
+  STATUS = "status",
 }
+
+type InscriptionData = {
+  id: string;
+  isConfirmed: boolean;
+  content: string;
+};
 
 type InscriptionsTableRow = {
   id: string;
-  [InscriptionsTableColumns.INSCRIPTION]: ReactNode;
+  [InscriptionsTableColumns.INSCRIPTION_ID]: ReactNode;
+  [InscriptionsTableColumns.STATUS]: ReactNode;
   [InscriptionsTableColumns.ACTIONS]: ReactNode;
 };
 
 const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
   const [isInscriptionOpen, setIsInscriptionOpen] = useState(false);
   const [isTransferFormOpen, setIsTransferFormOpen] = useState(false);
-  const [inscriptionId, setInscriptionId] = useState<string | undefined>();
+  const [inscription, setInscription] = useState<InscriptionData | undefined>();
 
   console.log("inscriptionIds", inscriptionIds);
 
   const { inscriptions } = useGetInscriptions(inscriptionIds);
   console.log(inscriptions);
 
-  const handleShowInscription = (id: string) => {
-    setInscriptionId(id);
+  const handleShowInscription = (inscription: InscriptionData) => {
+    setInscription(inscription);
     setIsInscriptionOpen(true);
   };
 
-  const handleShowTransferForm = (id: string) => {
-    setInscriptionId(id);
+  const handleShowTransferForm = (inscription: InscriptionData) => {
+    setInscription(inscription);
     setIsTransferFormOpen(true);
   };
 
   const columns = [
-    { name: "Inscription", id: InscriptionsTableColumns.INSCRIPTION },
+    { name: "Inscription ID", id: InscriptionsTableColumns.INSCRIPTION_ID },
+    { name: "Status", id: InscriptionsTableColumns.STATUS },
     { name: "", id: InscriptionsTableColumns.ACTIONS },
   ];
 
@@ -62,7 +72,8 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
         .map((inscription) => {
           return {
             id: inscription!.id,
-            inscription: `${inscription!.id!}`,
+            inscription_id: shortAddress(inscription!.id),
+            status: inscription!.isConfirmed ? "Confirmed" : "Unconfirmed",
             actions: (
               <Flex
                 justifyContent="flex-end"
@@ -70,13 +81,13 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
                 alignItems="center"
               >
                 <CTA
-                  onPress={() => handleShowInscription(inscription!.id)}
+                  onPress={() => handleShowInscription(inscription!)}
                   size="small"
                 >
                   Show
                 </CTA>
                 <CTA
-                  onPress={() => handleShowTransferForm(inscription!.id)}
+                  onPress={() => handleShowTransferForm(inscription!)}
                   size="small"
                 >
                   Transfer
@@ -107,7 +118,7 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
       >
         <ModalHeader>Ordinal</ModalHeader>
         <ModalBody>
-          <Inscription id={inscriptionId} />
+          <Inscription inscription={inscription} />
         </ModalBody>
       </Modal>
       <Modal
@@ -117,7 +128,7 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
         <ModalHeader>Transfer</ModalHeader>
         <ModalBody>
           <TransferOrdinalForm
-            inscriptionId={inscriptionId || ""}
+            inscriptionId={inscription?.id || ""}
             onSuccess={() => setIsTransferFormOpen(false)}
           />
         </ModalBody>
@@ -126,4 +137,5 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
   );
 };
 
-export default Inscriptions;
+export { Inscriptions };
+export type { InscriptionData };
