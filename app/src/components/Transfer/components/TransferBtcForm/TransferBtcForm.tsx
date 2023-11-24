@@ -13,6 +13,10 @@ import { AuthCTA } from "../../../AuthCTA";
 import { BtcSnapSigner } from "../../../../utils/btcsnap-signer";
 import { useGetBalance } from "../../../../hooks/useGetBalance";
 
+type Props = {
+  onSuccess: () => void;
+};
+
 type TransferBTCForm = {
   amount: string;
   address: string;
@@ -26,7 +30,7 @@ async function sendBitcoin(toAddress: string, amount: number): Promise<string> {
 // eslint-disable-next-line @typescript-eslint/ban-types
 type TransferBtcFormProps = {};
 
-const TransferBtcForm = (): JSX.Element => {
+const TransferBtcForm = ({ onSuccess }: Props): JSX.Element => {
   const { data } = useGetBalance();
 
   const mutation = useMutation({
@@ -35,6 +39,7 @@ const TransferBtcForm = (): JSX.Element => {
         form.address,
         new Amount(Bitcoin, form.amount, true).toAtomic()
       ),
+    onSettled: () => onSuccess(),
   });
 
   const handleSubmit = (values: TransferBTCForm) => {

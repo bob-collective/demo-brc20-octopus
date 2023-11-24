@@ -21,12 +21,9 @@ const TextForm = ({ onSuccess }: Props): JSX.Element => {
   const mutation = useMutation({
     mutationFn: async (values: TextFormData) => {
       if (!bitcoinAddress) return;
-      const txid = await createOrdinal(bitcoinAddress, values.text);
-
-      onSuccess();
-
-      return txid;
+      await createOrdinal(bitcoinAddress, values.text);
     },
+    onSettled: () => onSuccess(),
   });
 
   const handleSubmit = async (values: TextFormData) => {

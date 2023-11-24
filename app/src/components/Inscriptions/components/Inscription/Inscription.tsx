@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { TESTNET_ORD_BASE_PATH } from "../../../../utils/ordinals-client";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
 import { getInscriptionFromId } from "../../../../utils/inscription";
+import { shortAddress } from "../../../../utils/format";
 
 type Props = {
   id?: string;
@@ -12,7 +13,7 @@ type Props = {
 const electrsClient = new DefaultElectrsClient("testnet");
 
 const Inscription = ({ id }: Props) => {
-  const [fakeInscription, setFakeInscription] = useState<string>("");
+  const [pendingInscription, setPendingInscription] = useState<string>("");
 
   useEffect(() => {
     if (!id) return;
@@ -26,7 +27,7 @@ const Inscription = ({ id }: Props) => {
         const decodedString = new TextDecoder().decode(body);
 
         // TODO: Recreate script—move this elsewhere
-        const getFakeIframeSrc = () => {
+        const getIframeSrc = () => {
           return `
             <html lang="en"><head>
               <meta charset="utf-8">
@@ -71,9 +72,9 @@ const Inscription = ({ id }: Props) => {
           </html>`;
         };
 
-        const fakeIframeSrc = getFakeIframeSrc();
+        const iframeSrc = getIframeSrc();
 
-        setFakeInscription(fakeIframeSrc);
+        setPendingInscription(iframeSrc);
       }
     };
 
@@ -82,8 +83,8 @@ const Inscription = ({ id }: Props) => {
 
   return (
     <StyledWrapper direction="column" gap="spacing4">
-      {fakeInscription ? (
-        <iframe srcDoc={fakeInscription} loading="lazy" allow="" />
+      {pendingInscription ? (
+        <iframe srcDoc={pendingInscription} loading="lazy" allow="" />
       ) : (
         <iframe
           src={`${TESTNET_ORD_BASE_PATH}/preview/${id}`}
@@ -94,8 +95,12 @@ const Inscription = ({ id }: Props) => {
       <Card>
         <Dl>
           <DlGroup flex={1} justifyContent="space-between">
-            <Dt size="s">Inscription Id:</Dt>
-            <Dd size="s">{id}</Dd>
+            <Dt size="s">
+              {pendingInscription
+                ? "Inscription Id (unconfirmed):"
+                : "Inscription Id:"}
+            </Dt>
+            <Dd size="s">{shortAddress(id)}</Dd>
           </DlGroup>
         </Dl>
       </Card>

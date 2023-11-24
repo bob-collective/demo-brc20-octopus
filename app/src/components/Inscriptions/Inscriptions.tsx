@@ -92,7 +92,7 @@ const Inscriptions = (): JSX.Element => {
         isOpen={isInscriptionOpen}
         onClose={() => setIsInscriptionOpen(false)}
       >
-        <ModalHeader>{inscriptionId}</ModalHeader>
+        <ModalHeader>Ordinal</ModalHeader>
         <ModalBody>
           <Inscription id={inscriptionId} />
         </ModalBody>
@@ -103,7 +103,10 @@ const Inscriptions = (): JSX.Element => {
       >
         <ModalHeader>Transfer</ModalHeader>
         <ModalBody>
-          <TransferOrdinalForm inscriptionId={inscriptionId || ""} />
+          <TransferOrdinalForm
+            inscriptionId={inscriptionId || ""}
+            onSuccess={() => setIsTransferFormOpen(false)}
+          />
         </ModalBody>
       </Modal>
     </>

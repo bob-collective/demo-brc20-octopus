@@ -9,6 +9,7 @@ import { sendInscription } from "../../../../utils/btcsnap-signer";
 
 type Props = {
   inscriptionId: string;
+  onSuccess: () => void;
 };
 
 type TransferOrdinalFormData = {
@@ -18,7 +19,10 @@ type TransferOrdinalFormData = {
 // eslint-disable-next-line @typescript-eslint/ban-types
 type TransferOrdinalFormProps = {};
 
-const TransferOrdinalForm = ({ inscriptionId }: Props): JSX.Element => {
+const TransferOrdinalForm = ({
+  inscriptionId,
+  onSuccess,
+}: Props): JSX.Element => {
   const [isWaitingUtxo, setWaitingUtxo] = useState(false);
 
   const inscribeMutation = useMutation({
@@ -27,6 +31,7 @@ const TransferOrdinalForm = ({ inscriptionId }: Props): JSX.Element => {
       setWaitingUtxo(false);
       return txid;
     },
+    onSettled: () => onSuccess(),
   });
 
   const handleSubmit = (values: TransferOrdinalFormData) => {

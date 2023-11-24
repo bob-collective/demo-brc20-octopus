@@ -14,10 +14,6 @@ const Header = () => {
 
   const { bitcoinAddress, connectBtcSnap } = useBtcSnap();
 
-  const handleOnSuccess = () => {
-    setIsInscribeOpen(false);
-  };
-
   return (
     <>
       <StyledHeader
@@ -59,13 +55,13 @@ const Header = () => {
       <Modal isOpen={isInscribeOpen} onClose={() => setIsInscribeOpen(false)}>
         <ModalHeader>Inscribe</ModalHeader>
         <ModalBody>
-          <Inscribe onSuccess={() => handleOnSuccess()} />
+          <Inscribe onSuccess={() => setIsInscribeOpen(false)} />
         </ModalBody>
       </Modal>
       <Modal isOpen={isTransferOpen} onClose={() => setIsTransferOpen(false)}>
         <ModalHeader>Transfer</ModalHeader>
         <ModalBody>
-          <Transfer />
+          <Transfer onSuccess={() => setIsTransferOpen(false)} />
         </ModalBody>
       </Modal>
     </>
