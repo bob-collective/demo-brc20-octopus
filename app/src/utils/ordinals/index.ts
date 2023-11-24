@@ -1,7 +1,7 @@
 import * as bitcoinjsLib from "bitcoinjs-lib";
 
 import { DummySigner, RemoteSigner } from "./signer";
-import { CommitTxData, createCommitTxData, createTextInscription } from "./commit";
+import { CommitTxData, Inscription, createCommitTxData } from "./commit";
 import { createRevealTx, customFinalizer, signRevealTx } from "./reveal";
 
 export type { RemoteSigner };
@@ -42,7 +42,7 @@ export async function inscribeText(
   signer: RemoteSigner,
   _toAddress: string,
   feeRate: number,
-  text: string,
+  inscription: Inscription,
   postage = 10000,
 ) {
   const bitcoinNetwork = await signer.getNetwork();
@@ -50,7 +50,6 @@ export async function inscribeText(
 
   const toAddress = bitcoinjsLib.payments.p2wpkh({ pubkey: publicKey, network: bitcoinNetwork }).address!;
 
-  const inscription = createTextInscription(text);
   const commitTxData = createCommitTxData(bitcoinNetwork, publicKey, inscription);
 
   const revealTxSize = estimateTxSize(bitcoinNetwork, publicKey, commitTxData, toAddress, postage);

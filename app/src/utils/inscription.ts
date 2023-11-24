@@ -59,18 +59,19 @@ export function parseInscriptions(tx: bitcoin.Transaction) {
                 if (chunk.value == bitcoin.opcodes.OP_ENDIF) {
                     inscriptions.push({ tags, body });
                     break;
+                } else if (chunk.value == bitcoin.opcodes.OP_0) {
+                    // `OP_PUSH 0` indicates that subsequent data pushes contain the content itself
+                    isBody = true;
+                    continue;
                 }
-                // `OP_PUSH 0` indicates that subsequent data pushes contain the content itself
-                isBody = chunk.value == bitcoin.opcodes.OP_0;
-                const data = chunks.next().value;
-                if (!Buffer.isBuffer(data)) {
-                    // TODO: should we throw an error?
-                    break;
-                } else if (!isBody && typeof chunk.value == 'number') {
-                    // fields are before body, e.g. `OP_PUSH 1` is content type
-                    tags[chunk.value] = data;
-                } else {
-                    body.push(data);
+                // fields are before body, e.g. `OP_PUSH 1` is content type
+                if (!isBody) {
+                    const data = chunks.next().value;
+                    if (typeof chunk.value == 'number' && Buffer.isBuffer(data)) {
+                        tags[chunk.value] = data;
+                    }
+                } else if (Buffer.isBuffer(chunk.value)) {
+                    body.push(chunk.value);
                 }
             }
         }
