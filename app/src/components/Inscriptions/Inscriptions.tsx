@@ -7,8 +7,6 @@ import {
   ModalHeader,
   Table,
 } from "@interlay/ui";
-import { StyledWrapper } from "./Inscriptions.style";
-import { H2 } from "@interlay/ui";
 import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
@@ -99,16 +97,13 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
 
   return (
     <>
-      <StyledWrapper direction="column" gap="spacing4">
-        <H2>Ordinals portfolio</H2>
-        <Card>
-          <Table
-            aria-label="Ordinals portfolio"
-            columns={columns}
-            rows={inscriptionRows}
-          />
-        </Card>
-      </StyledWrapper>
+      <Card>
+        <Table
+          aria-label="Ordinals portfolio"
+          columns={columns}
+          rows={inscriptionRows}
+        />
+      </Card>
       <Modal
         isOpen={isInscriptionOpen}
         onClose={() => setIsInscriptionOpen(false)}

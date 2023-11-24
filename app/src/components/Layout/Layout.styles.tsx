@@ -37,6 +37,12 @@ const StyledMain = styled(Flex)`
   }
 `;
 
+const StyledOrdinalsList = styled(Flex)`
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+`;
+
 const CTAWrapper = styled(Flex)`
   gap: ${theme.spacing.spacing2};
 `;
@@ -74,6 +80,7 @@ export {
   StyledLogo,
   StyledMain,
   StyledWrapper,
+  StyledOrdinalsList,
   StyledIFrameWrapper,
   StyledContent,
   StyledList,
