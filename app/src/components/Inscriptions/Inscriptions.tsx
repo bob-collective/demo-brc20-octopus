@@ -1,100 +1,109 @@
-import {
-  CTA,
-  Card,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  Table,
-} from "@interlay/ui";
-import { StyledWrapper } from "./Inscriptions.style";
-import { useGetInscriptionIds } from "../../hooks/useGetInscriptionIds";
-import { H2 } from "@interlay/ui";
-import { useBtcSnap } from "../../hooks/useBtcSnap";
+import { Card, Flex, Modal, ModalBody, ModalHeader, Table } from "@interlay/ui";
 import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
+import { useGetInscriptions } from "../../hooks/useGetInscriptions";
+import { shortAddress } from "../../utils/format";
+import { StyledCTA } from "../Layout/Layout.styles";
+
+type Props = {
+  inscriptionIds: string[];
+};
 
 enum InscriptionsTableColumns {
-  INSCRIPTION = "inscription",
+  INSCRIPTION_ID = "inscription_id",
   ACTIONS = "actions",
+  STATUS = "status",
 }
+
+type InscriptionData = {
+  id: string;
+  isConfirmed: boolean;
+  content: string;
+};
 
 type InscriptionsTableRow = {
   id: string;
-  [InscriptionsTableColumns.INSCRIPTION]: ReactNode;
+  [InscriptionsTableColumns.INSCRIPTION_ID]: ReactNode;
+  [InscriptionsTableColumns.STATUS]: ReactNode;
   [InscriptionsTableColumns.ACTIONS]: ReactNode;
 };
 
-const Inscriptions = (): JSX.Element => {
+const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
   const [isInscriptionOpen, setIsInscriptionOpen] = useState(false);
   const [isTransferFormOpen, setIsTransferFormOpen] = useState(false);
-  const [inscriptionId, setInscriptionId] = useState<string | undefined>();
+  const [inscription, setInscription] = useState<InscriptionData | undefined>();
 
-  const { bitcoinAddress } = useBtcSnap();
-  const { data: inscriptionIds } = useGetInscriptionIds(bitcoinAddress);
+  const { inscriptions } = useGetInscriptions(inscriptionIds);
 
-  const handleShowInscription = (id: string) => {
-    setInscriptionId(id);
+  const handleShowInscription = (inscription: InscriptionData) => {
+    setInscription(inscription);
     setIsInscriptionOpen(true);
   };
 
-  const handleShowTransferForm = (id: string) => {
-    setInscriptionId(id);
+  const handleShowTransferForm = (inscription: InscriptionData) => {
+    setInscription(inscription);
     setIsTransferFormOpen(true);
   };
 
   const columns = [
-    { name: "Inscription", id: InscriptionsTableColumns.INSCRIPTION },
+    { name: "Inscription ID", id: InscriptionsTableColumns.INSCRIPTION_ID },
+    { name: "Status", id: InscriptionsTableColumns.STATUS },
     { name: "", id: InscriptionsTableColumns.ACTIONS },
   ];
 
+  // TODO: Remove these non-null assertions
   const inscriptionRows: InscriptionsTableRow[] = useMemo(
     () =>
-      inscriptionIds
-        ? inscriptionIds.map((id) => {
-            return {
-              id: id,
-              inscription: `${id}`,
-              actions: (
-                <Flex
-                  justifyContent="flex-end"
-                  gap="spacing4"
-                  alignItems="center"
+      inscriptions &&
+      inscriptions
+        .map((inscription) => {
+          return {
+            id: inscription!.id,
+            inscription_id: shortAddress(inscription!.id),
+            status: inscription!.isConfirmed ? "Confirmed" : "Unconfirmed",
+            actions: (
+              <Flex
+                justifyContent="flex-end"
+                gap="spacing4"
+                alignItems="center"
+              >
+                <StyledCTA
+                  onPress={() => handleShowInscription(inscription!)}
+                  size="small"
                 >
-                  <CTA onPress={() => handleShowInscription(id)} size="small">
-                    Show
-                  </CTA>
-                  <CTA onPress={() => handleShowTransferForm(id)} size="small">
-                    Transfer
-                  </CTA>
-                </Flex>
-              ),
-            };
-          })
-        : [],
-    [inscriptionIds]
+                  Show
+                </StyledCTA>
+                <StyledCTA
+                  onPress={() => handleShowTransferForm(inscription!)}
+                  size="small"
+                >
+                  Transfer
+                </StyledCTA>
+              </Flex>
+            ),
+          };
+        })
+        .filter((row) => row !== undefined),
+    [inscriptions]
   );
 
   return (
     <>
-      <StyledWrapper direction="column" gap="spacing4">
-        <H2>Ordinals portfolio</H2>
-        <Card>
-          <Table
-            aria-label="Ordinals portfolio"
-            columns={columns}
-            rows={inscriptionRows}
-          />
-        </Card>
-      </StyledWrapper>
+      <Card>
+        <Table
+          aria-label="Ordinals portfolio"
+          columns={columns}
+          rows={inscriptionRows}
+        />
+      </Card>
       <Modal
         isOpen={isInscriptionOpen}
         onClose={() => setIsInscriptionOpen(false)}
       >
         <ModalHeader>Ordinal</ModalHeader>
         <ModalBody>
-          <Inscription id={inscriptionId} />
+          <Inscription inscription={inscription} />
         </ModalBody>
       </Modal>
       <Modal
@@ -104,7 +113,7 @@ const Inscriptions = (): JSX.Element => {
         <ModalHeader>Transfer</ModalHeader>
         <ModalBody>
           <TransferOrdinalForm
-            inscriptionId={inscriptionId || ""}
+            inscriptionId={inscription?.id || ""}
             onSuccess={() => setIsTransferFormOpen(false)}
           />
         </ModalBody>
@@ -113,4 +122,5 @@ const Inscriptions = (): JSX.Element => {
   );
 };
 
-export default Inscriptions;
+export { Inscriptions };
+export type { InscriptionData };
