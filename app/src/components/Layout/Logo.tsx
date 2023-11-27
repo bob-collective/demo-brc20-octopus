@@ -2,7 +2,7 @@ import { StyledLogo } from "./Layout.styles";
 
 const Logo = () => {
   return (
-    <StyledLogo href="/" aria-label="navigate to home page">
+    <StyledLogo aria-label="BOB logo">
       <svg
         width="137"
         height="64"
