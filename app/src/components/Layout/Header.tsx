@@ -7,13 +7,17 @@ import Inscribe from "../Inscribe/Inscribe";
 import Transfer from "../Transfer/Transfer";
 import { Badge } from "../Badge";
 import { shortAddress } from "../../utils/format";
-// import { shortAddress } from "../../utils/format";
+import { FaCopy } from "react-icons/fa";
+import { useCopyToClipboard } from "react-use";
 
 const Header = () => {
   const [isInscribeOpen, setIsInscribeOpen] = useState(false);
   const [isTransferOpen, setIsTransferOpen] = useState(false);
 
   const { bitcoinAddress, connectBtcSnap, isConnected } = useBtcSnap();
+  const [, copy] = useCopyToClipboard();
+
+  const handleCopyAddress = () => copy(bitcoinAddress || "");
 
   return (
     <>
@@ -47,10 +51,18 @@ const Header = () => {
         <Flex>
           <CTA
             size="small"
-            onPress={() => connectBtcSnap()}
-            disabled={!!bitcoinAddress}
+            onPress={
+              isConnected ? () => handleCopyAddress() : () => connectBtcSnap()
+            }
           >
-            {bitcoinAddress ? shortAddress(bitcoinAddress) : "Connect Metamask"}
+            {bitcoinAddress ? (
+              <Flex gap={"spacing2"} alignItems="center">
+                {shortAddress(bitcoinAddress)}
+                <FaCopy />
+              </Flex>
+            ) : (
+              "Connect Metamask"
+            )}
           </CTA>
         </Flex>
       </StyledHeader>
