@@ -1,12 +1,4 @@
-import {
-  CTA,
-  Card,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  Table,
-} from "@interlay/ui";
+import { Card, Flex, Modal, ModalBody, ModalHeader, Table } from "@interlay/ui";
 import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";

@@ -5,10 +5,18 @@ import { useBtcSnap } from "./hooks/useBtcSnap";
 import { useGetInscriptionIds } from "./hooks/useGetInscriptionIds";
 import { StyledOrdinalsList } from "./components/Layout/Layout.styles";
 import "./utils/yup.custom";
+import { useEffect } from "react";
 
 const App = () => {
   const { bitcoinAddress } = useBtcSnap();
-  const { data: inscriptionIds } = useGetInscriptionIds(bitcoinAddress);
+  const { inscriptionIds, refetch } = useGetInscriptionIds(bitcoinAddress);
+
+  useEffect(() => {
+    if (!bitcoinAddress) return;
+
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bitcoinAddress]);
 
   return (
     <Layout>
