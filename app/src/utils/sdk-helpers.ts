@@ -13,6 +13,7 @@ export interface UTXO {
   vout: number,
   value: number,
   confirmed: boolean,
+  height?: number
 }
 
 export interface TxOutTarget {
@@ -22,8 +23,17 @@ export interface TxOutTarget {
 
 export async function getInscriptionIds(electrsClient: ElectrsClient, ordinalsClient: OrdinalsClient, bitcoinAddress: string) {
   const utxos = await getAddressUtxos(electrsClient, bitcoinAddress);
-  const inscriptionIds = await Promise.all(utxos.map(utxo => getInscriptionIdsForUtxo(electrsClient, ordinalsClient, utxo)));
-  return inscriptionIds.flat().sort();
+  const inscriptionIds = await Promise.all(
+    utxos.sort((a, b) => {
+      // force large number if height is not available (as expected for unconfirmed utxo)
+      const heightA = a.height || Number.MAX_SAFE_INTEGER;
+      const heightB = b.height || Number.MAX_SAFE_INTEGER;
+
+      return heightA - heightB;
+    })
+      .map(utxo => getInscriptionIdsForUtxo(electrsClient, ordinalsClient, utxo))
+  );
+  return inscriptionIds.flat();
 }
 
 async function getInscriptionIdsForUtxo(electrsClient: ElectrsClient, ordinalsClient: OrdinalsClient, utxo: UTXO) {
@@ -87,6 +97,7 @@ export async function getAddressUtxos(electrsClient: ElectrsClient, address: str
         vout: utxo.vout,
         value: utxo.value,
         confirmed: utxo.status.confirmed,
+        height: utxo.status.block_height
       }
     });
 }
