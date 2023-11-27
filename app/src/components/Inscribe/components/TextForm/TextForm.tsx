@@ -6,6 +6,7 @@ import { isFormDisabled } from "../../../../utils/validation";
 import { createOrdinal } from "../../../../utils/btcsnap-signer";
 import { textFormSchema } from "../../../../utils/schemas";
 import { useBtcSnap } from "../../../../hooks/useBtcSnap";
+import { useState } from "react";
 
 type TextFormData = {
   text: string;
@@ -16,6 +17,8 @@ type Props = {
 };
 
 const TextForm = ({ onSuccess }: Props): JSX.Element => {
+  const [error, setError] = useState<string>("");
+
   const { bitcoinAddress } = useBtcSnap();
 
   const mutation = useMutation({
@@ -23,7 +26,13 @@ const TextForm = ({ onSuccess }: Props): JSX.Element => {
       if (!bitcoinAddress) return;
       await createOrdinal(bitcoinAddress, values.text);
     },
-    onSettled: () => onSuccess(),
+    onError: (e) => {
+      console.error(e);
+      setError(
+        "There was a problem inscribing your ordinal. Do you have enough BTC?"
+      );
+    },
+    onSuccess: () => onSuccess(),
   });
 
   const handleSubmit = async (values: TextFormData) => {
@@ -49,9 +58,9 @@ const TextForm = ({ onSuccess }: Props): JSX.Element => {
             label="Text"
             placeholder="Enter text to be inscribed"
             {...form.getFieldProps("text")}
+            errorMessage={error}
           />
         </Flex>
-
         <AuthCTA
           loading={mutation.isLoading}
           disabled={isSubmitDisabled}

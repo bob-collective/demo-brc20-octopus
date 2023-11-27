@@ -23,7 +23,10 @@ const TransferOrdinalForm = ({
   inscriptionId,
   onSuccess,
 }: Props): JSX.Element => {
+  const [error, setError] = useState<string>("");
   const [isWaitingUtxo, setWaitingUtxo] = useState(false);
+
+  console.log(inscriptionId);
 
   const inscribeMutation = useMutation({
     mutationFn: async (form: TransferOrdinalFormData) => {
@@ -31,7 +34,13 @@ const TransferOrdinalForm = ({
       setWaitingUtxo(false);
       return txid;
     },
-    onSettled: () => onSuccess(),
+    onError: (e) => {
+      console.error(e);
+      setError(
+        "There was a problem inscribing your ordinal. Do you have enough BTC?"
+      );
+    },
+    onSuccess: () => onSuccess(),
   });
 
   const handleSubmit = (values: TransferOrdinalFormData) => {
@@ -59,6 +68,7 @@ const TransferOrdinalForm = ({
             label="Bitcoin Address"
             placeholder="Enter the bitcoin address"
             {...form.getFieldProps("address")}
+            errorMessage={error}
           />
         </Flex>
 
