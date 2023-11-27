@@ -12,6 +12,7 @@ import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
 import { useGetInscriptions } from "../../hooks/useGetInscriptions";
 import { shortAddress } from "../../utils/format";
+import { StyledCTA } from "../Layout/Layout.styles";
 
 type Props = {
   inscriptionIds: string[];
@@ -75,18 +76,18 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
                 gap="spacing4"
                 alignItems="center"
               >
-                <CTA
+                <StyledCTA
                   onPress={() => handleShowInscription(inscription!)}
                   size="small"
                 >
                   Show
-                </CTA>
-                <CTA
+                </StyledCTA>
+                <StyledCTA
                   onPress={() => handleShowTransferForm(inscription!)}
                   size="small"
                 >
                   Transfer
-                </CTA>
+                </StyledCTA>
               </Flex>
             ),
           };

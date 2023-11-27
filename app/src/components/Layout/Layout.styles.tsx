@@ -1,5 +1,5 @@
 import { theme } from "@interlay/theme";
-import { Flex, List } from "@interlay/ui";
+import { CTA, Flex, List } from "@interlay/ui";
 import styled from "styled-components";
 
 const StyledHeader = styled(Flex)`
@@ -45,6 +45,7 @@ const StyledOrdinalsList = styled(Flex)`
 
 const CTAWrapper = styled(Flex)`
   gap: ${theme.spacing.spacing2};
+  cursor: grab;
 `;
 
 const StyledWrapper = styled.div`
@@ -64,6 +65,12 @@ const StyledContent = styled.div`
   overflow: hidden;
 `;
 
+const StyledCTA = styled(CTA)`
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 const StyledLogo = styled.div`
   display: inline-flex;
   align-items: center;
@@ -75,6 +82,7 @@ const StyledIFrameWrapper = styled(Flex)`
 
 export {
   CTAWrapper,
+  StyledCTA,
   StyledHeader,
   StyledFooter,
   StyledLogo,

@@ -1,5 +1,5 @@
-import { CTA, Flex, Modal, ModalBody, ModalHeader } from "@interlay/ui";
-import { StyledHeader } from "./Layout.styles";
+import { Flex, Modal, ModalBody, ModalHeader } from "@interlay/ui";
+import { StyledCTA, StyledHeader } from "./Layout.styles";
 import { Logo } from "./Logo";
 import { useBtcSnap } from "../../hooks/useBtcSnap";
 import { useState } from "react";
@@ -35,21 +35,27 @@ const Header = () => {
             <nav>
               <Flex elementType="ul" gap="spacing5">
                 <li>
-                  <CTA onPress={() => setIsTransferOpen(true)} size="small">
+                  <StyledCTA
+                    onPress={() => setIsTransferOpen(true)}
+                    size="small"
+                  >
                     Transfer BTC
-                  </CTA>
+                  </StyledCTA>
                 </li>
                 <li>
-                  <CTA onPress={() => setIsInscribeOpen(true)} size="small">
+                  <StyledCTA
+                    onPress={() => setIsInscribeOpen(true)}
+                    size="small"
+                  >
                     Inscribe
-                  </CTA>
+                  </StyledCTA>
                 </li>
               </Flex>
             </nav>
           )}
         </Flex>
         <Flex>
-          <CTA
+          <StyledCTA
             size="small"
             onPress={
               isConnected ? () => handleCopyAddress() : () => connectBtcSnap()
@@ -63,7 +69,7 @@ const Header = () => {
             ) : (
               "Connect Metamask"
             )}
-          </CTA>
+          </StyledCTA>
         </Flex>
       </StyledHeader>
       <Modal isOpen={isInscribeOpen} onClose={() => setIsInscribeOpen(false)}>
