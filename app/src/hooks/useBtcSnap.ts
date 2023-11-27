@@ -60,7 +60,7 @@ const useBtcSnap = () => {
     checkConnection();
   }, [bitcoinAddress, isConnected, removeBitcoinAddress, setBitcoinAddress]);
 
-  return { connectBtcSnap, bitcoinAddress };
+  return { connectBtcSnap, bitcoinAddress, isConnected };
 };
 
 export { useBtcSnap };
