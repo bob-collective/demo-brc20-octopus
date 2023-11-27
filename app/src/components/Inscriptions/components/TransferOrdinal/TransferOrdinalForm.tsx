@@ -26,8 +26,6 @@ const TransferOrdinalForm = ({
   const [error, setError] = useState<string>("");
   const [isWaitingUtxo, setWaitingUtxo] = useState(false);
 
-  console.log(inscriptionId);
-
   const inscribeMutation = useMutation({
     mutationFn: async (form: TransferOrdinalFormData) => {
       const txid = await sendInscription(form.address, inscriptionId);
