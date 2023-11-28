@@ -1,5 +1,5 @@
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
-import * as retry from "async-retry";
+import retry from "async-retry";
 import * as bitcoin from "bitcoinjs-lib";
 import { BIP32Factory } from "bip32";
 import { BitcoinNetwork, BitcoinScriptType, getExtendedPublicKey, getMasterFingerprint, getNetworkInSnap, signInput, signPsbt, updateNetworkInSnap } from "./btcsnap-utils";
