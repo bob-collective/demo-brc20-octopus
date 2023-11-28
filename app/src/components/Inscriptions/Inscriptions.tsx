@@ -2,9 +2,12 @@ import { Card, Flex, Modal, ModalBody, ModalHeader, Table } from "@interlay/ui";
 import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
 import { TransferOrdinalForm } from "./components/TransferOrdinal/TransferOrdinalForm";
+import { useGetInscriptionIds } from "../../hooks/useGetInscriptionIds";
 import { useGetInscriptions } from "../../hooks/useGetInscriptions";
 import { shortAddress } from "../../utils/format";
 import { StyledCTA } from "../Layout/Layout.styles";
+import { useLocalStorage } from "react-use";
+import { LocalStorageKey } from "../../hooks/useLocalStorage";
 
 type Props = {
   inscriptionIds: string[];
@@ -34,6 +37,8 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
   const [isTransferFormOpen, setIsTransferFormOpen] = useState(false);
   const [inscription, setInscription] = useState<InscriptionData | undefined>();
 
+  const [bitcoinAddress] = useLocalStorage(LocalStorageKey.DERIVED_BTC_ADDRESS);
+  const { refetch } = useGetInscriptionIds(bitcoinAddress as string);
   const { inscriptions } = useGetInscriptions(inscriptionIds);
 
   const handleShowInscription = (inscription: InscriptionData) => {
@@ -44,6 +49,11 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
   const handleShowTransferForm = (inscription: InscriptionData) => {
     setInscription(inscription);
     setIsTransferFormOpen(true);
+  };
+
+  const handleTransferComplete = () => {
+    refetch();
+    setIsTransferFormOpen(false);
   };
 
   const columns = [
@@ -114,7 +124,7 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
         <ModalBody>
           <TransferOrdinalForm
             inscriptionId={inscription?.id || ""}
-            onSuccess={() => setIsTransferFormOpen(false)}
+            onSuccess={() => handleTransferComplete()}
           />
         </ModalBody>
       </Modal>
