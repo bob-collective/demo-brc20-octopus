@@ -1,47 +1,90 @@
-import { CTA, Flex, Span } from "@interlay/ui";
-import { Link } from "react-router-dom";
-import { useAccount } from "../../hooks/useAccount";
-import { StyledHeader } from "./Layout.styles";
+import { Flex, Modal, ModalBody, ModalHeader } from "@interlay/ui";
+import { StyledCTA, StyledHeader } from "./Layout.styles";
 import { Logo } from "./Logo";
+import { useBtcSnap } from "../../hooks/useBtcSnap";
+import { useState } from "react";
+import Inscribe from "../Inscribe/Inscribe";
+import Transfer from "../Transfer/Transfer";
+import { Badge } from "../Badge";
+import { shortAddress } from "../../utils/format";
+import { FaCopy } from "react-icons/fa";
+import { useCopyToClipboard } from "react-use";
 
-function shortAddress(address?: string, len = 5) {
-  if (!address) return "";
-  if (address.length <= len * 2) return address;
-  return address.slice(0, len) + "..." + address.slice(address.length - len);
-}
+const Header = () => {
+  const [isInscribeOpen, setIsInscribeOpen] = useState(false);
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
 
-const Header = ({ onClickAccount }: { onClickAccount: () => void }) => {
-  const { data: address } = useAccount();
+  const { bitcoinAddress, connectBtcSnap, isConnected } = useBtcSnap();
+  const [, copy] = useCopyToClipboard();
+
+  const handleCopyAddress = () => copy(bitcoinAddress || "");
 
   return (
-    <StyledHeader
-      elementType="header"
-      alignItems="center"
-      justifyContent="space-between"
-    >
-      <Flex gap="spacing6">
-        <Logo />
-        <nav>
-          <Flex elementType="ul" gap="spacing5">
-            <li>
-              <Link to="/transfer">
-                <Span weight="bold">Transfer</Span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/inscribe">
-                <Span weight="bold">Inscribe</Span>
-              </Link>
-            </li>
+    <>
+      <StyledHeader
+        elementType="header"
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <Flex gap="spacing6" alignItems="center">
+          <Flex gap="spacing1">
+            <Logo />
+            <Badge />
           </Flex>
-        </nav>
-      </Flex>
-      <Flex>
-        <CTA size="small" onPress={onClickAccount}>
-          {address ? shortAddress(address) : "Connect Wallet"}
-        </CTA>
-      </Flex>
-    </StyledHeader>
+          {isConnected && (
+            <nav>
+              <Flex elementType="ul" gap="spacing5">
+                <li>
+                  <StyledCTA
+                    onPress={() => setIsTransferOpen(true)}
+                    size="small"
+                  >
+                    Transfer BTC
+                  </StyledCTA>
+                </li>
+                <li>
+                  <StyledCTA
+                    onPress={() => setIsInscribeOpen(true)}
+                    size="small"
+                  >
+                    Inscribe
+                  </StyledCTA>
+                </li>
+              </Flex>
+            </nav>
+          )}
+        </Flex>
+        <Flex>
+          <StyledCTA
+            size="small"
+            onPress={
+              isConnected ? () => handleCopyAddress() : () => connectBtcSnap()
+            }
+          >
+            {bitcoinAddress ? (
+              <Flex gap={"spacing2"} alignItems="center">
+                {shortAddress(bitcoinAddress)}
+                <FaCopy />
+              </Flex>
+            ) : (
+              "Connect Metamask"
+            )}
+          </StyledCTA>
+        </Flex>
+      </StyledHeader>
+      <Modal isOpen={isInscribeOpen} onClose={() => setIsInscribeOpen(false)}>
+        <ModalHeader>Inscribe</ModalHeader>
+        <ModalBody>
+          <Inscribe onSuccess={() => setIsInscribeOpen(false)} />
+        </ModalBody>
+      </Modal>
+      <Modal isOpen={isTransferOpen} onClose={() => setIsTransferOpen(false)}>
+        <ModalHeader>Transfer</ModalHeader>
+        <ModalBody>
+          <Transfer onSuccess={() => setIsTransferOpen(false)} />
+        </ModalBody>
+      </Modal>
+    </>
   );
 };
 

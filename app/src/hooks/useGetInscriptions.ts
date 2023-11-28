@@ -1,36 +1,51 @@
-import { useQuery } from "@tanstack/react-query";
-import { useRef } from "react";
-import { QueryConfig } from "../types/query";
-import { useAccount } from "./useAccount";
-import { getInscriptionsResult } from "../types/unisat";
+import { useQueries } from "@tanstack/react-query";
+import { TESTNET_ORD_BASE_PATH } from "../utils/ordinals-client";
+import { getInscriptionFromId } from "../utils/inscription";
+import { DefaultElectrsClient } from "@gobob/bob-sdk";
+import { getIframeSource } from "../components/Inscriptions/utils/getIframeSource";
 
-const queryFn = async () => window.unisat.getInscriptions(0, 100);
+const electrsClient = new DefaultElectrsClient("testnet");
 
-type UseGetInscriptionsProps = QueryConfig<
-  getInscriptionsResult,
-  Error,
-  getInscriptionsResult
->;
+const useGetInscriptions = (inscriptionIds: string[]) => {
+  const results = useQueries({
+    queries: inscriptionIds.map((id) => {
+      return {
+        queryKey: ["ordinal", id],
+        queryFn: async () =>
+          await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`).then(
+            async (response) => {
+              const isConfirmed = response.ok;
 
-const useGetInscriptions = (props: UseGetInscriptionsProps = {}) => {
-  const account = useAccount();
+              let decodedString;
 
-  const query = useQuery(["inscriptions", account.data], queryFn, {
-    ...props,
-    enabled: !!account.data,
-    onSuccess: (data) => {
-      previousAccountRef.current = data;
-    },
-    refetchInterval: 60000,
+              if (!isConfirmed) {
+                const inscription = await getInscriptionFromId(
+                  electrsClient,
+                  id!
+                );
+                const body = Buffer.concat(inscription.body);
+
+                decodedString = new TextDecoder().decode(body);
+              }
+              return {
+                id,
+                isConfirmed,
+                content: isConfirmed
+                  ? `${TESTNET_ORD_BASE_PATH}/preview/${id}`
+                  : getIframeSource(decodedString || ""),
+              };
+            }
+          ),
+        enabled: !!id,
+      };
+    }),
   });
 
-  const previousAccountRef = useRef<getInscriptionsResult>();
+  const inscriptions = results
+    .filter((result) => result.data !== undefined)
+    .map((inscription) => inscription.data);
 
-  return {
-    ...query,
-    data: previousAccountRef.current,
-  };
+  return { inscriptions };
 };
 
 export { useGetInscriptions };
-export type { UseGetInscriptionsProps };

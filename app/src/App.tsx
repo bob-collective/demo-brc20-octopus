@@ -1,24 +1,50 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Alert, H2, P } from "@interlay/ui";
 import { Layout } from "./components";
-import Inscribe from "./pages/Inscribe/Inscribe";
-import Inscription from "./pages/Inscription/Inscription";
-import Transfer from "./pages/Transfer/Transfer";
+import { Inscriptions } from "./components/Inscriptions/Inscriptions";
+import { useBtcSnap } from "./hooks/useBtcSnap";
+import { useGetInscriptionIds } from "./hooks/useGetInscriptionIds";
+import { StyledOrdinalsList } from "./components/Layout/Layout.styles";
 import "./utils/yup.custom";
-import Home from "./pages/Home/Home";
+import { useEffect } from "react";
 
-function App() {
+const App = () => {
+  const { bitcoinAddress } = useBtcSnap();
+  const { inscriptionIds, refetch } = useGetInscriptionIds(bitcoinAddress);
+
+  useEffect(() => {
+    if (!bitcoinAddress) return;
+
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bitcoinAddress]);
+
   return (
-    <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route element={<Home />} path="/" />
-          <Route element={<Inscribe />} path="/inscribe" />
-          <Route element={<Transfer />} path="/transfer" />
-          <Route element={<Inscription />} path="/inscription/:id" />
-        </Routes>
-      </Layout>
-    </BrowserRouter>
+    <Layout>
+      <Alert status="warning">
+        This demo uses experimental technology and can only be used with{" "}
+        <a href="https://metamask.io/flask/" rel="external" target="_blank">
+          Metamask Flask
+        </a>
+        . Please{" "}
+        <a
+          href="https://docs.gobob.xyz/docs/build/examples/metamask-ordinals/"
+          rel="external"
+          target="_blank"
+        >
+          see the documentation
+        </a>{" "}
+        for more information.
+      </Alert>
+      <StyledOrdinalsList gap="spacing4" direction="column">
+        <H2>Ordinals portfolio</H2>
+        {inscriptionIds?.length ? (
+          <Inscriptions inscriptionIds={inscriptionIds} />
+        ) : (
+          <P>No ordinals yet</P>
+        )}
+      </StyledOrdinalsList>
+    </Layout>
   );
-}
+};
 
 export default App;

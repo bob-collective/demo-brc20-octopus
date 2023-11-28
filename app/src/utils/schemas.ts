@@ -4,34 +4,24 @@ import {
   MinAmountValidationParams,
 } from "./yup.custom";
 
-export type TransferBTCSchemaParams = {
+export type TransferBtcSchemaParams = {
   amount?: Partial<MaxAmountValidationParams & MinAmountValidationParams>;
 };
 
-export const transferBtcSchema = (params: TransferBTCSchemaParams) => {
+export const transferBtcSchema = () => {
   return yup.object().shape({
-    amount: yup
-      .string()
-      .requiredAmount("transfer")
-      .minAmount(params.amount as MinAmountValidationParams, "transfer")
-      .maxAmount(params.amount as MaxAmountValidationParams, "transfer"),
+    // amount: yup
+    //   .string()
+    //   .requiredAmount("transfer")
+    //   .minAmount(params.amount as MinAmountValidationParams, "transfer")
+    //   .maxAmount(params.amount as MaxAmountValidationParams, "transfer"),
     address: yup.string().required("Please enter bitcoin address").address(),
   });
 };
 
-export type TransferBrc20SchemaParams = {
-  amount?: Partial<MaxAmountValidationParams & MinAmountValidationParams>;
-};
-
-export const transferBrc20Schema = (params: TransferBTCSchemaParams) => {
+export const transferOrdinalSchema = () => {
   return yup.object().shape({
-    amount: yup
-      .string()
-      .requiredAmount("transfer")
-      .minAmount(params.amount as MinAmountValidationParams, "transfer")
-      .maxAmount(params.amount as MaxAmountValidationParams, "transfer"),
     address: yup.string().required("Please enter bitcoin address").address(),
-    ticker: yup.string().required(),
   });
 };
 
