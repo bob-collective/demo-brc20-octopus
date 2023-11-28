@@ -20,22 +20,22 @@ const App = () => {
 
   return (
     <Layout>
-      <Alert status="warning">
-        This demo uses experimental technology and can only be used with{" "}
-        <a href="https://metamask.io/flask/" rel="external" target="_blank">
-          Metamask Flask
-        </a>
-        . Please{" "}
-        <a
-          href="https://docs.gobob.xyz/docs/build/examples/metamask-ordinals/"
-          rel="external"
-          target="_blank"
-        >
-          see the documentation
-        </a>{" "}
-        for more information.
-      </Alert>
       <StyledOrdinalsList gap="spacing4" direction="column">
+        <Alert status="warning">
+          This demo uses experimental technology and can only be used with{" "}
+          <a href="https://metamask.io/flask/" rel="external" target="_blank">
+            Metamask Flask
+          </a>
+          . Please{" "}
+          <a
+            href="https://docs.gobob.xyz/docs/build/examples/metamask-ordinals/"
+            rel="external"
+            target="_blank"
+          >
+            see the documentation
+          </a>{" "}
+          for more information.
+        </Alert>
         <H2>Ordinals portfolio</H2>
         {inscriptionIds?.length ? (
           <Inscriptions inscriptionIds={inscriptionIds} />
