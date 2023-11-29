@@ -1,4 +1,5 @@
 import { useQueries } from "@tanstack/react-query";
+import { fileTypeFromBuffer } from "file-type";
 import { TESTNET_ORD_BASE_PATH } from "../utils/ordinals-client";
 import { getInscriptionFromId } from "../utils/inscription";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
@@ -23,9 +24,18 @@ const useGetInscriptions = (inscriptionIds: string[]) => {
                   electrsClient,
                   id!
                 );
-                const body = Buffer.concat(inscription.body);
 
-                decodedString = new TextDecoder().decode(body);
+                const body = Buffer.concat(inscription.body);
+                const fileType = await fileTypeFromBuffer(body);
+
+                if (!fileType) {
+                  decodedString = new TextDecoder().decode(body);
+                } else {
+                  const imageUrl = URL.createObjectURL(
+                    new Blob([body.buffer], { type: "image/png" } /* (1) */)
+                  );
+                  decodedString = `<img src="${imageUrl}" />`;
+                }
               }
               return {
                 id,

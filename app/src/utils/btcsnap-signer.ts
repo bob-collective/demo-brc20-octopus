@@ -19,7 +19,7 @@ import coinSelect from "coinselect";
 import { inscribeText, RemoteSigner } from "./ordinals";
 import { DefaultOrdinalsClient, OrdinalsClient } from "./ordinals-client";
 import { getTxInscriptions, parseInscriptionId } from "./inscription";
-import { Inscription, createTextInscription } from "./ordinals/commit";
+import { Inscription } from "./ordinals/commit";
 
 bitcoin.initEccLib(ecc);
 const bip32 = BIP32Factory(ecc);
