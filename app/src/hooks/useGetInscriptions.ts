@@ -17,6 +17,10 @@ const useGetInscriptions = (inscriptionIds: string[]) => {
             async (response) => {
               const isConfirmed = response.ok;
 
+              const isImage = response?.headers
+                ?.get("Content-Type")
+                ?.includes("image");
+
               let decodedString;
 
               if (!isConfirmed) {
@@ -40,9 +44,12 @@ const useGetInscriptions = (inscriptionIds: string[]) => {
               return {
                 id,
                 isConfirmed,
-                content: isConfirmed
-                  ? `${TESTNET_ORD_BASE_PATH}/preview/${id}`
-                  : getIframeSource(decodedString || ""),
+                content:
+                  isConfirmed && isImage
+                    ? `${TESTNET_ORD_BASE_PATH}/content/${id}`
+                    : isConfirmed && !isImage
+                    ? `${TESTNET_ORD_BASE_PATH}/preview/${id}`
+                    : getIframeSource(decodedString || ""),
               };
             }
           ),
