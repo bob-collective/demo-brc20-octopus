@@ -37,10 +37,7 @@ const ImageForm = ({ onSuccess }: Props): JSX.Element => {
         "There was a problem inscribing your ordinal. Do you have enough BTC?"
       );
     },
-    onSuccess: () => {
-      console.log("on succe");
-      onSuccess();
-    },
+    onSuccess: () => onSuccess(),
   });
 
   const handleSubmit = async (values: ImageFormData) => {
