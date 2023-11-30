@@ -7,6 +7,7 @@ import { createOrdinal } from "../../../../utils/btcsnap-signer";
 import { textFormSchema } from "../../../../utils/schemas";
 import { useBtcSnap } from "../../../../hooks/useBtcSnap";
 import { useState } from "react";
+import { createTextInscription } from "../../../../utils/ordinals/commit";
 
 type TextFormData = {
   text: string;
@@ -24,7 +25,7 @@ const TextForm = ({ onSuccess }: Props): JSX.Element => {
   const mutation = useMutation({
     mutationFn: async (values: TextFormData) => {
       if (!bitcoinAddress) return;
-      await createOrdinal(bitcoinAddress, values.text);
+      await createOrdinal(bitcoinAddress, createTextInscription(values.text));
     },
     onError: (e) => {
       console.error(e);
