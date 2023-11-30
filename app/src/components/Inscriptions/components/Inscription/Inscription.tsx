@@ -1,5 +1,10 @@
 import { Card, Dd, Dl, DlGroup, Dt } from "@interlay/ui";
-import { InscriptionWrapper, StyledWrapper } from "./Inscription.style";
+import {
+  InscribedImage,
+  InscribedText,
+  InscriptionWrapper,
+  StyledWrapper,
+} from "./Inscription.style";
 import { shortAddress } from "../../../../utils/format";
 import { InscriptionData } from "../../Inscriptions";
 
@@ -16,9 +21,9 @@ const Inscription = ({ inscription }: Props) => {
     <StyledWrapper direction="column" gap="spacing4">
       <InscriptionWrapper>
         {inscription.contentType === "image" ? (
-          <img src={inscription.content as string} />
+          <InscribedImage src={inscription.content as string} />
         ) : (
-          <p>{inscription.content as string} </p>
+          <InscribedText>{inscription.content as string}</InscribedText>
         )}
       </InscriptionWrapper>
       <Card>
