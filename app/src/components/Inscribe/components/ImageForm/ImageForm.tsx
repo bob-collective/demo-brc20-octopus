@@ -29,7 +29,7 @@ const ImageForm = ({ onSuccess }: Props): JSX.Element => {
       if (!bitcoinAddress || !values.imageData) return;
       const buffer = Buffer.from(values.imageData.split(",")[1], "base64");
 
-      createOrdinal(bitcoinAddress, createImageInscription(buffer));
+      await createOrdinal(bitcoinAddress, createImageInscription(buffer));
     },
     onError: (e) => {
       console.error(e);
