@@ -13,7 +13,7 @@ const Inscription = ({ inscription }: Props) => {
   return (
     <StyledWrapper direction="column" gap="spacing4">
       {inscription.isConfirmed ? (
-        <iframe src={inscription.content} loading="lazy" allow=""></iframe>
+        <iframe src={inscription.content} loading="lazy" allow="" />
       ) : (
         <iframe srcDoc={inscription.content} loading="lazy" allow="" />
       )}

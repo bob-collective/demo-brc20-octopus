@@ -17,11 +17,7 @@ const useGetInscriptions = (inscriptionIds: string[]) => {
             async (response) => {
               const isConfirmed = response.ok;
 
-              const isImage = response?.headers
-                ?.get("Content-Type")
-                ?.includes("image");
-
-              let decodedString;
+              let unconfirmedOrdinalData = "";
 
               if (!isConfirmed) {
                 const inscription = await getInscriptionFromId(
@@ -33,23 +29,20 @@ const useGetInscriptions = (inscriptionIds: string[]) => {
                 const fileType = await fileTypeFromBuffer(body);
 
                 if (!fileType) {
-                  decodedString = new TextDecoder().decode(body);
+                  unconfirmedOrdinalData = new TextDecoder().decode(body);
                 } else {
                   const imageUrl = URL.createObjectURL(
                     new Blob([body.buffer], { type: "image/png" } /* (1) */)
                   );
-                  decodedString = `<img src="${imageUrl}" />`;
+                  unconfirmedOrdinalData = `<img src="${imageUrl}" />`;
                 }
               }
               return {
                 id,
                 isConfirmed,
-                content:
-                  isConfirmed && isImage
-                    ? `${TESTNET_ORD_BASE_PATH}/content/${id}`
-                    : isConfirmed && !isImage
-                    ? `${TESTNET_ORD_BASE_PATH}/preview/${id}`
-                    : getIframeSource(decodedString || ""),
+                content: isConfirmed
+                  ? `${TESTNET_ORD_BASE_PATH}/content/${id}`
+                  : getIframeSource(unconfirmedOrdinalData),
               };
             }
           ),

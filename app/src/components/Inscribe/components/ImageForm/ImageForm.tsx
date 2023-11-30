@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileTrigger, Button } from "react-aria-components";
+import { FileTrigger } from "react-aria-components";
 import { useForm } from "@interlay/hooks";
 import { Flex } from "@interlay/ui";
 import { useMutation } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { createOrdinal } from "../../../../utils/btcsnap-signer";
 import { isFormDisabled } from "../../../../utils/validation";
 import { useBtcSnap } from "../../../../hooks/useBtcSnap";
 import { createImageInscription } from "../../../../utils/ordinals/commit";
+import { StyledSelectFile } from "../../Inscribe.style";
 
 type ImageFormData = {
   imageData: Buffer | undefined;
@@ -94,9 +95,11 @@ const ImageForm = ({ onSuccess }: Props): JSX.Element => {
               setFiles(files[0]);
             }}
           >
-            <Button>Select a file</Button>
+            <Flex justifyContent="center">
+              <StyledSelectFile>Select a file</StyledSelectFile>
+            </Flex>
           </FileTrigger>
-          {fileData && <img src={fileData} />}
+          {fileData && <img width="100%" src={fileData} />}
         </Flex>
         <AuthCTA
           loading={mutation.isLoading}
