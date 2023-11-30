@@ -11,7 +11,7 @@ import { createImageInscription } from "../../../../utils/ordinals/commit";
 import { StyledSelectFile } from "../../Inscribe.style";
 
 type ImageFormData = {
-  imageData: Buffer | undefined;
+  imageData: string | undefined;
 };
 
 type Props = {
@@ -20,7 +20,6 @@ type Props = {
 
 const ImageForm = ({ onSuccess }: Props): JSX.Element => {
   const [files, setFiles] = useState<File | undefined>();
-  const [fileData, setFileData] = useState<string>("");
   const [error, setError] = useState<string>("");
 
   const { bitcoinAddress } = useBtcSnap();
@@ -28,8 +27,9 @@ const ImageForm = ({ onSuccess }: Props): JSX.Element => {
   const mutation = useMutation({
     mutationFn: async (values: ImageFormData) => {
       if (!bitcoinAddress || !values.imageData) return;
+      const buffer = Buffer.from(values.imageData.split(",")[1], "base64");
 
-      createOrdinal(bitcoinAddress, createImageInscription(values.imageData));
+      createOrdinal(bitcoinAddress, createImageInscription(buffer));
     },
     onError: (e) => {
       console.error(e);
@@ -66,12 +66,7 @@ const ImageForm = ({ onSuccess }: Props): JSX.Element => {
 
       const result = r.target.result as string;
 
-      const buffer = Buffer.from(result.split(",")[1], "base64");
-
-      // TODO: Set field value as data url and encode to buffer on submit
-      // so that we can get rid of fileData state instance
-      setFileData(result);
-      form.setFieldValue("imageData", buffer);
+      form.setFieldValue("imageData", result);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
@@ -99,7 +94,9 @@ const ImageForm = ({ onSuccess }: Props): JSX.Element => {
               <StyledSelectFile>Select a file</StyledSelectFile>
             </Flex>
           </FileTrigger>
-          {fileData && <img width="100%" src={fileData} />}
+          {form.values.imageData && (
+            <img width="100%" src={form.values.imageData} />
+          )}
         </Flex>
         <AuthCTA
           loading={mutation.isLoading}
