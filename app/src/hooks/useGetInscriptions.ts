@@ -7,7 +7,7 @@ import { DefaultElectrsClient } from "@gobob/bob-sdk";
 
 const electrsClient = new DefaultElectrsClient("testnet");
 
-const getInscriptionContent = async (
+const getConfirmedInscriptionContent = async (
   response: Response,
   contentType: string
 ) => {
@@ -16,19 +16,36 @@ const getInscriptionContent = async (
   if (contentType === "text") {
     content = await response.text();
   } else {
-    const convert2DataUrl = async () => {
+    const getImageData = async () => {
       const reader = new FileReader();
       const blob = await response.blob();
 
       reader.readAsDataURL(blob);
+
       await new Promise<void>((resolve) => (reader.onload = () => resolve()));
       return reader.result;
     };
 
-    content = await convert2DataUrl();
+    content = await getImageData();
   }
 
   return content;
+};
+
+const getUnconfirmedInscription = async (id: string) => {
+  const inscription = await getInscriptionFromId(electrsClient, id!);
+
+  const body = Buffer.concat(inscription.body);
+
+  const fileType = await fileTypeFromBuffer(body);
+  const unconfirmedContentType = !fileType ? "text" : "image";
+
+  const decodedInscriptionData =
+    unconfirmedContentType === "text"
+      ? new TextDecoder().decode(body)
+      : URL.createObjectURL(new Blob([body], { type: "image/png" }));
+
+  return { unconfirmedContentType, decodedInscriptionData };
 };
 
 const useGetInscriptions = (inscriptionIds: string[]) => {
@@ -51,29 +68,16 @@ const useGetInscriptions = (inscriptionIds: string[]) => {
                   ? "text"
                   : "image";
 
-                content = await getInscriptionContent(response, contentType);
-              }
-
-              if (!isConfirmed) {
-                const inscription = await getInscriptionFromId(
-                  electrsClient,
-                  id!
+                content = await getConfirmedInscriptionContent(
+                  response,
+                  contentType
                 );
+              } else {
+                const { unconfirmedContentType, decodedInscriptionData } =
+                  await getUnconfirmedInscription(id);
 
-                console.log(inscription.body);
-                const body = Buffer.concat(inscription.body);
-
-                const fileType = await fileTypeFromBuffer(body);
-                contentType = !fileType ? "text" : "image";
-
-                const decodedString =
-                  contentType === "text"
-                    ? new TextDecoder().decode(body)
-                    : URL.createObjectURL(
-                        new Blob([body], { type: "image/png" })
-                      );
-
-                content = decodedString;
+                content = decodedInscriptionData;
+                contentType = unconfirmedContentType;
               }
 
               return {
