@@ -28,6 +28,7 @@ const App = () => {
           </a>
           . Please{" "}
           <a
+          // TODO: This url is used in more than one place so should be moved to a const
             href="https://docs.gobob.xyz/docs/build/examples/metamask-ordinals/"
             rel="external"
             target="_blank"

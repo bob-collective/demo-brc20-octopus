@@ -1,5 +1,5 @@
 import { Card, Dd, Dl, DlGroup, Dt } from "@interlay/ui";
-import { StyledWrapper } from "./Inscription.style";
+import { InscriptionWrapper, StyledWrapper } from "./Inscription.style";
 import { shortAddress } from "../../../../utils/format";
 import { InscriptionData } from "../../Inscriptions";
 
@@ -10,13 +10,17 @@ type Props = {
 const Inscription = ({ inscription }: Props) => {
   if (!inscription) return;
 
+  console.log(inscription);
+
   return (
     <StyledWrapper direction="column" gap="spacing4">
-      {inscription.isConfirmed ? (
-        <iframe src={inscription.content} loading="lazy" allow="" />
-      ) : (
-        <iframe srcDoc={inscription.content} loading="lazy" allow="" />
-      )}
+      <InscriptionWrapper>
+        {inscription.contentType === "image" ? (
+          <img src={inscription.content as string} />
+        ) : (
+          <p>{inscription.content as string} </p>
+        )}
+      </InscriptionWrapper>
       <Card>
         <Dl>
           <DlGroup flex={1} justifyContent="space-between">
