@@ -7,4 +7,6 @@ const StyledWrapper = styled(Flex)`
   margin: 0 auto;
 `;
 
-export { StyledWrapper };
+const InscriptionWrapper = styled("div")``;
+
+export { InscriptionWrapper, StyledWrapper };

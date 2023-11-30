@@ -22,7 +22,8 @@ enum InscriptionsTableColumns {
 type InscriptionData = {
   id: string;
   isConfirmed: boolean;
-  content: string;
+  content: string | ArrayBuffer | null | undefined;
+  contentType: string;
 };
 
 type InscriptionsTableRow = {
