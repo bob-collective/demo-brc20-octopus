@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQueries } from "@tanstack/react-query";
+import { fileTypeFromBuffer } from "file-type";
 import { TESTNET_ORD_BASE_PATH } from "../utils/ordinals-client";
 import { getInscriptionFromId } from "../utils/inscription";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
@@ -40,27 +41,38 @@ const useGetInscriptions = (inscriptionIds: string[]) => {
             async (response) => {
               const isConfirmed = response.ok;
 
-              const contentType = response?.headers
-                ?.get("Content-Type")
-                ?.includes("text")
-                ? "text"
-                : "image";
-
+              let contentType;
               let content;
 
               if (isConfirmed) {
+                contentType = response?.headers
+                  ?.get("Content-Type")
+                  ?.includes("text")
+                  ? "text"
+                  : "image";
+
                 content = await getInscriptionContent(response, contentType);
               }
 
               if (!isConfirmed) {
-                console.log("not getting here");
                 const inscription = await getInscriptionFromId(
                   electrsClient,
                   id!
                 );
+
+                console.log(inscription.body);
                 const body = Buffer.concat(inscription.body);
 
-                const decodedString = new TextDecoder().decode(body);
+                const fileType = await fileTypeFromBuffer(body);
+                contentType = !fileType ? "text" : "image";
+
+                const decodedString =
+                  contentType === "text"
+                    ? new TextDecoder().decode(body)
+                    : URL.createObjectURL(
+                        new Blob([body], { type: "image/png" })
+                      );
+
                 content = decodedString;
               }
 

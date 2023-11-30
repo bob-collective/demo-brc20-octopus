@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, Flex, Modal, ModalBody, ModalHeader, Table } from "@interlay/ui";
 import { ReactNode, useMemo, useState } from "react";
 import { Inscription } from "./components/Inscription";
@@ -80,13 +81,13 @@ const Inscriptions = ({ inscriptionIds }: Props): JSX.Element => {
                 alignItems="center"
               >
                 <StyledCTA
-                  onPress={() => handleShowInscription(inscription!)}
+                  onPress={() => handleShowInscription(inscription! as any)}
                   size="small"
                 >
                   Show
                 </StyledCTA>
                 <StyledCTA
-                  onPress={() => handleShowTransferForm(inscription!)}
+                  onPress={() => handleShowTransferForm(inscription! as any)}
                   size="small"
                 >
                   Transfer
