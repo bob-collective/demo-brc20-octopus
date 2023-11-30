@@ -15,8 +15,6 @@ type Props = {
 const Inscription = ({ inscription }: Props) => {
   if (!inscription) return;
 
-  console.log(inscription);
-
   return (
     <StyledWrapper direction="column" gap="spacing4">
       <InscriptionWrapper>
