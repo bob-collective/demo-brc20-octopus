@@ -203,7 +203,7 @@ declare global {
 
 const { ethereum } = window;
 
-const snapId = "local:http://localhost:8081";
+const snapId = "npm:@gobob/btcsnap";
 
 export async function checkConnection(): Promise<boolean> {
   const snaps = await ethereum.request({
