@@ -81,7 +81,7 @@ const ImageForm = ({ onSuccess }: Props): JSX.Element => {
       <Flex marginTop="spacing4" direction="column" gap="spacing8">
         <Flex direction="column" gap="spacing4">
           <FileTrigger
-            acceptedFileTypes={["image/png"]}
+            acceptedFileTypes={["image/png", "image/jpg"]}
             onSelect={(e: FileList | null) => {
               if (!e) return;
 
