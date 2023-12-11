@@ -38,7 +38,7 @@ function estimateTxSize(
   return tx.virtualSize();
 }
 
-export async function inscribeText(
+export async function inscribeData(
   signer: RemoteSigner,
   _toAddress: string,
   feeRate: number,

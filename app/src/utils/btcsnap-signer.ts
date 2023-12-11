@@ -13,10 +13,10 @@ import {
   updateNetworkInSnap,
 } from "./btcsnap-utils";
 import { DefaultElectrsClient, ElectrsClient } from "@gobob/bob-sdk";
-import { UTXO, broadcastTx, getAddressUtxos } from "./sdk-helpers";
+import { UTXO, broadcastTx, getAddressUtxos, getFeeRate } from "./sdk-helpers";
 import bs58check from "bs58check";
 import coinSelect from "coinselect";
-import { inscribeText, RemoteSigner } from "./ordinals";
+import { inscribeData, RemoteSigner } from "./ordinals";
 import { DefaultOrdinalsClient, OrdinalsClient } from "./ordinals-client";
 import { getTxInscriptions, parseInscriptionId } from "./inscription";
 import { Inscription } from "./ordinals/commit";
@@ -258,7 +258,8 @@ export class BtcSnapSigner implements RemoteSigner {
 export async function createOrdinal(address: string, inscription: Inscription) {
   const signer = new BtcSnapSigner();
   // fee rate is 1 for testnet
-  const tx = await inscribeText(signer, address, 1, inscription); // 546
+  const feeRate = await getFeeRate();
+  const tx = await inscribeData(signer, address, feeRate, inscription); // 546
   const res = await fetch(`${getBlockStreamUrl()}/tx`, {
     method: "POST",
     body: tx.toHex(),
@@ -273,7 +274,8 @@ export async function sendInscription(
 ): Promise<string> {
   const signer = new BtcSnapSigner();
   // fee rate is 1 for testnet
-  const txid = await transferInscription(signer, address, inscriptionId, 1);
+  const feeRate = await getFeeRate();
+  const txid = await transferInscription(signer, address, inscriptionId, feeRate);
   return txid;
 }
 
