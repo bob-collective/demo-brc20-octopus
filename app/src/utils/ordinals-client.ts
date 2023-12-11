@@ -1,8 +1,7 @@
 // TODO: Copied from bob-sdk, remove this file once merged and published and import the sdk's client instead
 
-export const REGTEST_ORD_BASE_PATH = "http://0.0.0.0:3003";
-export const MAINNET_ORD_BASE_PATH = "https://ordinals-mainnet.gobob.xyz";
 export const TESTNET_ORD_BASE_PATH = "https://ordinals-testnet.gobob.xyz";
+export const MAINNET_ORD_BASE_PATH = "https://ordinals-mainnet.gobob.xyz";
 
 export type InscriptionId = string & { length: 64 };
 export type InscriptionContent = string;
@@ -76,14 +75,11 @@ export class DefaultOrdinalsClient implements OrdinalsClient {
 
     constructor(networkOrUrl: string = "regtest") {
         switch (networkOrUrl) {
-            case "mainnet":
-                this.basePath = MAINNET_ORD_BASE_PATH;
-                break;
             case "testnet":
                 this.basePath = TESTNET_ORD_BASE_PATH;
                 break;
-            case "regtest":
-                this.basePath = REGTEST_ORD_BASE_PATH;
+            case "mainnet":
+                this.basePath = MAINNET_ORD_BASE_PATH;
                 break;
             default:
                 this.basePath = networkOrUrl;

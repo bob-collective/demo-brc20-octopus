@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQueries } from "@tanstack/react-query";
 import { fileTypeFromBuffer } from "file-type";
-import { TESTNET_ORD_BASE_PATH } from "../utils/ordinals-client";
 import { getInscriptionFromId } from "../utils/inscription";
 import { DefaultElectrsClient } from "@gobob/bob-sdk";
+import { BITCOIN_NETWORK, getOrdinalsUrl } from "../utils/config";
 
-const electrsClient = new DefaultElectrsClient("testnet");
+const electrsClient = new DefaultElectrsClient(BITCOIN_NETWORK);
 
 const getConfirmedInscriptionContent = async (
   response: Response,
@@ -54,7 +54,7 @@ const useGetInscriptions = (inscriptionIds: string[]) => {
       return {
         queryKey: ["ordinal", id],
         queryFn: async () =>
-          await fetch(`${TESTNET_ORD_BASE_PATH}/content/${id}`).then(
+          await fetch(`${getOrdinalsUrl()}/content/${id}`).then(
             async (response) => {
               const isConfirmed = response.ok;
 
