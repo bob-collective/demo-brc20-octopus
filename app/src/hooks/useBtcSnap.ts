@@ -10,8 +10,10 @@ import {
 import { useLocalStorage, LocalStorageKey } from "./useLocalStorage";
 import { useGetInscriptionIds } from "./useGetInscriptionIds";
 import { useQueryClient } from "@tanstack/react-query";
+import { BITCOIN_NETWORK } from "../utils/config";
 
-const bitcoinNetwork = BitcoinNetwork.Test;
+const bitcoinNetwork =
+  BITCOIN_NETWORK === "mainnet" ? BitcoinNetwork.Main : BitcoinNetwork.Test;
 
 const getDerivedBtcAddress = async () => {
   const xpub = await getExtendedPublicKey(
