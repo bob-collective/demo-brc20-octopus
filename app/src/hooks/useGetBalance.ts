@@ -3,8 +3,9 @@ import { DefaultElectrsClient } from "@gobob/bob-sdk";
 import { getAddressUtxos } from "../utils/sdk-helpers";
 import { useLocalStorage } from "react-use";
 import { LocalStorageKey } from "./useLocalStorage";
+import { BITCOIN_NETWORK } from "../utils/config";
 
-const electrs = new DefaultElectrsClient("testnet");
+const electrs = new DefaultElectrsClient(BITCOIN_NETWORK);
 
 const satsToBtc = (sats: number) => Number(sats) / 10 ** 8;
 

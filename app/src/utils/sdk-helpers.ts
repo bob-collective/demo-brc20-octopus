@@ -7,6 +7,7 @@ import { ElectrsClient } from "@gobob/bob-sdk";
 import { OrdinalsClient } from "./ordinals-client";
 import * as bitcoin from "bitcoinjs-lib";
 import { parseInscriptions } from "./inscription";
+import { getBlockStreamUrl } from "./config";
 
 export interface UTXO {
   txid: string
@@ -124,4 +125,10 @@ export async function broadcastTx(electrsClient: ElectrsClient, txHex: string): 
 function getBasePath(electrsClient: ElectrsClient): string {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (electrsClient as any).basePath;
+}
+
+export async function getFeeRate(): Promise<number> {
+  const res = await fetch(`${getBlockStreamUrl()}/fee-estimates`);
+  const feeRates = await res.json();
+  return feeRates["6"]; // one hour
 }

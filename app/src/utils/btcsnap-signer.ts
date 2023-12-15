@@ -13,13 +13,14 @@ import {
   updateNetworkInSnap,
 } from "./btcsnap-utils";
 import { DefaultElectrsClient, ElectrsClient } from "@gobob/bob-sdk";
-import { UTXO, broadcastTx, getAddressUtxos } from "./sdk-helpers";
+import { UTXO, broadcastTx, getAddressUtxos, getFeeRate } from "./sdk-helpers";
 import bs58check from "bs58check";
 import coinSelect from "coinselect";
-import { inscribeText, RemoteSigner } from "./ordinals";
+import { inscribeData, RemoteSigner } from "./ordinals";
 import { DefaultOrdinalsClient, OrdinalsClient } from "./ordinals-client";
 import { getTxInscriptions, parseInscriptionId } from "./inscription";
 import { Inscription } from "./ordinals/commit";
+import { getBlockStreamUrl, getNetworkName } from "./config";
 
 bitcoin.initEccLib(ecc);
 const bip32 = BIP32Factory(ecc);
@@ -34,7 +35,7 @@ async function getTxHex(txId: string) {
     async (bail) => {
       // if anything throws, we retry
       const res = await fetch(
-        `https://blockstream.info/testnet/api/tx/${txId}/hex`
+        `${getBlockStreamUrl()}/tx/${txId}/hex`
       );
 
       if (res.status === 403) {
@@ -132,8 +133,7 @@ export class BtcSnapSigner implements RemoteSigner {
 
   async sendToAddress(toAddress: string, amount: number): Promise<string> {
     const network = await this.getNetwork();
-    const networkName =
-      network === bitcoin.networks.testnet ? "testnet" : "mainnet";
+    const networkName = getNetworkName(network);
     const electrsClient = new DefaultElectrsClient(networkName);
     const ordinalsClient = new DefaultOrdinalsClient(networkName);
 
@@ -258,8 +258,9 @@ export class BtcSnapSigner implements RemoteSigner {
 export async function createOrdinal(address: string, inscription: Inscription) {
   const signer = new BtcSnapSigner();
   // fee rate is 1 for testnet
-  const tx = await inscribeText(signer, address, 1, inscription); // 546
-  const res = await fetch("https://blockstream.info/testnet/api/tx", {
+  const feeRate = await getFeeRate();
+  const tx = await inscribeData(signer, address, feeRate, inscription); // 546
+  const res = await fetch(`${getBlockStreamUrl()}/tx`, {
     method: "POST",
     body: tx.toHex(),
   });
@@ -273,7 +274,8 @@ export async function sendInscription(
 ): Promise<string> {
   const signer = new BtcSnapSigner();
   // fee rate is 1 for testnet
-  const txid = await transferInscription(signer, address, inscriptionId, 1);
+  const feeRate = await getFeeRate();
+  const txid = await transferInscription(signer, address, inscriptionId, feeRate);
   return txid;
 }
 
@@ -329,8 +331,7 @@ async function transferInscription(
   const pubkey = Buffer.from(await signer.getPublicKey(), "hex");
   const fromAddress = bitcoin.payments.p2wpkh({ pubkey, network }).address!;
 
-  const networkName =
-    network === bitcoin.networks.testnet ? "testnet" : "mainnet";
+  const networkName = getNetworkName(network);
   const ordinalsClient = new DefaultOrdinalsClient(networkName);
   const electrsClient = new DefaultElectrsClient(networkName);
 
