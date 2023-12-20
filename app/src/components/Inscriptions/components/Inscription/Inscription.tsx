@@ -1,12 +1,6 @@
-import { Card, Dd, Dl, DlGroup, Dt } from "@interlay/ui";
-import {
-  InscribedImage,
-  InscribedText,
-  InscriptionWrapper,
-  StyledWrapper,
-} from "./Inscription.style";
-import { shortAddress } from "../../../../utils/format";
+import { Flex, P } from "@interlay/ui";
 import { InscriptionData } from "../../Inscriptions";
+import { StyledWrapper } from "./Inscription.style";
 
 type Props = {
   inscription?: InscriptionData;
@@ -17,25 +11,22 @@ const Inscription = ({ inscription }: Props) => {
 
   return (
     <StyledWrapper direction="column" gap="spacing4">
-      <InscriptionWrapper>
-        {inscription.contentType === "image" ? (
-          <InscribedImage src={inscription.content as string} />
-        ) : (
-          <InscribedText>{inscription.content as string}</InscribedText>
-        )}
-      </InscriptionWrapper>
-      <Card>
-        <Dl>
-          <DlGroup flex={1} justifyContent="space-between">
-            <Dt size="s">
-              {inscription.isConfirmed
-                ? "Inscription Id:"
-                : "Inscription Id (unconfirmed):"}
-            </Dt>
-            <Dd size="s">{shortAddress(inscription.id)}</Dd>
-          </DlGroup>
-        </Dl>
-      </Card>
+      <Flex direction="column">
+        <iframe
+          src={`https://testnet.ordinals.com/preview/${inscription.id}`}
+          sandbox="allow-scripts"
+          scrolling="no"
+          loading="lazy"
+          allow=""
+          height={200}
+        ></iframe>
+      </Flex>
+      <Flex direction="column" gap="spacing2">
+        <P size="s" color="tertiary">
+          Inscription ID
+        </P>
+        <P size="xs">{inscription.id}</P>
+      </Flex>
     </StyledWrapper>
   );
 };

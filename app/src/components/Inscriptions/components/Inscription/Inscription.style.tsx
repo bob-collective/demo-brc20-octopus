@@ -8,8 +8,6 @@ const StyledWrapper = styled(Flex)`
   margin: 0 auto;
 `;
 
-const InscriptionWrapper = styled("div")``;
-
 const InscribedText = styled(Flex)`
   background-color: black;
   font-family: monospace;
@@ -21,4 +19,4 @@ const InscribedImage = styled("img")`
   max-width: 100%;
 `;
 
-export { InscribedImage, InscribedText, InscriptionWrapper, StyledWrapper };
+export { InscribedImage, InscribedText, StyledWrapper };
