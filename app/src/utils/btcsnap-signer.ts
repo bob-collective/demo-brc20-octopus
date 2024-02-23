@@ -87,6 +87,7 @@ function anyPubToXpub(xyzpub: string, network: bitcoin.Network) {
 }
 
 export class BtcSnapSigner implements RemoteSigner {
+  pubKeyHex?: string;
   async _getBtcSnapNetwork(): Promise<BitcoinNetwork> {
     return (await getNetworkInSnap()) === "test"
       ? BitcoinNetwork.Test
@@ -105,8 +106,12 @@ export class BtcSnapSigner implements RemoteSigner {
     }
   }
 
-  // TODO: cache this or something so MetaMask doesn't prompt multiple times
   async getPublicKey(): Promise<string> {
+    // poor man's, naive cache. Beware: we need a new signer instance created to "clear" the cached value.
+    if (this.pubKeyHex != undefined) {
+      return this.pubKeyHex;
+    }
+
     const network = await this.getNetwork();
     if (network === bitcoin.networks.bitcoin) {
       await updateNetworkInSnap(BitcoinNetwork.Test);
@@ -255,8 +260,8 @@ export class BtcSnapSigner implements RemoteSigner {
   }
 }
 
-export async function createOrdinal(address: string, inscription: Inscription) {
-  const signer = new BtcSnapSigner();
+export async function createOrdinal(address: string, inscription: Inscription, maybeSigner?: BtcSnapSigner) {
+  const signer = maybeSigner || new BtcSnapSigner();
   // fee rate is 1 for testnet
   const feeRate = await getFeeRate();
   const tx = await inscribeData(signer, address, feeRate, inscription); // 546
@@ -270,9 +275,10 @@ export async function createOrdinal(address: string, inscription: Inscription) {
 
 export async function sendInscription(
   address: string,
-  inscriptionId: string
+  inscriptionId: string,
+  maybeSigner?: BtcSnapSigner
 ): Promise<string> {
-  const signer = new BtcSnapSigner();
+  const signer = maybeSigner || new BtcSnapSigner();
   // fee rate is 1 for testnet
   const feeRate = await getFeeRate();
   const txid = await transferInscription(signer, address, inscriptionId, feeRate);
